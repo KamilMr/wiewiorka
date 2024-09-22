@@ -1,4 +1,4 @@
-import {configureStore, combineReducers} from '@reduxjs/toolkit';
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import {
   FLUSH,
   PAUSE,
@@ -9,11 +9,11 @@ import {
   createMigrate,
   persistReducer,
   persistStore,
-} from 'redux-persist';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+} from "redux-persist";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import authReducer, {authEmptyState} from './features/authSlice';
-import mainReducer, {mainEmptyState} from './features/mainSlice';
+import authReducer, { authEmptyState } from "./slices/authSlice";
+import mainReducer, { mainEmptyState } from "./slices/mainSlice";
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -21,7 +21,7 @@ const rootReducer = combineReducers({
 });
 
 const migrations = {
-  0: state => {
+  0: (state) => {
     // migration: flush store
     return {
       ...state,
@@ -32,24 +32,25 @@ const migrations = {
 };
 
 const persistConfig = {
-  key: 'nebula',
+  key: "nebula",
   version: 0,
   storage: AsyncStorage,
-  whitelist: ['auth', 'main'],
-  migrate: createMigrate(migrations, {debug: false}),
+  whitelist: ["auth", "main"],
+  migrate: createMigrate(migrations, { debug: false }),
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 const store = configureStore({
   reducer: persistedReducer,
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware({
-    serializableCheck: {
-      ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-    },
-  }),
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
+    }),
 });
 
 const persistor = persistStore(store);
 
-export {store, persistor};
+export { store, persistor };
