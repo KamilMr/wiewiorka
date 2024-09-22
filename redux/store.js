@@ -32,7 +32,7 @@ const migrations = {
 };
 
 const persistConfig = {
-  key: "nebula",
+  key: "squirrel",
   version: 0,
   storage: AsyncStorage,
   whitelist: ["auth", "main"],
