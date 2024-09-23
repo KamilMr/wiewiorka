@@ -7,11 +7,11 @@ import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
-export default function TabLayout() {
+const TabLayout = () => {
   const colorScheme = useColorScheme();
   const token = useSelector(selectToken);
 
-  if (!token) return <Redirect href="/login" />
+  if (!token) return <Redirect href="/sign-in" />
 
   return (
     <Tabs
@@ -46,3 +46,4 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+export default TabLayout;

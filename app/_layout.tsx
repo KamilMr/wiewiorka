@@ -34,7 +34,7 @@ const RootLayout = () => {
       <PersistGate persistor={persistor}>
         <PaperProvider theme={paperTheme}>
           <Stack>
-            <Stack.Screen name="login" options={{ headerShown: false }} />
+            <Stack.Screen name="sign-in" options={{ headerShown: false }} />
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="+not-found" />
           </Stack>
