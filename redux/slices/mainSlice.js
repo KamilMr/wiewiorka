@@ -1,19 +1,18 @@
-import {
-  createSlice,
-  createAsyncThunk,
-  createSelector,
-} from "@reduxjs/toolkit";
+import {createSlice, createAsyncThunk, createSelector} from '@reduxjs/toolkit';
+
+import {getURL, makeNewIdArr} from '@/common';
+import _ from 'lodash';
 
 const emptyState = () => ({
   expenses: [],
   income: [],
   categories: {},
 });
-export const fetchIni = createAsyncThunk("fetchIni", async (_, thunkAPI) => {
-  const { token } = thunkAPI.getState().auth.me;
+export const fetchIni = createAsyncThunk('fetchIni', async (_, thunkAPI) => {
+  const {token} = thunkAPI.getState().auth.me;
   let data;
   try {
-    let resp = await fetch(getURL("ini"), {
+    let resp = await fetch(getURL('ini'), {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -27,20 +26,20 @@ export const fetchIni = createAsyncThunk("fetchIni", async (_, thunkAPI) => {
 });
 
 export const handleCategory = createAsyncThunk(
-  "handleCategory",
+  'handleCategory',
   async (payload = {}, thunkAPI) => {
-    const { token } = thunkAPI.getState().me;
+    const {token} = thunkAPI.getState().me;
 
     if (!Object.keys(payload).length) return;
 
-    const { method, id, ...rest } = payload;
-    let q = "category" + (method === "PUT" ? `/${id}` : "");
+    const {method, id, ...rest} = payload;
+    let q = 'category' + (method === 'PUT' ? `/${id}` : '');
     let data;
     try {
       let resp = await fetch(getURL(q), {
         method,
         headers: {
-          "content-type": "application/json",
+          'content-type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(rest),
@@ -56,12 +55,12 @@ export const handleCategory = createAsyncThunk(
 );
 
 const mainSlice = createSlice({
-  name: "main",
+  name: 'main',
   initialState: {
     snackbar: {
       open: false,
-      type: "success",
-      msg: "",
+      type: 'success',
+      msg: '',
     },
     expenses: [],
     income: [],
@@ -69,17 +68,17 @@ const mainSlice = createSlice({
   },
   reducers: {
     setSnackbar: (state, action) => {
-      let { open = false, type = "", msg = "" } = action.payload || {};
+      let {open = false, type = '', msg = ''} = action.payload || {};
       if (msg) open = true;
       // state.snackbar.open = open;
       // state.snackbar.msg = msg;
       // state.snackbar.type = type;
-      state.snackbar = { type, msg, open };
+      state.snackbar = {type, msg, open};
     },
     initState: (state, action) => {
       state.expenses = action.payload.expenses.map((ex) => ({
         ...ex,
-        date: format(ex.date, "yyyy-MM-dd"),
+        date: format(ex.date, 'yyyy-MM-dd'),
       }));
       state.categories = action.payload.categories;
       state.income = action.payload.income;
@@ -89,7 +88,7 @@ const mainSlice = createSlice({
         ...state.expenses,
         ...action.payload.map((ex) => ({
           ...ex,
-          date: format(ex.date, "yyyy-MM-dd"),
+          date: format(ex.date, 'yyyy-MM-dd'),
         })),
       ];
     },
@@ -103,7 +102,7 @@ const mainSlice = createSlice({
         ...stateNew,
         ...exp.map((ex) => ({
           ...ex,
-          date: format(ex.date, "yyyy-MM-dd"),
+          date: format(ex.date, 'yyyy-MM-dd'),
         })),
       ];
     },
@@ -111,7 +110,7 @@ const mainSlice = createSlice({
       if (!action.payload?.length) return;
       state.income = action.payload.map((inc) => ({
         ...inc,
-        date: format(inc.date, "yyyy-MM-dd"),
+        date: format(inc.date, 'yyyy-MM-dd'),
       }));
     },
     dropMain: () => {
@@ -128,25 +127,25 @@ const mainSlice = createSlice({
       .addCase(fetchIni.fulfilled, (state, action) => {
         state.expenses = action.payload.expenses.map((ex) => ({
           ...ex,
-          date: format(ex.date, "yyyy-MM-dd"),
+          date: format(ex.date, 'yyyy-MM-dd'),
         }));
         state.categories = action.payload.categories;
         state.income = action.payload.income.map((inc) => ({
           ...inc,
-          date: format(inc.date, "yyyy-MM-dd"),
+          date: format(inc.date, 'yyyy-MM-dd'),
         }));
         state.snackbar.open = true;
-        state.snackbar.type = "success";
-        state.snackbar.msg = "Pobrano dane";
+        state.snackbar.type = 'success';
+        state.snackbar.msg = 'Pobrano dane';
       })
       .addCase(fetchIni.rejected, (state, action) => {
         state.snackbar.open = true;
-        state.snackbar.type = "error";
+        state.snackbar.type = 'error';
         state.snackbar.msg = action.error.message;
       })
       .addCase(handleCategory.rejected, (state, action) => {
         state.snackbar.open = true;
-        state.snackbar.type = "error";
+        state.snackbar.type = 'error';
         state.snackbar.msg = action.error.message;
       });
   },
@@ -162,7 +161,7 @@ export const {
   updateExpense,
 } = mainSlice.actions;
 
-export { emptyState as mainEmptyState };
+export {emptyState as mainEmptyState};
 
 export const selectSnackbar = (state) => state.snackbar;
 const selectExpensesAll = (state) => state.expenses;
@@ -179,12 +178,12 @@ export const selectExpenses = (number, search) =>
         if (!f.length) return true;
         return f.includes(exp.category);
       };
-      const { txt, categories: fc } = search;
-      expenses = _.sortBy(expenses, ["date"]).map((exp) => ({
+      const {txt, categories: fc} = search;
+      expenses = _.sortBy(expenses, ['date']).map((exp) => ({
         ...exp,
-        category: categories.find(({ catId }) => catId === exp.categoryId)
+        category: categories.find(({catId}) => catId === exp.categoryId)
           .category,
-        date: format(new Date(exp.date), "dd/MM/yyyy"),
+        date: format(new Date(exp.date), 'dd/MM/yyyy'),
       }));
 
       expenses = expenses.filter((exp) => {
@@ -199,8 +198,8 @@ export const selectExpense = (id) =>
   createSelector([selectCategories, selectExpensesAll], (cat, exp) => {
     const expense = exp.find((ex) => ex.id === +id);
     if (!expense) return;
-    const category = cat.find((obj) => obj.catId === +id)?.category || "";
-    return { ...expense, category };
+    const category = cat.find((obj) => obj.catId === +id)?.category || '';
+    return {...expense, category};
   });
 
 export const selectIncome = (id) =>
@@ -239,7 +238,7 @@ export const selectMainCategories = createSelector(
 
 export const selectComparison = (num) =>
   createSelector([selectIncomes, selectExpensesAll], (income, expenses) => {
-    const pattern = +num === 1 ? "MM/yyyy" : "yyyy";
+    const pattern = +num === 1 ? 'MM/yyyy' : 'yyyy';
     const calPrice = (price, vat = 0) => price - price * (vat / 100);
 
     /** {
@@ -248,19 +247,19 @@ export const selectComparison = (num) =>
      }*/
     const tR = {};
     income.forEach((obj) => {
-      const { date, price, vat } = obj;
+      const {date, price, vat} = obj;
       const fd = format(new Date(date), pattern);
-      if (!tR[fd]) tR[fd] = { income: 0, date: fd, outcome: 0, costs: {} };
+      if (!tR[fd]) tR[fd] = {income: 0, date: fd, outcome: 0, costs: {}};
 
       tR[fd].income += calPrice(price, vat);
-      tR[fd].month = +fd.split("/")[0];
-      tR[fd].year = +fd.split("/")[1];
+      tR[fd].month = +fd.split('/')[0];
+      tR[fd].year = +fd.split('/')[1];
     });
 
     // console.log(expenses);
-    expenses.forEach(({ date, price, owner, categoryId }) => {
+    expenses.forEach(({date, price, owner, categoryId}) => {
       const fd = format(new Date(date), pattern);
-      if (!tR[fd]) tR[fd] = { income: 0, date: fd, outcome: 0, costs: {} };
+      if (!tR[fd]) tR[fd] = {income: 0, date: fd, outcome: 0, costs: {}};
       tR[fd].outcome += price;
       tR[fd].costs[owner] ??= 0;
       tR[fd].costs[owner] += [72, 83].includes(categoryId) ? price : 0;
@@ -270,7 +269,7 @@ export const selectComparison = (num) =>
     const ids = makeNewIdArr(arr.length);
     arr.forEach((ob, idx) => (ob.id = ids[idx]));
     // console.log(_.orderBy(arr, ['year', 'month'], ['desc', 'desc']))
-    return _.orderBy(arr, ["year", "month"], ["desc", "desc"]);
+    return _.orderBy(arr, ['year', 'month'], ['desc', 'desc']);
   });
 
 /** @param {string} date=MM/yyyy*/
@@ -281,13 +280,13 @@ export const aggregateExpenses = (agrDates = [new Date(), new Date()]) =>
       const [startDate, endDate] = agrDates;
 
       const tR = {};
-      expenses.forEach(({ date, price, categoryId }) => {
+      expenses.forEach(({date, price, categoryId}) => {
         if (!dh.isBetweenDates(date, startDate, endDate)) return;
         const cat = categories.find((c) => c.catId === categoryId);
         tR[categoryId] ??= {
           v: 0,
           name: cat.category,
-          color: "#" + cat.color,
+          color: '#' + cat.color,
         };
 
         tR[categoryId].v += price;
@@ -295,8 +294,8 @@ export const aggregateExpenses = (agrDates = [new Date(), new Date()]) =>
 
       return _.orderBy(
         _.omitBy(tR, (c) => c.v === 0),
-        ["v"],
-        ["desc"],
+        ['v'],
+        ['desc'],
       );
     },
   );
