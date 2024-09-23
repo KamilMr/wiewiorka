@@ -1,15 +1,15 @@
-import { Provider } from 'react-redux';
-import { PersistGate } from 'redux-persist/integration/react';
-import { Image, StyleSheet } from 'react-native';
-import { Provider as PaperProvider } from 'react-native-paper';
+import {Provider} from 'react-redux';
+import {PersistGate} from 'redux-persist/integration/react';
+import {Image, StyleSheet} from 'react-native';
+import {Provider as PaperProvider} from 'react-native-paper';
 
-import { HelloWave } from '@/components/HelloWave';
+import {HelloWave} from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import {ThemedText} from '@/components/ThemedText';
+import {ThemedView} from '@/components/ThemedView';
 
-import { store, persistor } from '@/redux/store';
-import { paperTheme } from '@/constants/Colors';
+import {store, persistor} from '@/redux/store';
+import {paperTheme} from '@/constants/Colors';
 
 export default function HomeScreen() {
   return (
@@ -17,7 +17,7 @@ export default function HomeScreen() {
       <PersistGate persistor={persistor}>
         <PaperProvider theme={paperTheme}>
           <ParallaxScrollView
-            headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
+            headerBackgroundColor={{light: '#A1CEDC', dark: '#1D3D47'}}
             headerImage={
               <Image
                 source={require('@/assets/images/partial-react-logo.png')}

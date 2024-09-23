@@ -27,7 +27,7 @@ export const makeNewIdArr = (number: number) => {
   let num = number;
 
   while (num > 0) {
-    const id = uniqueId();
+    const id: string = uniqueId();
     if (set.has(id)) continue;
     set.add(id);
     --num;
