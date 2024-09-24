@@ -8,6 +8,7 @@ import {selectToken} from '@/redux/auth/authSlice';
 const TabLayout = () => {
   const token = useSelector(selectToken);
 
+  console.log(token)
   if (!token) return <Redirect href="/sign-in" />;
 
   return (

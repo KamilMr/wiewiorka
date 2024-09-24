@@ -1,10 +1,12 @@
 import {createSlice} from '@reduxjs/toolkit';
 
 import _ from 'lodash';
-import { signIn } from './thunks';
+import {logout, signIn} from './thunks';
 
 const emptyState = () => ({
-  me: {name: '', email: '', token: ''},
+  name: '',
+  email: '',
+  token: '',
 });
 
 export const authSlice = createSlice({
@@ -18,15 +20,29 @@ export const authSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(signIn.fulfilled, (state, action) => {
-      const {name = '', email, token} = action.payload;
-      return Object.assign(state.me, {name, email, token});
-    })
+    builder
+      .addCase(signIn.fulfilled, (state, action) => {
+        const {name = '', email, token} = action.payload;
+        console.log(name, email);
+        state.name = name;
+        state.email = email;
+        state.token = token;
+        // Object.assign(state.auth, {name, email, token});
+      })
+      .addCase(signIn.rejected, (state, action) => {
+        console.log('rejected', action.payload);
+      })
+      .addCase(logout.fulfilled, () => {
+        return emptyState();
+      })
+      .addCase(logout.rejected, () => {
+        return emptyState();
+      });
   },
 });
 
-export const selectMe = (state) => state.auth.me;
-export const selectToken = (state) => state.auth.me.token;
+export const selectMe = (state) => state.auth;
+export const selectToken = (state) => state.auth.token;
 
 export const {dropMe} = authSlice.actions;
 

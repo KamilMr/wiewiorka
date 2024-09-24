@@ -4,6 +4,7 @@ import {useDispatch} from 'react-redux';
 import {ThemedView} from '@/components/ThemedView';
 import {Button, Text, TextInput} from 'react-native-paper';
 import {signIn} from '@/redux/auth/thunks';
+import {router} from 'expo-router';
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -26,7 +27,7 @@ const Login = () => {
   };
 
   const handleSave = () => {
-    dispatch(signIn(data));
+    dispatch(signIn(data)).then(() => router.replace('/'));
   };
 
   return (

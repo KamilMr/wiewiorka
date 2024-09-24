@@ -30,7 +30,6 @@ export const signIn = createAsyncThunk(
         body: JSON.stringify({email, password}),
       });
       data = await resp.json();
-      console.log(data.d)
       if (data.err) throw data.err;
     } catch (err) {
       throw err;
@@ -38,3 +37,20 @@ export const signIn = createAsyncThunk(
     return data.d;
   },
 );
+
+export const logout = createAsyncThunk('/user/logout', async (thunkAPI) => {
+  let data: DataResponse;
+  try {
+    const resp = await fetch(getURL('users/login'), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    data = await resp.json();
+    if (data.err) throw data.err;
+  } catch (err) {
+    throw err;
+  }
+  return data.d;
+});

@@ -1,4 +1,4 @@
-import { configureStore, combineReducers } from "@reduxjs/toolkit";
+import {configureStore, combineReducers} from '@reduxjs/toolkit';
 import {
   FLUSH,
   PAUSE,
@@ -9,11 +9,11 @@ import {
   createMigrate,
   persistReducer,
   persistStore,
-} from "redux-persist";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+} from 'redux-persist';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import authReducer, { authEmptyState } from "./auth/authSlice";
-import mainReducer, { mainEmptyState } from "./main/mainSlice";
+import authReducer, {authEmptyState} from './auth/authSlice';
+import mainReducer, {mainEmptyState} from './main/mainSlice';
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -32,11 +32,11 @@ const migrations = {
 };
 
 const persistConfig = {
-  key: "squirrel",
+  key: 'squirrel',
   version: 0,
   storage: AsyncStorage,
-  whitelist: ["auth", "main"],
-  migrate: createMigrate(migrations, { debug: false }),
+  whitelist: ['auth', 'main'],
+  migrate: createMigrate(migrations, {debug: false}),
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -53,4 +53,4 @@ const store = configureStore({
 
 const persistor = persistStore(store);
 
-export { store, persistor };
+export {store, persistor};
