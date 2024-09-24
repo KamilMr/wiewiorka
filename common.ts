@@ -1,6 +1,6 @@
 import {v4 as uniqueId} from 'uuid';
 
-const URL = process.env.REACT_APP_BE_URL;
+const URL = process.env.EXPO_PUBLIC_API_URL;
 
 export const CATEGORY_LIST_ADD_EDIT_PATH = 'category-list/:param';
 export const CATS_PATH = 'cats';

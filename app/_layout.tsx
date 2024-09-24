@@ -1,15 +1,14 @@
-import { useEffect } from 'react';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
 import 'react-native-reanimated';
-import { Provider, useSelector } from 'react-redux';
-import { PersistGate } from 'redux-persist/integration/react';
-import { Provider as PaperProvider } from 'react-native-paper';
+import {useEffect} from 'react';
+import {Stack} from 'expo-router';
+import {useFonts} from 'expo-font';
+import * as SplashScreen from 'expo-splash-screen';
+import {Provider} from 'react-redux';
+import {PersistGate} from 'redux-persist/integration/react';
+import {Provider as PaperProvider} from 'react-native-paper';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { store, persistor } from '@/redux/store';
-import { paperTheme } from '@/constants/Colors';
+import {store, persistor} from '@/redux/store';
+import {paperTheme} from '@/constants/theme';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -34,13 +33,13 @@ const RootLayout = () => {
       <PersistGate persistor={persistor}>
         <PaperProvider theme={paperTheme}>
           <Stack>
-            <Stack.Screen name="sign-in" options={{ headerShown: false }} />
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="sign-in" options={{headerShown: false}} />
+            <Stack.Screen name="(tabs)" options={{headerShown: false}} />
             <Stack.Screen name="+not-found" />
           </Stack>
         </PaperProvider>
       </PersistGate>
     </Provider>
   );
-}
+};
 export default RootLayout;

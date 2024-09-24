@@ -1,29 +1,25 @@
-import { Redirect, Tabs } from 'expo-router';
 import React from 'react';
-import { selectToken } from '@/redux/slices/authSlice';
-import { useSelector } from 'react-redux';
+import {useSelector} from 'react-redux';
+import {Redirect, Tabs} from 'expo-router';
 
-import { TabBarIcon } from '@/components/navigation/TabBarIcon';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import {TabBarIcon} from '@/components/navigation/TabBarIcon';
+import {selectToken} from '@/redux/auth/authSlice';
 
 const TabLayout = () => {
-  const colorScheme = useColorScheme();
   const token = useSelector(selectToken);
 
-  if (!token) return <Redirect href="/sign-in" />
+  if (!token) return <Redirect href="/sign-in" />;
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
       }}>
       <Tabs.Screen
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({color, focused}) => (
             <TabBarIcon
               name={focused ? 'home' : 'home-outline'}
               color={color}
@@ -35,7 +31,7 @@ const TabLayout = () => {
         name="explore"
         options={{
           title: 'Wpływy',
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({color, focused}) => (
             <TabBarIcon
               name={focused ? 'code-slash' : 'code-slash-outline'}
               color={color}
@@ -45,5 +41,5 @@ const TabLayout = () => {
       />
     </Tabs>
   );
-}
+};
 export default TabLayout;

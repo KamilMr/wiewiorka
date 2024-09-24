@@ -1,23 +1,65 @@
-import { ThemedView } from "@/components/ThemedView";
-import { Text } from "react-native-paper";
-import { router } from 'expo-router';
+import {useState} from 'react';
+import {StyleSheet} from 'react-native';
+import {useDispatch} from 'react-redux';
+import {ThemedView} from '@/components/ThemedView';
+import {Button, Text, TextInput} from 'react-native-paper';
+import {signIn} from '@/redux/auth/thunks';
 
 const Login = () => {
-  const { signIn } = { signIn: () => { } };
+  const dispatch = useDispatch();
+  const [data, setData] = useState({
+    email: process.env.EXPO_PUBLIC_USER_EMAIL || '',
+    password: process.env.EXPO_PUBLIC_USER_PASSWORD || '',
+  });
+  const [rememberUser, setRememberUser] = useState(false);
+
+  const isFormReady = data.password && data.email;
+
+  const handleCheckbox = () => setRememberUser(!rememberUser);
+
+  const handleData = (field: string) => (text: string) => {
+    setData((data) => ({...data, [field]: text}));
+  };
+
+  const handleForgotPassword = () => {
+    // TODO:
+  };
+
+  const handleSave = () => {
+    dispatch(signIn(data));
+  };
+
   return (
-    <ThemedView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text
-        style={{ color: 'black' }}
-        onPress={() => {
-          signIn();
-          // Navigate after signing in. You may want to tweak this to ensure sign-in is
-          // successful before navigating.
-          router.replace('/');
-        }}>
-        Sign In
+    <ThemedView
+      style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+      <Text variant="headlineSmall" style={styles.heading}>
+        Logowanie do konta
       </Text>
+      <TextInput
+        label="Email"
+        value={data.email}
+        onChangeText={handleData('email')}
+        style={[styles.textInput, {marginBottom: 4 * 2}]}
+      />
+      <TextInput
+        label="Hasło"
+        value={data.password}
+        onChangeText={handleData('password')}
+        style={styles.textInput}
+      />
+      <Button onPress={handleSave}>Login</Button>
     </ThemedView>
   );
-}
+};
+
+const styles = StyleSheet.create({
+  heading: {
+    textAlign: 'center',
+    marginBottom: 4 * 4,
+  },
+  textInput: {
+    width: '80%',
+  },
+});
 
 export default Login;
