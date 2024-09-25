@@ -1,7 +1,6 @@
 import {useState} from 'react';
-import {StyleSheet} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import {useDispatch} from 'react-redux';
-import {ThemedView} from '@/components/ThemedView';
 import {Button, Text, TextInput} from 'react-native-paper';
 import {signIn} from '@/redux/auth/thunks';
 import {router} from 'expo-router';
@@ -31,7 +30,7 @@ const Login = () => {
   };
 
   return (
-    <ThemedView
+    <View
       style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
       <Text variant="headlineSmall" style={styles.heading}>
         Logowanie do konta
@@ -48,8 +47,10 @@ const Login = () => {
         onChangeText={handleData('password')}
         style={styles.textInput}
       />
-      <Button onPress={handleSave}>Login</Button>
-    </ThemedView>
+      <Button onPress={handleSave} disabled={!isFormReady}>
+        Login
+      </Button>
+    </View>
   );
 };
 

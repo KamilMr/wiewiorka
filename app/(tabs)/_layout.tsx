@@ -8,7 +8,6 @@ import {selectToken} from '@/redux/auth/authSlice';
 const TabLayout = () => {
   const token = useSelector(selectToken);
 
-  console.log(token)
   if (!token) return <Redirect href="/sign-in" />;
 
   return (
@@ -29,12 +28,48 @@ const TabLayout = () => {
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="income"
         options={{
           title: 'Wpływy',
           tabBarIcon: ({color, focused}) => (
             <TabBarIcon
-              name={focused ? 'code-slash' : 'code-slash-outline'}
+              name={focused ? 'cash' : 'cash-outline'}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="expenses"
+        options={{
+          title: 'Wydatki',
+          tabBarIcon: ({color, focused}) => (
+            <TabBarIcon
+              name={focused ? 'cart' : 'cart-outline'}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="summary"
+        options={{
+          title: 'Podsumowanie',
+          tabBarIcon: ({color, focused}) => (
+            <TabBarIcon
+              name={focused ? 'bar-chart' : 'bar-chart-outline'}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profil',
+          tabBarIcon: ({color, focused}) => (
+            <TabBarIcon
+              name={focused ? 'person' : 'person-outline'}
               color={color}
             />
           ),

@@ -23,11 +23,9 @@ export const authSlice = createSlice({
     builder
       .addCase(signIn.fulfilled, (state, action) => {
         const {name = '', email, token} = action.payload;
-        console.log(name, email);
         state.name = name;
         state.email = email;
         state.token = token;
-        // Object.assign(state.auth, {name, email, token});
       })
       .addCase(signIn.rejected, (state, action) => {
         console.log('rejected', action.payload);

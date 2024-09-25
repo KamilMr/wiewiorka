@@ -1,7 +1,7 @@
 import {View} from 'react-native';
 import {Text} from 'react-native-paper';
 
-const NotFoundScreen = () => {
+const Summary = () => {
   return (
     <View>
       <Text>Hello</Text>
@@ -9,4 +9,4 @@ const NotFoundScreen = () => {
   );
 };
 
-export default NotFoundScreen;
+export default Summary;

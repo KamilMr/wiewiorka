@@ -1,7 +1,8 @@
+
 import {View} from 'react-native';
 import {Text} from 'react-native-paper';
 
-const NotFoundScreen = () => {
+const Income = () => {
   return (
     <View>
       <Text>Hello</Text>
@@ -9,4 +10,4 @@ const NotFoundScreen = () => {
   );
 };
 
-export default NotFoundScreen;
+export default Income;
