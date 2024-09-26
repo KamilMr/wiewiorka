@@ -3,26 +3,18 @@ import {createSlice, createAsyncThunk, createSelector} from '@reduxjs/toolkit';
 import {getURL, makeNewIdArr} from '@/common';
 import _ from 'lodash';
 
+import {fetchIni} from './thunks';
+import {format} from 'date-fns';
+
 const emptyState = () => ({
   expenses: [],
-  income: [],
+  incomes: [],
   categories: {},
-});
-export const fetchIni = createAsyncThunk('fetchIni', async (_, thunkAPI) => {
-  const {token} = thunkAPI.getState().auth.me;
-  let data;
-  try {
-    let resp = await fetch(getURL('ini'), {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    data = await resp.json();
-    if (data.err) throw data.err;
-  } catch (err) {
-    throw err;
-  }
-  return data.d;
+  snackbar: {
+    open: false,
+    type: 'success',
+    msg: '',
+  },
 });
 
 export const handleCategory = createAsyncThunk(
@@ -56,16 +48,7 @@ export const handleCategory = createAsyncThunk(
 
 const mainSlice = createSlice({
   name: 'main',
-  initialState: {
-    snackbar: {
-      open: false,
-      type: 'success',
-      msg: '',
-    },
-    expenses: [],
-    income: [],
-    categories: {},
-  },
+  initialState: emptyState(),
   reducers: {
     setSnackbar: (state, action) => {
       let {open = false, type = '', msg = ''} = action.payload || {};
@@ -81,7 +64,7 @@ const mainSlice = createSlice({
         date: format(ex.date, 'yyyy-MM-dd'),
       }));
       state.categories = action.payload.categories;
-      state.income = action.payload.income;
+      state.incomes = action.payload.income;
     },
     addExpense: (state, action) => {
       state.expenses = [
@@ -108,7 +91,7 @@ const mainSlice = createSlice({
     },
     addIncome: (state, action) => {
       if (!action.payload?.length) return;
-      state.income = action.payload.map((inc) => ({
+      state.incomes = action.payload.map((inc) => ({
         ...inc,
         date: format(inc.date, 'yyyy-MM-dd'),
       }));
@@ -130,7 +113,7 @@ const mainSlice = createSlice({
           date: format(ex.date, 'yyyy-MM-dd'),
         }));
         state.categories = action.payload.categories;
-        state.income = action.payload.income.map((inc) => ({
+        state.incomes = action.payload.income.map((inc) => ({
           ...inc,
           date: format(inc.date, 'yyyy-MM-dd'),
         }));
@@ -163,12 +146,13 @@ export const {
 
 export {emptyState as mainEmptyState};
 
-export const selectSnackbar = (state) => state.snackbar;
-const selectExpensesAll = (state) => state.expenses;
-export const selectExpenses = (number, search) =>
+export const selectSnackbar = (state) => state.main.snackbar;
+const selectExpensesAll = (state) => state.main.expenses;
+
+export const selectRecords = (number, search) =>
   createSelector(
-    [selectExpensesAll, selectCategories],
-    (expenses, categories) => {
+    [selectExpensesAll, selectCategories, selectIncomes],
+    (expenses, categories, incomes) => {
       const filterTxt = (exp, f) => {
         if (!f) return true;
         return exp.description.toLowerCase().includes(f.toLowerCase());
@@ -179,21 +163,37 @@ export const selectExpenses = (number, search) =>
         return f.includes(exp.category);
       };
       const {txt, categories: fc} = search;
-      expenses = _.sortBy(expenses, ['date']).map((exp) => ({
-        ...exp,
-        category: categories.find(({catId}) => catId === exp.categoryId)
-          .category,
-        date: format(new Date(exp.date), 'dd/MM/yyyy'),
-      }));
+      console.log(categories)
+      let tR = expenses
+        .map((exp) => ({...exp, exp: true}))
+        .concat(incomes)
+        .map((obj) => ({
+          ...obj,
+          category: obj?.exp
+            ? categories.find(({catId}) => catId === obj.categoryId).category
+            : null,
+          color: obj?.exp
+            ? categories.find(({catId}) => catId === obj.categoryId)?.color
+            : null,
+        }));
 
-      expenses = expenses.filter((exp) => {
+      tR= tR.filter((exp) => {
         return filterTxt(exp, txt) && filterCat(exp, fc);
       });
-      return expenses.reverse().slice(0, number);
+      return _.chain(tR)
+        .sortBy(['date'])
+        .reverse()
+        .slice(0, number)
+        .map((obj) => ({
+          ...obj,
+          date: format(new Date(obj.date), 'dd/MM/yyyy'),
+        }))
+        .groupBy('date') // Group by the formatted date
+        .value();
     },
   );
 
-export const selectIncomes = (state) => state.income;
+export const selectIncomes = (state) => state.main.incomes;
 export const selectExpense = (id) =>
   createSelector([selectCategories, selectExpensesAll], (cat, exp) => {
     const expense = exp.find((ex) => ex.id === +id);
@@ -210,7 +210,7 @@ export const selectIncome = (id) =>
   });
 
 export const selectCategories = createSelector(
-  [(state) => state.categories],
+  [(state) => state.main.categories],
   (cat) => {
     const arr = Object.entries(cat);
     return arr.reduce((pv, [key, cv]) => {

@@ -1,12 +1,20 @@
-import React from 'react';
-import {useSelector} from 'react-redux';
+import React, {useEffect} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
 import {Redirect, Tabs} from 'expo-router';
 
 import {TabBarIcon} from '@/components/navigation/TabBarIcon';
 import {selectToken} from '@/redux/auth/authSlice';
+import {fetchIni} from '@/redux/main/thunks';
 
 const TabLayout = () => {
   const token = useSelector(selectToken);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (!token) return;
+    console.log('fetching ini');
+    dispatch(fetchIni());
+  }, [dispatch]);
 
   if (!token) return <Redirect href="/sign-in" />;
 
@@ -14,6 +22,11 @@ const TabLayout = () => {
     <Tabs
       screenOptions={{
         headerShown: false,
+        tabBarStyle: {
+          borderTopWidth: 0,
+          padding: 0,
+        },
+        tabBarShowLabel: false,
       }}>
       <Tabs.Screen
         name="index"
@@ -28,9 +41,9 @@ const TabLayout = () => {
         }}
       />
       <Tabs.Screen
-        name="income"
+        name="records"
         options={{
-          title: 'Wpływy',
+          title: 'Historia',
           tabBarIcon: ({color, focused}) => (
             <TabBarIcon
               name={focused ? 'cash' : 'cash-outline'}
@@ -40,13 +53,21 @@ const TabLayout = () => {
         }}
       />
       <Tabs.Screen
-        name="expenses"
+        name="newRecord"
         options={{
-          title: 'Wydatki',
+          title: 'Dodaj',
           tabBarIcon: ({color, focused}) => (
             <TabBarIcon
-              name={focused ? 'cart' : 'cart-outline'}
+              name={focused ? 'add' : 'add-outline'}
               color={color}
+              style={{
+                backgroundColor: 'green',
+                paddingHorizontal: 16,
+                paddingVertical: 12,
+                borderRadius: 50,
+                height: 50,
+                marginBottom: 20,
+              }}
             />
           ),
         }}

@@ -1,12 +1,12 @@
 import {Text} from 'react-native-paper';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
-const Summary = () => {
+const Expenses = () => {
   return (
     <SafeAreaView>
-      <Text>Podsumowanie i wykresy</Text>
+      <Text>Dodaj nowy</Text>
     </SafeAreaView>
   );
 };
 
-export default Summary;
+export default Expenses;
