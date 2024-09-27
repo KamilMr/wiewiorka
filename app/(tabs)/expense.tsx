@@ -1,7 +1,7 @@
-import {useState} from 'react';
-import {View, StyleSheet, Image, TextInput} from 'react-native';
+import {useCallback, useEffect, useState} from 'react';
+import {View, StyleSheet, Image, TextInput, ScrollView} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
-import {router, useLocalSearchParams} from 'expo-router';
+import {router, useFocusEffect, useLocalSearchParams} from 'expo-router';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Text, Button} from 'react-native-paper';
 
@@ -10,6 +10,25 @@ import {uploadExpense} from '@/redux/main/thunks';
 import _ from 'lodash';
 import {format} from 'date-fns';
 
+interface Expense {
+  id?: string;
+  description?: string;
+  date?: string;
+  price?: string;
+  categoryId?: string;
+  image?: string;
+}
+
+const initState = (expense: Expense) => ({
+  id: '',
+  description: '',
+  date: format(new Date(), 'yyyy-MM-dd'),
+  price: '',
+  categoryId: '',
+  image: '',
+  ...expense,
+});
+
 const Expense = () => {
   const dispatch = useDispatch();
   const param = useLocalSearchParams();
@@ -17,7 +36,14 @@ const Expense = () => {
 
   // State for edit mode and editing fields
   const [isEditMode, setIsEditMode] = useState(false);
-  const [editedExpense, setEditedExpense] = useState({...expense});
+  const [editedExpense, setEditedExpense] = useState(initState(expense));
+
+  // useFocusEffect(
+    // useCallback(() => {
+    //   console.log('fopcus')
+      // setIsEditMode(param.id ? false : true);
+    // }, []),
+  // );
 
   // Placeholder image if no image is provided
   const imagePlaceholder = 'https://via.placeholder.com/150';
@@ -33,8 +59,10 @@ const Expense = () => {
       .pick(['date', 'description', 'categoryId', 'price', 'image'])
       .omitBy(editedExpense, (d) => !d || d === 'undefined')
       .value();
+
     newD.date = newD.date.split('/').reverse().join('-');
     newD.image = newD.image ? newD.image : '';
+
     dispatch(
       uploadExpense({
         id: param.id,
@@ -51,114 +79,125 @@ const Expense = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.detailsContainer}>
-        <Text style={styles.label}>Description:</Text>
-        {isEditMode ? (
-          <TextInput
-            style={styles.input}
-            value={editedExpense.description}
-            onChangeText={(text) =>
-              setEditedExpense({...editedExpense, description: text})
-            }
-          />
-        ) : (
-          <Text style={styles.value}>{expense.description}</Text>
-        )}
+      <ScrollView>
+        <View style={styles.detailsContainer}>
+          <Text style={styles.label}>Opis:</Text>
+          {isEditMode ? (
+            <TextInput
+              style={styles.input}
+              value={editedExpense.description}
+              onChangeText={(text) =>
+                setEditedExpense({...editedExpense, description: text})
+              }
+            />
+          ) : (
+            <Text style={styles.value}>{expense.description}</Text>
+          )}
 
-        <Text style={styles.label}>Price:</Text>
-        {isEditMode ? (
-          <TextInput
-            style={styles.input}
-            value={String(editedExpense.price)}
-            keyboardType="numeric"
-            onChangeText={(text) =>
-              setEditedExpense({...editedExpense, price: parseFloat(text)})
-            }
-          />
-        ) : (
-          <Text style={styles.value}>{expense.price} zł</Text>
-        )}
+          <Text style={styles.label}>Cena:</Text>
+          {isEditMode ? (
+            <TextInput
+              style={styles.input}
+              value={String(editedExpense.price)}
+              keyboardType="numeric"
+              onChangeText={(text) =>
+                setEditedExpense({...editedExpense, price: parseFloat(text)})
+              }
+            />
+          ) : (
+            <Text style={styles.value}>{expense.price} zł</Text>
+          )}
 
-        <Text style={styles.label}>Date:</Text>
-        {isEditMode ? (
-          <TextInput
-            style={styles.input}
-            value={editedExpense.date}
-            onChangeText={(text) =>
-              setEditedExpense({...editedExpense, date: text})
-            }
-          />
-        ) : (
-          <Text style={styles.value}>{expense.date}</Text>
-        )}
+          <Text style={styles.label}>Data:</Text>
+          {isEditMode ? (
+            <TextInput
+              style={styles.input}
+              value={editedExpense.date}
+              onChangeText={(text) =>
+                setEditedExpense({...editedExpense, date: text})
+              }
+            />
+          ) : (
+            <Text style={styles.value}>{expense.date}</Text>
+          )}
 
-        <Text style={styles.label}>Owner:</Text>
-        {isEditMode ? (
-          <TextInput
-            style={styles.input}
-            value={editedExpense.owner}
-            onChangeText={(text) =>
-              setEditedExpense({...editedExpense, owner: text})
-            }
-          />
-        ) : (
-          <Text style={styles.value}>{expense.owner}</Text>
-        )}
+          <Text style={styles.label}>Właściciel:</Text>
+          {isEditMode ? (
+            <TextInput
+              style={styles.input}
+              value={editedExpense.owner}
+              onChangeText={(text) =>
+                setEditedExpense({...editedExpense, owner: text})
+              }
+            />
+          ) : (
+            <Text style={styles.value}>{expense.owner}</Text>
+          )}
 
-        <Text style={styles.label}>Kategoria:</Text>
-        {isEditMode ? (
-          <TextInput
-            style={styles.input}
-            value={editedExpense.category}
-            onChangeText={(text) =>
-              setEditedExpense({...editedExpense, category: text})
-            }
-          />
-        ) : (
-          <Text
-            style={{...styles.value, backgroundColor: `#${expense.catColor}`}}>
-            {expense.category || 'N/A'}
-          </Text>
-        )}
+          <Text style={styles.label}>Kategoria:</Text>
+          {isEditMode ? (
+            <TextInput
+              style={styles.input}
+              value={editedExpense.category}
+              onChangeText={(text) =>
+                setEditedExpense({...editedExpense, category: text})
+              }
+            />
+          ) : (
+            <Text
+              style={{
+                ...styles.value,
+                backgroundColor: `#${expense.catColor}`,
+              }}>
+              {expense.category || 'brak'}
+            </Text>
+          )}
 
-        {/* Image (if provided) */}
-        {expense.image ? (
-          <Image source={{uri: expense.image}} style={styles.image} />
-        ) : (
-          <Image source={{uri: imagePlaceholder}} style={styles.image} />
-        )}
-      </View>
+          {/* Image (if provided) */}
+          {expense.image ? (
+            <Image source={{uri: expense.image}} style={styles.image} />
+          ) : (
+            <Image source={{uri: imagePlaceholder}} style={styles.image} />
+          )}
+        </View>
 
-      {/* Buttons for Edit, Save, Cancel */}
-      <View style={styles.buttonContainer}>
-        {isEditMode ? (
-          <>
-            <Button mode="contained" onPress={handleSave} style={styles.button}>
-              Save
-            </Button>
-            <Button
-              mode="outlined"
-              onPress={handleCancel}
-              style={styles.button}>
-              Cancel
-            </Button>
-          </>
-        ) : (
-          <>
-            <Button mode="contained" onPress={handleEdit} style={styles.button}>
-              Edit
-            </Button>
-            <Button
-              mode="outlined"
-              onPress={() => {
-                router.navigate('/(tabs)/records');
-              }}
-              style={styles.button}>
-              Close
-            </Button>
-          </>
-        )}
-      </View>
+        {/* Buttons for Edit, Save, Cancel */}
+        <View style={styles.buttonContainer}>
+          {isEditMode ? (
+            <>
+              <Button
+                mode="contained"
+                onPress={handleSave}
+                style={styles.button}>
+                Save
+              </Button>
+              <Button
+                mode="outlined"
+                onPress={handleCancel}
+                style={styles.button}>
+                Cancel
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                mode="contained"
+                onPress={handleEdit}
+                style={styles.button}>
+                Edit
+              </Button>
+              <Button
+                mode="outlined"
+                onPress={() => {
+                  router.navigate('/(tabs)/records');
+                }}
+                style={styles.button}>
+                Close
+              </Button>
+            </>
+          )}
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };

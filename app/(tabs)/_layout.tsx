@@ -53,9 +53,13 @@ const TabLayout = () => {
         }}
       />
       <Tabs.Screen
-        name="newRecord"
+        name="expense"
         options={{
           title: 'Dodaj',
+          href: {
+            pathname: '/(tabs)/expense',
+            params: {id: ''},
+          },
           tabBarIcon: ({color, focused}) => (
             <TabBarIcon
               name={focused ? 'add' : 'add-outline'}
@@ -97,9 +101,9 @@ const TabLayout = () => {
         }}
       />
       <Tabs.Screen
-        name="expense"
+        name="income"
         options={{
-          href: null
+          href: null,
         }}
       />
     </Tabs>

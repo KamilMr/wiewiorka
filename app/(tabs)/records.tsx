@@ -29,7 +29,7 @@ const Records = () => {
   // const [openFilter, setOpenFilter] = useState(false);
   const [filter, setFilter] = useState([]); // [txt, categoryid]
   const [searchQuery, setSearchQuery] = useState('');
-  const expenses = useSelector(
+  const records = useSelector(
     selectRecords(number, {txt: searchQuery, categories: filter}),
   );
 
@@ -40,8 +40,8 @@ const Records = () => {
     }
   };
 
-  const handleNavigate = (id) => () => {
-    router.push({pathname: '/expense', params: {id}});
+  const handleNavigate = (id: number, isExpense: boolean) => () => {
+    router.push({pathname: isExpense ? '/expense' : '/income', params: {id}});
   };
 
   return (
@@ -56,15 +56,15 @@ const Records = () => {
         style={{marginBottom: 12}}
       />
       <ScrollView onScroll={handleScroll}>
-        {_.keys(expenses).map((dateKey) => (
+        {_.keys(records).map((dateKey) => (
           <View key={dateKey}>
             <Text>{dateKey}</Text>
 
-            {expenses[dateKey].map((exp: Expense) => (
+            {records[dateKey].map((exp: Expense) => (
               <View
                 style={styles.row}
                 key={exp.id}
-                onTouchEnd={handleNavigate(exp.id)}>
+                onTouchEnd={handleNavigate(exp.id, exp.exp)}>
                 <FontAwesome
                   name="tag"
                   size={24}

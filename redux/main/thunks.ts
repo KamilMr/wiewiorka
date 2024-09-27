@@ -53,3 +53,29 @@ export const uploadExpense = createAsyncThunk(
     await thunkAPI.dispatch(fetchIni());
   },
 );
+
+export const uploadIncome= createAsyncThunk(
+  'expense/add',
+  async ({id, ...rest}: Expense, thunkAPI) => {
+    const token = thunkAPI.getState().auth.token;
+
+    let data;
+    const path = 'income' + (id ? `/${id}` : '');
+    try {
+      let resp = await fetch(getURL(path), {
+        method: id ? 'PATCH' : 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-type': 'application/json',
+        },
+        body: JSON.stringify(rest),
+      });
+      data = await resp.json();
+      if (data.err) throw data;
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+    await thunkAPI.dispatch(fetchIni());
+  },
+);
