@@ -3,7 +3,7 @@ import {createSlice, createAsyncThunk, createSelector} from '@reduxjs/toolkit';
 import {getURL, makeNewIdArr} from '@/common';
 import _ from 'lodash';
 
-import {fetchIni} from './thunks';
+import {fetchIni, uploadExpense} from './thunks';
 import {format} from 'date-fns';
 
 const emptyState = () => ({
@@ -130,6 +130,9 @@ const mainSlice = createSlice({
         state.snackbar.open = true;
         state.snackbar.type = 'error';
         state.snackbar.msg = action.error.message;
+      })
+      .addCase(uploadExpense.rejected, (state, action) => {
+        console.log('rejected expense', action.payload);
       });
   },
 });
@@ -155,20 +158,22 @@ export const selectRecords = (number, search) =>
     (expenses, categories, incomes) => {
       const filterTxt = (exp, f) => {
         if (!f) return true;
-        return exp.description.toLowerCase().includes(f.toLowerCase());
+        const string = exp.description + exp.category;
+        return string.toLowerCase().includes(f.toLowerCase());
       };
 
       const filterCat = (exp, f) => {
         if (!f.length) return true;
         return f.includes(exp.category);
       };
+
       const {txt, categories: fc} = search;
-      console.log(categories)
       let tR = expenses
         .map((exp) => ({...exp, exp: true}))
         .concat(incomes)
         .map((obj) => ({
           ...obj,
+          description: obj.description || '',
           category: obj?.exp
             ? categories.find(({catId}) => catId === obj.categoryId).category
             : null,
@@ -177,7 +182,7 @@ export const selectRecords = (number, search) =>
             : null,
         }));
 
-      tR= tR.filter((exp) => {
+      tR = tR.filter((exp) => {
         return filterTxt(exp, txt) && filterCat(exp, fc);
       });
       return _.chain(tR)
@@ -198,8 +203,14 @@ export const selectExpense = (id) =>
   createSelector([selectCategories, selectExpensesAll], (cat, exp) => {
     const expense = exp.find((ex) => ex.id === +id);
     if (!expense) return;
-    const category = cat.find((obj) => obj.catId === +id)?.category || '';
-    return {...expense, category};
+    const categoryObj =
+      cat.find((obj) => obj.catId === expense.categoryId);
+    return {
+      ...expense,
+      category: categoryObj.category,
+      catColor: categoryObj.color,
+      date: format(new Date(expense.date), 'dd/MM/yyyy'),
+    };
   });
 
 export const selectIncome = (id) =>
@@ -256,7 +267,6 @@ export const selectComparison = (num) =>
       tR[fd].year = +fd.split('/')[1];
     });
 
-    // console.log(expenses);
     expenses.forEach(({date, price, owner, categoryId}) => {
       const fd = format(new Date(date), pattern);
       if (!tR[fd]) tR[fd] = {income: 0, date: fd, outcome: 0, costs: {}};
@@ -268,7 +278,6 @@ export const selectComparison = (num) =>
     const arr = Object.values(tR);
     const ids = makeNewIdArr(arr.length);
     arr.forEach((ob, idx) => (ob.id = ids[idx]));
-    // console.log(_.orderBy(arr, ['year', 'month'], ['desc', 'desc']))
     return _.orderBy(arr, ['year', 'month'], ['desc', 'desc']);
   });
 

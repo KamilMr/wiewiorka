@@ -1,17 +1,15 @@
-import {selectRecords} from '@/redux/main/mainSlice';
 import {useState} from 'react';
-import {
-  View,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-} from 'react-native';
-import {Text} from 'react-native-paper';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {View, Image, StyleSheet, ScrollView} from 'react-native';
 import {useSelector} from 'react-redux';
+import {Link, router} from 'expo-router';
+
+import {Text, Searchbar} from 'react-native-paper';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import {FontAwesome} from '@expo/vector-icons'; // Assuming you're using FontAwesome for icons
 import _ from 'lodash';
+
+import {isCloseToBottom} from '@/common';
+import {selectRecords} from '@/redux/main/mainSlice';
 
 type Expense = {
   id: string | number;
@@ -28,22 +26,45 @@ type Expense = {
 
 const Records = () => {
   const [number, setNumber] = useState(30);
-  const [openFilter, setOpenFilter] = useState(false);
-  const [filter, setFilter] = useState({txt: '', categories: []}); // [txt, categoryid]
-  const expenses = useSelector(selectRecords(number, filter));
+  // const [openFilter, setOpenFilter] = useState(false);
+  const [filter, setFilter] = useState([]); // [txt, categoryid]
+  const [searchQuery, setSearchQuery] = useState('');
+  const expenses = useSelector(
+    selectRecords(number, {txt: searchQuery, categories: filter}),
+  );
+
+  // Load more items when the scroll reaches the bottom
+  const handleScroll = ({nativeEvent}) => {
+    if (isCloseToBottom(nativeEvent)) {
+      setNumber(number + 20);
+    }
+  };
+
+  const handleNavigate = (id) => () => {
+    router.push({pathname: '/expense', params: {id}});
+  };
 
   return (
     <SafeAreaView style={{padding: 16}}>
       <Text style={{fontSize: 18, fontWeight: 'bold'}}>
-        Transaction History
+        Historia tranzakcji
       </Text>
-      <ScrollView>
+      <Searchbar
+        placeholder="Szukaj"
+        onChangeText={setSearchQuery}
+        value={searchQuery}
+        style={{marginBottom: 12}}
+      />
+      <ScrollView onScroll={handleScroll}>
         {_.keys(expenses).map((dateKey) => (
           <View key={dateKey}>
             <Text>{dateKey}</Text>
 
             {expenses[dateKey].map((exp: Expense) => (
-              <View style={styles.row} key={exp.id}>
+              <View
+                style={styles.row}
+                key={exp.id}
+                onTouchEnd={handleNavigate(exp.id)}>
                 <FontAwesome
                   name="tag"
                   size={24}

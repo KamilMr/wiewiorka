@@ -23,4 +23,33 @@ export const fetchIni = createAsyncThunk(
   },
 );
 
-export {createAsyncThunk};
+interface Expense {
+  id: string;
+  rest: object;
+}
+
+export const uploadExpense = createAsyncThunk(
+  'expense/add',
+  async ({id, ...rest}: Expense, thunkAPI) => {
+    const token = thunkAPI.getState().auth.token;
+    console.log(rest);
+    let data;
+    const path = 'expenses' + (id ? `/${id}` : '');
+    try {
+      let resp = await fetch(getURL(path), {
+        method: id ? 'PUT' : 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-type': 'application/json',
+        },
+        body: JSON.stringify(rest),
+      });
+      data = await resp.json();
+      if (data.err) throw data;
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+    await thunkAPI.dispatch(fetchIni());
+  },
+);

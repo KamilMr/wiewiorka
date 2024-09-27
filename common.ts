@@ -1,3 +1,4 @@
+import {NativeScrollEvent, NativeSyntheticEvent} from 'react-native';
 import {v4 as uniqueId} from 'uuid';
 
 const URL = process.env.EXPO_PUBLIC_API_URL;
@@ -33,4 +34,13 @@ export const makeNewIdArr = (number: number) => {
     --num;
   }
   return Array.from(set);
+};
+
+// Function to check if the user scrolled to the bottom
+export const isCloseToBottom = ({
+  layoutMeasurement,
+  contentOffset,
+  contentSize,
+}: NativeSyntheticEvent<NativeScrollEvent>['nativeEvent']): boolean => {
+  return layoutMeasurement.height + contentOffset.y >= contentSize.height - 20;
 };
