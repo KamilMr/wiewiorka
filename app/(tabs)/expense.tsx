@@ -38,12 +38,12 @@ const Expense = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedExpense, setEditedExpense] = useState(initState(expense));
 
-  // useFocusEffect(
-    // useCallback(() => {
-    //   console.log('fopcus')
-      // setIsEditMode(param.id ? false : true);
-    // }, []),
-  // );
+  useFocusEffect(
+    useCallback(() => {
+      console.log('fopcus', param.id)
+      setIsEditMode(param.id ? false : true);
+    }, [param.id]),
+  );
 
   // Placeholder image if no image is provided
   const imagePlaceholder = 'https://via.placeholder.com/150';
