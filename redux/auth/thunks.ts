@@ -1,12 +1,6 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {getURL} from '@/common';
 
-interface State {
-  me: {
-    token: string;
-  };
-}
-
 interface DataResponse {
   err?: string;
   d: any;
@@ -22,6 +16,7 @@ export const signIn = createAsyncThunk(
   async ({email, password}: SignInCredentials, thunkAPI) => {
     let data: DataResponse;
     try {
+      console.log(getURL('users/login'));
       const resp = await fetch(getURL('users/login'), {
         method: 'POST',
         headers: {
@@ -30,6 +25,7 @@ export const signIn = createAsyncThunk(
         body: JSON.stringify({email, password}),
       });
       data = await resp.json();
+      console.log('data', data);
       if (data.err) throw data.err;
     } catch (err) {
       throw err;

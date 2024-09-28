@@ -5,7 +5,7 @@ import {router, useLocalSearchParams} from 'expo-router';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Text, Button} from 'react-native-paper';
 
-import {selectIncome} from '@/redux/main/mainSlice';
+import {selectIncome} from '@/redux/main/selectors';
 import {uploadIncome} from '@/redux/main/thunks';
 import _ from 'lodash';
 import {format} from 'date-fns';

@@ -1,11 +1,11 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useState} from 'react';
 import {View, StyleSheet, Image, TextInput, ScrollView} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {router, useFocusEffect, useLocalSearchParams} from 'expo-router';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Text, Button} from 'react-native-paper';
 
-import {selectExpense} from '@/redux/main/mainSlice';
+import {selectExpense} from '@/redux/main/selectors';
 import {uploadExpense} from '@/redux/main/thunks';
 import _ from 'lodash';
 import {format} from 'date-fns';

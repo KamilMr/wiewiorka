@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {View, Image, StyleSheet, ScrollView} from 'react-native';
 import {useSelector} from 'react-redux';
-import {Link, router} from 'expo-router';
+import {router} from 'expo-router';
 
 import {Text, Searchbar} from 'react-native-paper';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -9,7 +9,7 @@ import {FontAwesome} from '@expo/vector-icons'; // Assuming you're using FontAwe
 import _ from 'lodash';
 
 import {isCloseToBottom} from '@/common';
-import {selectRecords} from '@/redux/main/mainSlice';
+import {selectRecords} from '@/redux/main/selectors';
 
 type Expense = {
   id: string | number;

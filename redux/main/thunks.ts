@@ -79,3 +79,33 @@ export const uploadIncome= createAsyncThunk(
     await thunkAPI.dispatch(fetchIni());
   },
 );
+
+export const handleCategory = createAsyncThunk(
+  'handleCategory',
+  async (payload = {}, thunkAPI) => {
+    const {token} = thunkAPI.getState().me;
+
+    if (!Object.keys(payload).length) return;
+
+    const {method, id, ...rest} = payload;
+    let q = 'category' + (method === 'PUT' ? `/${id}` : '');
+    let data;
+    try {
+      let resp = await fetch(getURL(q), {
+        method,
+        headers: {
+          'content-type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(rest),
+      });
+      data = await resp.json();
+      if (data.err) throw data.err;
+      thunkAPI.dispatch(fetchIni());
+    } catch (err) {
+      throw err;
+    }
+    return data.d;
+  },
+);
+
