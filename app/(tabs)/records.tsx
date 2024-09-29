@@ -1,6 +1,5 @@
 import {useState} from 'react';
 import {View, Image, StyleSheet, ScrollView} from 'react-native';
-import {useSelector} from 'react-redux';
 import {router} from 'expo-router';
 
 import {Text, Searchbar} from 'react-native-paper';
@@ -10,6 +9,7 @@ import _ from 'lodash';
 
 import {isCloseToBottom} from '@/common';
 import {selectRecords} from '@/redux/main/selectors';
+import {useAppSelector} from '@/hooks';
 
 type Expense = {
   id: string | number;
@@ -29,7 +29,7 @@ const Records = () => {
   // const [openFilter, setOpenFilter] = useState(false);
   const [filter, setFilter] = useState([]); // [txt, categoryid]
   const [searchQuery, setSearchQuery] = useState('');
-  const records = useSelector(
+  const records = useAppSelector(
     selectRecords(number, {txt: searchQuery, categories: filter}),
   );
 

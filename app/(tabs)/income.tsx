@@ -1,6 +1,5 @@
 import {useState} from 'react';
-import {View, StyleSheet, Image, TextInput} from 'react-native';
-import {useDispatch, useSelector} from 'react-redux';
+import {View, StyleSheet, TextInput} from 'react-native';
 import {router, useLocalSearchParams} from 'expo-router';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Text, Button} from 'react-native-paper';
@@ -9,6 +8,7 @@ import {selectIncome} from '@/redux/main/selectors';
 import {uploadIncome} from '@/redux/main/thunks';
 import _ from 'lodash';
 import {format} from 'date-fns';
+import {useAppDispatch, useAppSelector} from '@/hooks';
 
 interface Income {
   id?: string;
@@ -29,9 +29,9 @@ const initState = (income: Income) => ({
 });
 
 const Income = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const param = useLocalSearchParams();
-  const income = useSelector(selectIncome(param.id)) || {};
+  const income = useAppSelector(selectIncome(param.id)) || {};
 
   // State for edit mode and editing fields
   const [isEditMode, setIsEditMode] = useState(false);

@@ -5,7 +5,20 @@ import _ from 'lodash';
 import {fetchIni, handleCategory, uploadExpense} from './thunks';
 import {format} from 'date-fns';
 
-const emptyState = () => ({
+type Snackbar = {
+  open: boolean;
+  type: string;
+  msg: string;
+};
+
+interface MainSlice {
+  expenses: Array<{[key: string]: any}>;
+  incomes: Array<{[key: string]: any}>;
+  categories: {[key: string]: any};
+  snackbar: Snackbar;
+}
+
+const emptyState: MainSlice = {
   expenses: [],
   incomes: [],
   categories: {},
@@ -14,11 +27,11 @@ const emptyState = () => ({
     type: 'success',
     msg: '',
   },
-});
+};
 
 const mainSlice = createSlice({
   name: 'main',
-  initialState: emptyState(),
+  initialState: emptyState,
   reducers: {
     setSnackbar: (state, action) => {
       let {open = false, type = '', msg = ''} = action.payload || {};
@@ -67,7 +80,7 @@ const mainSlice = createSlice({
       }));
     },
     dropMain: () => {
-      return emptyState();
+      return emptyState;
     },
     removeExpense: (state, action) => {
       state.expenses = state.expenses.filter(

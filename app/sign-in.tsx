@@ -1,12 +1,12 @@
 import {useState} from 'react';
 import {StyleSheet, View} from 'react-native';
-import {useDispatch} from 'react-redux';
 import {Button, Text, TextInput} from 'react-native-paper';
 import {signIn} from '@/redux/auth/thunks';
 import {router} from 'expo-router';
+import {useAppDispatch} from '@/hooks';
 
 const Login = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [data, setData] = useState({
     email: process.env.EXPO_PUBLIC_USER_EMAIL || '',
     password: process.env.EXPO_PUBLIC_USER_PASSWORD || '',
@@ -30,8 +30,7 @@ const Login = () => {
   };
 
   return (
-    <View
-      style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
       <Text variant="headlineSmall" style={styles.heading}>
         Logowanie do konta
       </Text>

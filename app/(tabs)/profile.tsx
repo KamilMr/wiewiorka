@@ -1,10 +1,10 @@
+import {useAppDispatch} from '@/hooks';
 import {logout} from '@/redux/auth/thunks';
-import {Button, Text} from 'react-native-paper';
+import {Button} from 'react-native-paper';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {useDispatch} from 'react-redux';
 
 const Profile = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   return (
     <SafeAreaView>
       <Button icon="camera" mode="contained" onPress={() => dispatch(logout())}>

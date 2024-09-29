@@ -1,6 +1,5 @@
 import {useCallback, useState} from 'react';
 import {View, StyleSheet, Image, TextInput, ScrollView} from 'react-native';
-import {useDispatch, useSelector} from 'react-redux';
 import {router, useFocusEffect, useLocalSearchParams} from 'expo-router';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Text, Button} from 'react-native-paper';
@@ -9,6 +8,7 @@ import {selectExpense} from '@/redux/main/selectors';
 import {uploadExpense} from '@/redux/main/thunks';
 import _ from 'lodash';
 import {format} from 'date-fns';
+import {useAppDispatch, useAppSelector} from '@/hooks';
 
 interface Expense {
   id?: string;
@@ -30,9 +30,9 @@ const initState = (expense: Expense) => ({
 });
 
 const Expense = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const param = useLocalSearchParams();
-  const expense = useSelector(selectExpense(param.id)) || {};
+  const expense = useAppSelector(selectExpense(param.id)) || {};
 
   // State for edit mode and editing fields
   const [isEditMode, setIsEditMode] = useState(false);
@@ -40,7 +40,7 @@ const Expense = () => {
 
   useFocusEffect(
     useCallback(() => {
-      console.log('fopcus', param.id)
+      console.log('fopcus', param.id);
       setIsEditMode(param.id ? false : true);
     }, [param.id]),
   );

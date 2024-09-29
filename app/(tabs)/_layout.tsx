@@ -1,14 +1,14 @@
 import React, {useEffect} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
 import {Redirect, Tabs} from 'expo-router';
 
 import {TabBarIcon} from '@/components/navigation/TabBarIcon';
 import {selectToken} from '@/redux/auth/authSlice';
 import {fetchIni} from '@/redux/main/thunks';
+import {useAppDispatch, useAppSelector} from '@/hooks';
 
 const TabLayout = () => {
-  const token = useSelector(selectToken);
-  const dispatch = useDispatch();
+  const token = useAppSelector(selectToken);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (!token) return;

@@ -3,6 +3,7 @@ import {format} from 'date-fns';
 import _ from 'lodash';
 
 import {makeNewIdArr} from '@/common';
+import {RootState} from '../store';
 
 type Expense = {
   category: string;
@@ -35,12 +36,12 @@ type Record = {
   owner: string;
   price: number;
   receipt: string;
-  vat: number, 
-  source: string,
+  vat: number;
+  source: string;
 };
 
-export const selectSnackbar = (state) => state.main.snackbar;
-const selectExpensesAll = (state) => state.main.expenses;
+export const selectSnackbar = (state: RootState) => state.main.snackbar;
+const selectExpensesAll = (state: RootState) => state.main.expenses;
 
 const filterCat = (exp: Expense, f: Array<string>) => {
   if (!f.length) return true;
@@ -58,7 +59,7 @@ export const selectRecords = (number: number, search: Search) =>
     [selectExpensesAll, selectCategories, selectIncomes],
     (expenses, categories, incomes) => {
       const {txt, categories: fc} = search;
-      console.log(categories[0])
+      console.log(categories[0]);
       let tR = expenses
         .map((exp: Expense) => ({...exp, exp: true}))
         .concat(incomes)
@@ -89,7 +90,7 @@ export const selectRecords = (number: number, search: Search) =>
     },
   );
 
-export const selectIncomes = (state) => state.main.incomes;
+export const selectIncomes = (state: RootState) => state.main.incomes;
 export const selectExpense = (id: number) =>
   createSelector([selectCategories, selectExpensesAll], (cat, exp) => {
     const expense = exp.find((ex) => ex.id === +id);

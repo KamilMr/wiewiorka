@@ -1,46 +1,51 @@
-import {createSlice} from '@reduxjs/toolkit';
+import {PayloadAction, createSlice} from '@reduxjs/toolkit';
 
 import _ from 'lodash';
 import {logout, signIn} from './thunks';
+import {RootState} from '../store';
 
-const emptyState = () => ({
+interface AuthSlice {
+  name: string;
+  email: string;
+  token: string;
+}
+
+const emptyState: AuthSlice = {
   name: '',
   email: '',
   token: '',
-});
+};
 
 export const authSlice = createSlice({
   name: 'auth',
-  initialState: {
-    ...emptyState(),
-  },
+  initialState: emptyState,
   reducers: {
     dropMe: () => {
-      return emptyState();
+      return emptyState;
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(signIn.fulfilled, (state, action) => {
+      .addCase(signIn.fulfilled, (state, action: PayloadAction<AuthSlice>) => {
         const {name = '', email, token} = action.payload;
         state.name = name;
         state.email = email;
         state.token = token;
       })
-      .addCase(signIn.rejected, (state, action) => {
+      .addCase(signIn.rejected, (_, action) => {
         console.log('rejected', action.payload);
       })
       .addCase(logout.fulfilled, () => {
-        return emptyState();
+        return emptyState;
       })
       .addCase(logout.rejected, () => {
-        return emptyState();
+        return emptyState;
       });
   },
 });
 
-export const selectMe = (state) => state.auth;
-export const selectToken = (state) => state.auth.token;
+export const selectMe = (state: RootState) => state.auth;
+export const selectToken = (state: RootState) => state.auth.token;
 
 export const {dropMe} = authSlice.actions;
 
