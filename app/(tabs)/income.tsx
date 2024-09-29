@@ -1,8 +1,8 @@
 import {useState} from 'react';
-import {View, StyleSheet, TextInput} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 import {router, useLocalSearchParams} from 'expo-router';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {Text, Button} from 'react-native-paper';
+import {Text, Button, TextInput} from 'react-native-paper';
 
 import {selectIncome} from '@/redux/main/selectors';
 import {uploadIncome} from '@/redux/main/thunks';

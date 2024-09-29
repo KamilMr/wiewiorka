@@ -1,13 +1,14 @@
 import {useCallback, useState} from 'react';
-import {View, StyleSheet, Image, TextInput, ScrollView} from 'react-native';
+import {View, StyleSheet, Image, ScrollView} from 'react-native';
 import {router, useFocusEffect, useLocalSearchParams} from 'expo-router';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {Text, Button} from 'react-native-paper';
+import {Text, Button, TextInput} from 'react-native-paper';
+
+import _ from 'lodash';
+import {format} from 'date-fns';
 
 import {selectExpense} from '@/redux/main/selectors';
 import {uploadExpense} from '@/redux/main/thunks';
-import _ from 'lodash';
-import {format} from 'date-fns';
 import {useAppDispatch, useAppSelector} from '@/hooks';
 
 interface Expense {
@@ -16,10 +17,12 @@ interface Expense {
   date?: string;
   price?: string;
   categoryId?: string;
+  category: string;
   image?: string;
+  owner: string;
 }
 
-const initState = (expense: Expense) => ({
+const initState = (expense?: Expense) => ({
   id: '',
   description: '',
   date: format(new Date(), 'yyyy-MM-dd'),
@@ -40,8 +43,12 @@ const Expense = () => {
 
   useFocusEffect(
     useCallback(() => {
-      console.log('fopcus', param.id);
+      console.log('focus expense', param.id);
       setIsEditMode(param.id ? false : true);
+      return () => {
+        console.log('lost focus expense');
+        setEditedExpense(initState());
+      };
     }, [param.id]),
   );
 

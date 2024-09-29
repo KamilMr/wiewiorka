@@ -11,8 +11,8 @@ const TabLayout = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
+    console.log('works')
     if (!token) return;
-    console.log('fetching ini');
     dispatch(fetchIni());
   }, [dispatch]);
 
@@ -53,7 +53,7 @@ const TabLayout = () => {
         }}
       />
       <Tabs.Screen
-        name="[expense]"
+        name="expense"
         options={{
           title: 'Dodaj',
           href: {

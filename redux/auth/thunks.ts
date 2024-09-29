@@ -16,7 +16,6 @@ export const signIn = createAsyncThunk(
   async ({email, password}: SignInCredentials, thunkAPI) => {
     let data: DataResponse;
     try {
-      console.log(getURL('users/login'));
       const resp = await fetch(getURL('users/login'), {
         method: 'POST',
         headers: {
