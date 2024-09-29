@@ -53,7 +53,7 @@ const TabLayout = () => {
         }}
       />
       <Tabs.Screen
-        name="expense"
+        name="[expense]"
         options={{
           title: 'Dodaj',
           href: {

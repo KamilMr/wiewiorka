@@ -11,6 +11,7 @@ type Snackbar = {
   msg: string;
 };
 
+// TODO: write propper types 
 interface MainSlice {
   expenses: Array<{[key: string]: any}>;
   incomes: Array<{[key: string]: any}>;
