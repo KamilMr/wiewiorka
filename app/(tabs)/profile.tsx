@@ -5,6 +5,7 @@ import {useAppDispatch} from '@/hooks';
 import {logout} from '@/redux/auth/thunks';
 import CustomeDatePicker from '@/components/DatePicker';
 import CustomTextInput from '@/components/CustomTextInput';
+import CustomSelect from '@/components/CustomSelect';
 
 const Profile = () => {
   const dispatch = useAppDispatch();
@@ -22,6 +23,7 @@ const Profile = () => {
       </Button>
       <CustomeDatePicker />
       <CustomTextInput style={{marginTop: 40}} />
+      <CustomSelect items={[{label: 'test', value: 'test'}]} />
     </SafeAreaView>
   );
 };
