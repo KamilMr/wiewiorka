@@ -1,4 +1,4 @@
-import {useCallback, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {View, StyleSheet, Image, ScrollView} from 'react-native';
 import {router, useFocusEffect, useLocalSearchParams} from 'expo-router';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -42,16 +42,26 @@ const Expense = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedExpense, setEditedExpense] = useState(initState(expense));
 
+  const focusElem = useRef<any>();
+
   useFocusEffect(
     useCallback(() => {
       console.log('focus expense', param.id);
       setIsEditMode(param.id ? false : true);
+      setEditedExpense(initState(expense));
+
       return () => {
         console.log('lost focus expense');
         setEditedExpense(initState());
       };
     }, [param.id]),
   );
+
+  useEffect(() => {
+    if (!isEditMode) return;
+    if (focusElem.current) focusElem.current.focus();
+    console.log('works')
+  }, [editedExpense, editedExpense, param.id]);
 
   // Placeholder image if no image is provided
   const imagePlaceholder = 'https://via.placeholder.com/150';
@@ -89,77 +99,55 @@ const Expense = () => {
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <View style={styles.detailsContainer}>
-          {isEditMode ? (
-            <TextInput
-              style={styles.input}
-              value={editedExpense.description}
-              label="Opis"
-              onChangeText={(text: string) =>
-                setEditedExpense({...editedExpense, description: text})
-              }
-            />
-          ) : (
-            <Text style={styles.value}>{expense.description}</Text>
-          )}
+          <TextInput
+            style={styles.input}
+            value={editedExpense.description}
+            label="Opis"
+            readOnly={!isEditMode}
+            onChangeText={(text: string) =>
+              setEditedExpense({...editedExpense, description: text})
+            }
+          />
+          <TextInput
+            style={styles.input}
+            value={String(editedExpense.price)}
+            label="Cena"
+            readOnly={!isEditMode}
+            innerRef={focusElem}
+            keyboardType="numeric"
+            onChangeText={(text) =>
+              setEditedExpense({...editedExpense, price: parseFloat(text)})
+            }
+          />
+          <TextInput
+            style={styles.input}
+            label="Wybierz datę"
+            readOnly={!isEditMode}
+            value={editedExpense.date}
+            onChangeText={(text) =>
+              setEditedExpense({...editedExpense, date: text})
+            }
+          />
 
-          {isEditMode ? (
-            <TextInput
-              style={styles.input}
-              value={String(editedExpense.price)}
-              label="Cena"
-              keyboardType="numeric"
-              onChangeText={(text) =>
-                setEditedExpense({...editedExpense, price: parseFloat(text)})
-              }
-            />
-          ) : (
-            <Text style={styles.value}>{expense.price} zł</Text>
-          )}
+          <TextInput
+            style={styles.input}
+            label="Kto dokonał zakupu"
+            readOnly={!isEditMode}
+            value={editedExpense.owner}
+            onChangeText={(text) =>
+              setEditedExpense({...editedExpense, owner: text})
+            }
+          />
 
-          {isEditMode ? (
-            <TextInput
-              style={styles.input}
-              label="Wybierz datę"
-              value={editedExpense.date}
-              onChangeText={(text) =>
-                setEditedExpense({...editedExpense, date: text})
-              }
-            />
-          ) : (
-            <Text style={styles.value}>{expense.date}</Text>
-          )}
-
-          {isEditMode ? (
-            <TextInput
-              style={styles.input}
-              label="Kto dokonał zakupu"
-              value={editedExpense.owner}
-              onChangeText={(text) =>
-                setEditedExpense({...editedExpense, owner: text})
-              }
-            />
-          ) : (
-            <Text style={styles.value}>{expense.owner}</Text>
-          )}
-
-          {isEditMode ? (
-            <TextInput
-              style={styles.input}
-              label="Kategoria"
-              value={editedExpense.category}
-              onChangeText={(text) =>
-                setEditedExpense({...editedExpense, category: text})
-              }
-            />
-          ) : (
-            <Text
-              style={{
-                ...styles.value,
-                backgroundColor: `#${expense.catColor}`,
-              }}>
-              {expense.category || 'brak'}
-            </Text>
-          )}
+          <TextInput
+            style={styles.input}
+            label="Kategoria"
+            value={editedExpense.category}
+            readOnly={!isEditMode}
+            onChangeText={(text) =>
+              setEditedExpense({...editedExpense, category: text})
+            }
+          />
 
           {/* Image (if provided) */}
           {expense.image ? (
@@ -214,7 +202,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'space-between', // Ensure buttons stay at the bottom
-    padding: 16,
+    padding: 12,
   },
   detailsContainer: {
     flex: 1,

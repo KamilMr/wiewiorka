@@ -65,7 +65,7 @@ const TabLayout = () => {
               name={focused ? 'add' : 'add-outline'}
               color={color}
               style={{
-                backgroundColor: 'green',
+                backgroundColor: '#cd5700',
                 paddingHorizontal: 16,
                 paddingVertical: 12,
                 borderRadius: 50,

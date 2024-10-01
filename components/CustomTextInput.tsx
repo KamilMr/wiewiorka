@@ -1,13 +1,20 @@
 import {StyleSheet} from 'react-native';
-import {TextInput} from 'react-native-paper';
+import {TextInput, TextInputProps} from 'react-native-paper';
 
-const CustomTextInput = ({onChangeText, value, style, ...props}) => {
+const CustomTextInput = ({
+  onChangeText,
+  value,
+  style,
+  innerRef,
+  ...props
+}: TextInputProps) => {
   return (
     <TextInput
       onChangeText={onChangeText}
       value={value}
-      {...props}
+      ref={innerRef}
       style={[styles.root, style]}
+      {...props}
     />
   );
 };
