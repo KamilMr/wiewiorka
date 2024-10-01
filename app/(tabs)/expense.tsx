@@ -89,11 +89,11 @@ const Expense = () => {
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <View style={styles.detailsContainer}>
-          <Text style={styles.label}>Opis:</Text>
           {isEditMode ? (
             <TextInput
               style={styles.input}
               value={editedExpense.description}
+              label="Opis"
               onChangeText={(text: string) =>
                 setEditedExpense({...editedExpense, description: text})
               }
@@ -102,11 +102,11 @@ const Expense = () => {
             <Text style={styles.value}>{expense.description}</Text>
           )}
 
-          <Text style={styles.label}>Cena:</Text>
           {isEditMode ? (
             <TextInput
               style={styles.input}
               value={String(editedExpense.price)}
+              label="Cena"
               keyboardType="numeric"
               onChangeText={(text) =>
                 setEditedExpense({...editedExpense, price: parseFloat(text)})
@@ -116,10 +116,10 @@ const Expense = () => {
             <Text style={styles.value}>{expense.price} zł</Text>
           )}
 
-          <Text style={styles.label}>Data:</Text>
           {isEditMode ? (
             <TextInput
               style={styles.input}
+              label="Wybierz datę"
               value={editedExpense.date}
               onChangeText={(text) =>
                 setEditedExpense({...editedExpense, date: text})
@@ -129,10 +129,10 @@ const Expense = () => {
             <Text style={styles.value}>{expense.date}</Text>
           )}
 
-          <Text style={styles.label}>Właściciel:</Text>
           {isEditMode ? (
             <TextInput
               style={styles.input}
+              label="Kto dokonał zakupu"
               value={editedExpense.owner}
               onChangeText={(text) =>
                 setEditedExpense({...editedExpense, owner: text})
@@ -142,10 +142,10 @@ const Expense = () => {
             <Text style={styles.value}>{expense.owner}</Text>
           )}
 
-          <Text style={styles.label}>Kategoria:</Text>
           {isEditMode ? (
             <TextInput
               style={styles.input}
+              label="Kategoria"
               value={editedExpense.category}
               onChangeText={(text) =>
                 setEditedExpense({...editedExpense, category: text})
