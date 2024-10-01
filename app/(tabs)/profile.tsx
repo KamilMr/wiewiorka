@@ -23,7 +23,12 @@ const Profile = () => {
       </Button>
       <CustomeDatePicker />
       <CustomTextInput style={{marginTop: 40}} />
-      <CustomSelect items={[{label: 'test1', value: 'test1'},{label: 'test2', value: 'test2'}]} />
+      <CustomSelect
+        items={[
+          {label: 'test1', value: 'test1'},
+          {label: 'test2', value: 'test2'},
+        ]}
+      />
     </SafeAreaView>
   );
 };

@@ -10,7 +10,7 @@ import {format} from 'date-fns';
 import {selectExpense} from '@/redux/main/selectors';
 import {uploadExpense} from '@/redux/main/thunks';
 import {useAppDispatch, useAppSelector} from '@/hooks';
-import TextInput from '@/components/CustomTextInput';
+import {TextInput} from '@/components';
 
 interface Expense {
   id?: string;

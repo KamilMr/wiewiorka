@@ -9,7 +9,7 @@ import {Provider as PaperProvider} from 'react-native-paper';
 
 import {store, persistor} from '@/redux/store';
 import {paperTheme} from '@/constants/theme';
-import CustomSnackBar from '@/components/Snackbar';
+import {SnackBar} from '@/components';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -38,7 +38,7 @@ const RootLayout = () => {
             <Stack.Screen name="(tabs)" options={{headerShown: false}} />
             <Stack.Screen name="+not-found" />
           </Stack>
-          <CustomSnackBar />
+          <SnackBar />
         </PaperProvider>
       </PersistGate>
     </Provider>

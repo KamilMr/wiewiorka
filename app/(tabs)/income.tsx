@@ -1,14 +1,16 @@
 import {useState} from 'react';
-import {View, StyleSheet} from 'react-native';
 import {router, useLocalSearchParams} from 'expo-router';
+import {View, StyleSheet} from 'react-native';
+import {Text, Button} from 'react-native-paper';
+
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {Text, Button, TextInput} from 'react-native-paper';
+import _ from 'lodash';
+import {format} from 'date-fns';
 
 import {selectIncome} from '@/redux/main/selectors';
 import {uploadIncome} from '@/redux/main/thunks';
-import _ from 'lodash';
-import {format} from 'date-fns';
 import {useAppDispatch, useAppSelector} from '@/hooks';
+import {TextInput} from '@/components';
 
 interface Income {
   id?: string;
