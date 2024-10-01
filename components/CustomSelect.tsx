@@ -10,7 +10,7 @@ interface Props {
   items: Array<any>;
 }
 
-const DropdownComponent = ({onChange, value, items}: Props) => {
+const DropdownComponent = ({onChange = () => {}, value, items}: Props) => {
   const [componentValue, setComponentValue] = useState(value || null);
   const [isFocus, setIsFocus] = useState(false);
 

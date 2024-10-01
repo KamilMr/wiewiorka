@@ -2,7 +2,7 @@ import {useCallback, useState} from 'react';
 import {View, StyleSheet, Image, ScrollView} from 'react-native';
 import {router, useFocusEffect, useLocalSearchParams} from 'expo-router';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {Text, Button, TextInput} from 'react-native-paper';
+import {Text, Button} from 'react-native-paper';
 
 import _ from 'lodash';
 import {format} from 'date-fns';
@@ -10,6 +10,7 @@ import {format} from 'date-fns';
 import {selectExpense} from '@/redux/main/selectors';
 import {uploadExpense} from '@/redux/main/thunks';
 import {useAppDispatch, useAppSelector} from '@/hooks';
+import TextInput from '@/components/CustomTextInput';
 
 interface Expense {
   id?: string;
@@ -93,7 +94,7 @@ const Expense = () => {
             <TextInput
               style={styles.input}
               value={editedExpense.description}
-              onChangeText={(text) =>
+              onChangeText={(text: string) =>
                 setEditedExpense({...editedExpense, description: text})
               }
             />
