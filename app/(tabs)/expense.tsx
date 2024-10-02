@@ -1,8 +1,8 @@
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useRef, useState} from 'react';
 import {View, StyleSheet, Image, ScrollView} from 'react-native';
 import {router, useFocusEffect, useLocalSearchParams} from 'expo-router';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {Text, Button} from 'react-native-paper';
+import {Button} from 'react-native-paper';
 
 import _ from 'lodash';
 import {format} from 'date-fns';
@@ -11,11 +11,12 @@ import {selectExpense} from '@/redux/main/selectors';
 import {uploadExpense} from '@/redux/main/thunks';
 import {useAppDispatch, useAppSelector} from '@/hooks';
 import {TextInput} from '@/components';
+import CustomeDatePicker from '@/components/DatePicker';
 
 interface Expense {
   id?: string;
   description?: string;
-  date?: string;
+  date?: string | Date;
   price?: string;
   categoryId?: string;
   category: string;
@@ -28,6 +29,7 @@ const initState = (expense?: Expense) => ({
   description: '',
   date: format(new Date(), 'yyyy-MM-dd'),
   price: '',
+  owner: '',
   categoryId: '',
   image: '',
   ...expense,
@@ -35,8 +37,8 @@ const initState = (expense?: Expense) => ({
 
 const Expense = () => {
   const dispatch = useAppDispatch();
-  const param = useLocalSearchParams();
-  const expense = useAppSelector(selectExpense(param.id)) || {};
+  const {id} = useLocalSearchParams();
+  const expense = useAppSelector(selectExpense(+id)) || initState();
 
   // State for edit mode and editing fields
   const [isEditMode, setIsEditMode] = useState(false);
@@ -46,22 +48,17 @@ const Expense = () => {
 
   useFocusEffect(
     useCallback(() => {
-      console.log('focus expense', param.id);
-      setIsEditMode(param.id ? false : true);
+      console.log('focus expense', id);
+      setIsEditMode(id ? false : true);
       setEditedExpense(initState(expense));
 
       return () => {
         console.log('lost focus expense');
         setEditedExpense(initState());
+        setIsEditMode(false);
       };
-    }, [param.id]),
+    }, [id]),
   );
-
-  useEffect(() => {
-    if (!isEditMode) return;
-    if (focusElem.current) focusElem.current.focus();
-    console.log('works')
-  }, [editedExpense, editedExpense, param.id]);
 
   // Placeholder image if no image is provided
   const imagePlaceholder = 'https://via.placeholder.com/150';
@@ -83,7 +80,7 @@ const Expense = () => {
 
     dispatch(
       uploadExpense({
-        id: param.id,
+        id: id,
         ...newD,
       }),
     );
@@ -113,20 +110,26 @@ const Expense = () => {
             value={String(editedExpense.price)}
             label="Cena"
             readOnly={!isEditMode}
+            autoFocus={true}
             innerRef={focusElem}
             keyboardType="numeric"
             onChangeText={(text) =>
               setEditedExpense({...editedExpense, price: parseFloat(text)})
             }
           />
-          <TextInput
-            style={styles.input}
+          <CustomeDatePicker
+            editable={!isEditMode}
             label="Wybierz datę"
             readOnly={!isEditMode}
-            value={editedExpense.date}
-            onChangeText={(text) =>
-              setEditedExpense({...editedExpense, date: text})
-            }
+            style={styles.input}
+            value={new Date(editedExpense.date.split('/').reverse().join('-'))}
+            onChange={(date) => {
+              if (!date) return;
+              setEditedExpense({
+                ...editedExpense,
+                date: format(date, 'dd/MM/yyyy'),
+              });
+            }}
           />
 
           <TextInput

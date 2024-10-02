@@ -1,4 +1,3 @@
-import {useState} from 'react';
 import {
   DatePickerInput,
   pl,
@@ -10,7 +9,7 @@ registerTranslation('pl', pl);
 interface CustomeDatePickerProps {
   editable: boolean;
   label: string;
-  onChange: (date: Date | undefined) => Date;
+  onChange: (date: Date | undefined) => Date | void;
   readOnly: boolean;
   style?: any;
   value: Date | null;
@@ -24,10 +23,9 @@ const CustomeDatePicker = ({
   value,
   style,
 }: CustomeDatePickerProps) => {
-  const [date, setDate] = useState<Date | undefined>(value || new Date());
 
   const handleOnConfirm = (date: Date | undefined) => {
-    setDate(date);
+    if(!date) return;
     onChange(date);
   };
 
@@ -39,7 +37,7 @@ const CustomeDatePicker = ({
       keyboardType="numeric"
       locale="pl"
       label={label}
-      value={date}
+      value={value || new Date()}
       onChange={handleOnConfirm}
       style={[style]}
     />
