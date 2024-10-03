@@ -27,7 +27,7 @@ interface Expense {
 const initState = (expense?: Expense) => ({
   id: '',
   description: '',
-  date: format(new Date(), 'yyyy-MM-dd'),
+  date: format(new Date(), 'dd/MM/yyyy'),
   price: '',
   owner: '',
   categoryId: '',
@@ -49,7 +49,7 @@ const Expense = () => {
   useFocusEffect(
     useCallback(() => {
       console.log('focus expense', id);
-      setIsEditMode(id ? false : true);
+      setIsEditMode(!!id);
       setEditedExpense(initState(expense));
 
       return () => {
