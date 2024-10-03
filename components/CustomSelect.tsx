@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {Dropdown} from 'react-native-element-dropdown';
 import AntDesign from '@expo/vector-icons/AntDesign';
@@ -8,17 +8,18 @@ interface Props {
   value: any;
   styles?: Object;
   items: Array<any>;
+  title: string;
+  disable: boolean;
 }
 
-const DropdownComponent = ({onChange = () => {}, value, items}: Props) => {
-  const [componentValue, setComponentValue] = useState(value || null);
+const DropdownComponent = ({onChange = () => {}, value, items, title, disable}: Props) => {
   const [isFocus, setIsFocus] = useState(false);
 
   const renderLabel = () => {
-    if (componentValue || isFocus) {
+    if (value || isFocus && title) {
       return (
         <Text style={[styles.label, isFocus && {color: 'blue'}]}>
-          Dropdown label
+          {title}
         </Text>
       );
     }
@@ -26,7 +27,6 @@ const DropdownComponent = ({onChange = () => {}, value, items}: Props) => {
   };
 
   const handleOnChange = (item) => {
-    setComponentValue(item.value);
     setIsFocus(false);
     onChange(item);
   };
@@ -42,12 +42,13 @@ const DropdownComponent = ({onChange = () => {}, value, items}: Props) => {
         iconStyle={styles.iconStyle}
         data={items}
         search
+        disable={disable}
         maxHeight={300}
         labelField="label"
         valueField="value"
-        placeholder={!isFocus ? 'Select item' : '...'}
-        searchPlaceholder="Search..."
-        value={componentValue}
+        placeholder={!isFocus ? 'Wybierz kategorię' : '...'}
+        searchPlaceholder="Szuka..."
+        value={value}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
         onChange={handleOnChange}

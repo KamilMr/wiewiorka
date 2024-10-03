@@ -7,20 +7,21 @@ import {Button} from 'react-native-paper';
 import _ from 'lodash';
 import {format} from 'date-fns';
 
-import {selectExpense} from '@/redux/main/selectors';
+import {selectCategories, selectExpense} from '@/redux/main/selectors';
 import {uploadExpense} from '@/redux/main/thunks';
 import {useAppDispatch, useAppSelector} from '@/hooks';
-import {TextInput} from '@/components';
+import {Select, TextInput} from '@/components';
 import CustomeDatePicker from '@/components/DatePicker';
+import {selectMe} from '@/redux/auth/authSlice';
 
 interface Expense {
-  id?: string;
-  description?: string;
-  date?: string | Date;
-  price?: string;
-  categoryId?: string;
+  id: string;
+  description: string;
+  date: string;
+  price: string;
+  categoryId: string;
   category: string;
-  image?: string;
+  image: string;
   owner: string;
 }
 
@@ -39,6 +40,8 @@ const Expense = () => {
   const dispatch = useAppDispatch();
   const {id} = useLocalSearchParams();
   const expense = useAppSelector(selectExpense(+id)) || initState();
+  const categories = useAppSelector(selectCategories);
+  const user = useAppSelector(selectMe);
 
   // State for edit mode and editing fields
   const [isEditMode, setIsEditMode] = useState(false);
@@ -49,7 +52,7 @@ const Expense = () => {
   useFocusEffect(
     useCallback(() => {
       console.log('focus expense', id);
-      setIsEditMode(!!id);
+      setIsEditMode(!id);
       setEditedExpense(initState(expense));
 
       return () => {
@@ -72,10 +75,12 @@ const Expense = () => {
   const handleSave = () => {
     const newD = _.chain(editedExpense)
       .pick(['date', 'description', 'categoryId', 'price', 'image'])
-      .omitBy(editedExpense, (d) => !d || d === 'undefined')
+      .omitBy((d) => !d || d === 'undefined')
       .value();
 
-    newD.date = newD.date.split('/').reverse().join('-');
+    if (newD.date) {
+      newD.date = newD.date.split('/').reverse().join('-');
+    }
     newD.image = newD.image ? newD.image : '';
 
     dispatch(
@@ -90,6 +95,22 @@ const Expense = () => {
   const handleCancel = () => {
     setEditedExpense({...expense}); // Revert changes
     setIsEditMode(false);
+  };
+
+  const handleDate = (date: Date | undefined) => {
+    if (!date) return;
+    setEditedExpense({
+      ...editedExpense,
+      date: format(date, 'dd/MM/yyyy'),
+    });
+  };
+
+  const handleSelectCategory = (cat: {value: string} | undefined) => {
+    if (!cat) return;
+    setEditedExpense({
+      ...editedExpense,
+      categoryId: categories.find((c) => c.category === cat.value).catId,
+    });
   };
 
   return (
@@ -120,38 +141,36 @@ const Expense = () => {
           <CustomeDatePicker
             editable={!isEditMode}
             label="Wybierz datę"
-            readOnly={!isEditMode}
+            disabled={!isEditMode}
             style={styles.input}
             value={new Date(editedExpense.date.split('/').reverse().join('-'))}
-            onChange={(date) => {
-              if (!date) return;
-              setEditedExpense({
-                ...editedExpense,
-                date: format(date, 'dd/MM/yyyy'),
-              });
-            }}
+            onChange={handleDate}
           />
 
           <TextInput
             style={styles.input}
             label="Kto dokonał zakupu"
-            readOnly={!isEditMode}
+            readOnly={true}
+            disabled={true}
             value={editedExpense.owner}
             onChangeText={(text) =>
               setEditedExpense({...editedExpense, owner: text})
             }
           />
 
-          <TextInput
-            style={styles.input}
-            label="Kategoria"
-            value={editedExpense.category}
-            readOnly={!isEditMode}
-            onChangeText={(text) =>
-              setEditedExpense({...editedExpense, category: text})
+          <Select
+            value={
+              categories.find(({catId}) => catId === editedExpense.categoryId)
+                ?.category || ''
             }
+            title="Wybierz kategorię"
+            onChange={handleSelectCategory}
+            disable={!isEditMode}
+            items={categories.map((cat) => ({
+              label: cat.category,
+              value: cat.category,
+            }))}
           />
-
           {/* Image (if provided) */}
           {expense.image ? (
             <Image source={{uri: expense.image}} style={styles.image} />

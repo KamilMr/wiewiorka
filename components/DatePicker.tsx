@@ -8,9 +8,10 @@ registerTranslation('pl', pl);
 
 interface CustomeDatePickerProps {
   editable: boolean;
-  label: string;
-  onChange: (date: Date | undefined) => Date | undefined;
+  disabled: boolean;
   readOnly: boolean;
+  label: string;
+  onChange: (date: Date | undefined) => void;
   style?: any;
   value: Date | null;
 }
@@ -20,6 +21,7 @@ const defaultValue = new Date();
 const CustomeDatePicker = ({
   label,
   editable,
+  disabled,
   readOnly,
   onChange = () => {},
   value,
@@ -33,8 +35,9 @@ const CustomeDatePicker = ({
   return (
     <DatePickerInput
       inputMode="end"
-      readOnly={readOnly}
       editable={editable}
+      disabled={disabled}
+      readOnly={readOnly}
       keyboardType="numeric"
       locale="pl"
       label={label}
