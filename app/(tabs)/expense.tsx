@@ -1,5 +1,5 @@
 import {useCallback, useRef, useState} from 'react';
-import {View, StyleSheet, Image, ScrollView} from 'react-native';
+import {View, StyleSheet, ScrollView} from 'react-native';
 import {router, useFocusEffect, useLocalSearchParams} from 'expo-router';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Button} from 'react-native-paper';
@@ -10,7 +10,7 @@ import {format} from 'date-fns';
 import {selectCategories, selectExpense} from '@/redux/main/selectors';
 import {uploadExpense} from '@/redux/main/thunks';
 import {useAppDispatch, useAppSelector} from '@/hooks';
-import {Select, TextInput} from '@/components';
+import {Select, TextInput, Image} from '@/components';
 import CustomeDatePicker from '@/components/DatePicker';
 import {selectMe} from '@/redux/auth/authSlice';
 
@@ -62,9 +62,6 @@ const Expense = () => {
       };
     }, [id]),
   );
-
-  // Placeholder image if no image is provided
-  const imagePlaceholder = 'https://via.placeholder.com/150';
 
   // Toggle between edit and view modes
   const handleEdit = () => {
@@ -171,12 +168,7 @@ const Expense = () => {
               value: cat.category,
             }))}
           />
-          {/* Image (if provided) */}
-          {expense.image ? (
-            <Image source={{uri: expense.image}} style={styles.image} />
-          ) : (
-            <Image source={{uri: imagePlaceholder}} style={styles.image} />
-          )}
+          <Image imageSrc={expense.image} editable={isEditMode} />
         </View>
 
         {/* Buttons for Edit, Save, Cancel */}

@@ -9,7 +9,7 @@ registerTranslation('pl', pl);
 interface CustomeDatePickerProps {
   editable: boolean;
   disabled: boolean;
-  readOnly: boolean;
+  readOnly?: boolean;
   label: string;
   onChange: (date: Date | undefined) => void;
   style?: any;
