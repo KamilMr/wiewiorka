@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import {Image} from 'react-native';
 
-const FullWidthPicture = ({uri}) => {
+const FullWidthImage = ({uri}: {uri: string}) => {
   const [ratio, setRatio] = useState(1);
   useEffect(() => {
     if (uri) {
@@ -20,4 +20,4 @@ const FullWidthPicture = ({uri}) => {
   );
 };
 
-export default FullWidthPicture;
+export default FullWidthImage;

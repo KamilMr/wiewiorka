@@ -59,7 +59,6 @@ export const selectRecords = (number: number, search: Search) =>
     [selectExpensesAll, selectCategories, selectIncomes],
     (expenses, categories, incomes) => {
       const {txt, categories: fc} = search;
-      console.log(categories[0]);
       let tR = expenses
         .map((exp: Expense) => ({...exp, exp: true}))
         .concat(incomes)

@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {Image, StyleSheet, View} from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 
@@ -6,10 +6,12 @@ import {
   ActivityIndicator,
   Icon,
   Menu,
+  Portal,
   TouchableRipple,
 } from 'react-native-paper';
 import {useAppDispatch} from '@/hooks';
 import {uploadFile} from '@/redux/main/thunks';
+import {Modal, FullWidthImage} from '.';
 
 const isPDF = ({url = ''}: {url: string}) =>
   getExtension(url).toLowerCase() === 'pdf';
@@ -20,12 +22,17 @@ const getExtension = (url: string = '') => {
   return parts[parts.length - 1] || '';
 };
 
-const ImageThumbnail = ({image, onPress}) => {
+const ImageThumbnail = ({
+  image,
+  onPress,
+}: {
+  image: {url: string};
+  onPress: () => void;
+}) => {
   const isPdf = isPDF(image);
 
-  console.log('imageThumbnail', image);
   return (
-    <TouchableRipple style={styles.img} onPress={onPress}>
+    <TouchableRipple style={styles.touchBtn} onPress={onPress}>
       {isPdf ? (
         <View style={styles.updBtn}>
           <Icon size={80} source="file-pdf-box" color="blue" />
@@ -61,6 +68,7 @@ const UploadButton = ({
 const CustomImage = ({
   imageSrc,
   editable,
+  onChange,
 }: {
   imageSrc: string;
   editable: boolean;
@@ -70,12 +78,15 @@ const CustomImage = ({
   const [isSaving, setIsSaving] = useState(false);
   const [isVisibleMenu, setIsVisibleMenu] = useState(false);
 
+  const [isOpenImage, setIsOpenImage] = useState<boolean>(false);
+
   const handleOpenMenu = (isOpen: boolean) => () => {
     setIsVisibleMenu(isOpen);
   };
 
   const handleViewImage = (isVisible: boolean) => () => {
     handleOpenMenu(false)();
+    setIsOpenImage(isVisible);
   };
 
   const handleUploadFile = async () => {
@@ -102,13 +113,17 @@ const CustomImage = ({
       .then((resp) => {
         setImage(initState(resp.url));
         setIsSaving(false);
+        onChange(resp.url);
       })
       .catch(() => {
         setIsSaving(false);
       });
   };
 
-  console.log('image', image);
+  useEffect(() => {
+    setImage(initState(imageSrc));
+  }, [imageSrc]);
+
   return (
     <View style={styles.root}>
       <Menu
@@ -137,6 +152,13 @@ const CustomImage = ({
           />
         )}
       </Menu>
+      {image.url && (
+        <Portal>
+          <Modal visible={isOpenImage} onDismiss={handleViewImage(false)}>
+            <FullWidthImage uri={image.url} />
+          </Modal>
+        </Portal>
+      )}
     </View>
   );
 };
@@ -165,8 +187,9 @@ const styles = StyleSheet.create({
     aspectRatio: '1',
     borderWidth: 2,
   },
-  img: {
+  touchBtn: {
     width: 100,
+    height: 100,
     maxWidth: '100%',
     aspectRatio: '1',
   },
