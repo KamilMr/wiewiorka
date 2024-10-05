@@ -110,6 +110,10 @@ const Expense = () => {
     });
   };
 
+  const handleImageSave = (url: string) => {
+    setEditedExpense({...editedExpense, image: url});
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
@@ -168,7 +172,11 @@ const Expense = () => {
               value: cat.category,
             }))}
           />
-          <Image imageSrc={expense.image} editable={isEditMode} />
+          <Image
+            imageSrc={editedExpense.image}
+            editable={isEditMode}
+            onChange={handleImageSave}
+          />
         </View>
 
         {/* Buttons for Edit, Save, Cancel */}
