@@ -1,10 +1,87 @@
-import {Text} from 'react-native-paper';
+import {BarChart, SummaryCard} from '@/components';
+import {useAppSelector} from '@/hooks';
+import {selectComparison} from '@/redux/main/selectors';
+import {useState} from 'react';
+import {ScrollView, View} from 'react-native';
+import {Button, RadioButton, Text} from 'react-native-paper';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
+const MONTH = 1;
+const YEAR = 12;
+
+const Config = ({selection, onChange, title}) => {
+  const [active, setActive] = useState(0);
+
+  const handleChange = (f) => {
+    if (typeof onChange === 'function') {
+      onChange(f);
+    }
+    setActive(selection.map((el) => el[0]).findIndex((n) => n === +f));
+  };
+
+  return (
+    <View style={{alignItems: 'center', marginBottom: 16}}>
+      <Text variant="headlineLarge">{title}</Text>
+      <RadioButton.Group
+        onValueChange={(value) => handleChange(value)}
+        value={selection[active][0].toString()}>
+        {selection.map(([f, name], idx) => (
+          <Button
+            key={f}
+            mode={idx === active ? 'contained' : 'outlined'}
+            onPress={() => handleChange(f.toString())}>
+            {name}
+          </Button>
+        ))}
+      </RadioButton.Group>
+    </View>
+  );
+};
+
 const Summary = () => {
+  const [filter, setFilter] = useState(MONTH);
+  const summary = useAppSelector(selectComparison(filter));
+  const handleChange = (f) => setFilter(f);
+
+  console.log(summary[0]);
+  const data = summary.map((obj) =>
+    ['income', 'outcome'].map((key, i) => {
+      const tR = {
+        value: parseInt(obj[key]),
+        frontColor: '#3BE9DE',
+      };
+
+      if (!(i % 2)) {
+        tR.spacing = 6;
+        tR.label = obj.date;
+        tR.frontColor = '#006DFF';
+      }
+      return tR;
+    }),
+  );
+
   return (
     <SafeAreaView>
-      <Text>Podsumowanie i wykresy</Text>
+      <ScrollView>
+        <Config
+          selection={[
+            [MONTH, 'miesiac'],
+            [YEAR, 'rok'],
+          ]}
+          onChange={handleChange}
+          title="Podsumowanie"
+        />
+        {summary.map((sumObj) => (
+          <SummaryCard
+            key={sumObj.id}
+            income={sumObj.income}
+            outcome={sumObj.outcome}
+            date={sumObj.date}
+            costs={sumObj.costs}
+          />
+        ))}
+        <BarChart barData={data.flat()} />
+      </ScrollView>
     </SafeAreaView>
   );
 };

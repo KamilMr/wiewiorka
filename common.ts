@@ -1,5 +1,5 @@
 import {NativeScrollEvent, NativeSyntheticEvent} from 'react-native';
-import {v4 as uniqueId} from 'uuid';
+import uniqueId from 'react-native-uuid';
 
 const URL = process.env.EXPO_PUBLIC_API_URL;
 
@@ -28,7 +28,7 @@ export const makeNewIdArr = (number: number) => {
   let num = number;
 
   while (num > 0) {
-    const id: string = uniqueId();
+    const id: string | number[] = uniqueId.v4();
     if (set.has(id)) continue;
     set.add(id);
     --num;
