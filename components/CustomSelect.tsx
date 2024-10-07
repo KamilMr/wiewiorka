@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {Dropdown} from 'react-native-element-dropdown';
 import AntDesign from '@expo/vector-icons/AntDesign';
@@ -8,19 +8,23 @@ interface Props {
   value: any;
   styles?: Object;
   items: Array<any>;
-  title: string;
-  disable: boolean;
+  title?: string;
+  disable?: boolean;
 }
 
-const DropdownComponent = ({onChange = () => {}, value, items, title, disable}: Props) => {
+const DropdownComponent = ({
+  onChange = () => {},
+  value,
+  items,
+  title = '',
+  disable = false,
+}: Props) => {
   const [isFocus, setIsFocus] = useState(false);
 
   const renderLabel = () => {
-    if (value || isFocus && title) {
+    if ((value || isFocus) && title) {
       return (
-        <Text style={[styles.label, isFocus && {color: 'blue'}]}>
-          {title}
-        </Text>
+        <Text style={[styles.label, isFocus && {color: 'blue'}]}>{title}</Text>
       );
     }
     return null;

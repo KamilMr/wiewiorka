@@ -76,7 +76,18 @@ const Expense = () => {
       .value();
 
     if (newD.date) {
-      newD.date = newD.date.split('/').reverse().join('-');
+      try {
+        const [day, month, year] = newD.date.split('/');
+        const parsedDate = new Date(+year, +month - 1, +day);
+        if (isNaN(parsedDate.getTime())) {
+          throw new Error('Invalid date');
+        }
+        newD.date = format(parsedDate, 'yyyy-MM-dd');
+      } catch (error) {
+        console.error('Invalid date format:', error);
+        // Handle the error (e.g., show an error message to the user)
+        return;
+      }
     }
     newD.image = newD.image ? newD.image : '';
 
