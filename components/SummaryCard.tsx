@@ -16,13 +16,16 @@ interface Props {
   outcome: number;
   date: string;
   costs: Costs;
+  icon?: string;
 }
 
-const LeftContent = (props) => <Avatar.Icon {...props} icon="folder" />;
+const LeftContent = (props: {icon: string}) => (
+  <Avatar.Icon {...props} icon={props.icon} />
+);
 
 const SummaryCard = (props: Props) => {
-  const {income, outcome, date, costs} = props;
-  // the amount of costs total
+  const {income, outcome, date, costs, icon = ''} = props;
+ // the amount of costs total
   const sumCosts = _.sumBy(_.values(costs));
 
   const handleNavigate = (whereTo: string) => router.navigate(whereTo);
@@ -31,7 +34,7 @@ const SummaryCard = (props: Props) => {
       <Card.Title
         title={date}
         subtitle={`Saldo: ${formatPrice(income - outcome)}`}
-        left={LeftContent}
+        left={icon ? () => <LeftContent icon={icon} /> : undefined}
       />
       <Card.Content style={{padding: 8}}>
         <View
