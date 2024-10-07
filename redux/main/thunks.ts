@@ -55,7 +55,7 @@ export const uploadExpense = createAsyncThunk(
 );
 
 export const uploadIncome= createAsyncThunk(
-  'expense/add',
+  'income/add',
   async ({id, ...rest}: Expense, thunkAPI) => {
     const token = thunkAPI.getState().auth.token;
 
@@ -109,3 +109,29 @@ export const handleCategory = createAsyncThunk(
   },
 );
 
+export const uploadFile = createAsyncThunk(
+  'expense/image',
+  async ({file}, thunkAPI) => {
+    const token = thunkAPI.getState().auth.token;
+    let data;
+    const path = 'expenses/image';
+    try {
+      let resp = await fetch(getURL(path), {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: file,
+      });
+      console.log('response', resp)
+      data = await resp.json();
+      console.log('ds',data)
+      if (data.err) throw data;
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+    await thunkAPI.dispatch(fetchIni());
+    return data.d;
+  },
+);

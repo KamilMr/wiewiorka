@@ -4,40 +4,11 @@ import _ from 'lodash';
 
 import {makeNewIdArr} from '@/common';
 import {RootState} from '../store';
-
-type Expense = {
-  category: string;
-  categoryId: number;
-  color: string;
-  date: string;
-  description: string;
-  exp: boolean;
-  id: number;
-  image: string;
-  owner: string;
-  price: number;
-  receipt: string;
-};
+import {Expense} from './mainSlice';
 
 type Search = {
   txt: string;
   categories: Array<string>;
-};
-
-type Record = {
-  category: string;
-  categoryId: number;
-  color: string;
-  date: string;
-  description: string;
-  exp: boolean;
-  id: number;
-  image: string;
-  owner: string;
-  price: number;
-  receipt: string;
-  vat: number;
-  source: string;
 };
 
 export const selectSnackbar = (state: RootState) => state.main.snackbar;
@@ -59,11 +30,10 @@ export const selectRecords = (number: number, search: Search) =>
     [selectExpensesAll, selectCategories, selectIncomes],
     (expenses, categories, incomes) => {
       const {txt, categories: fc} = search;
-      console.log(categories[0]);
       let tR = expenses
-        .map((exp: Expense) => ({...exp, exp: true}))
+        .map((exp) => ({...exp, exp: true}))
         .concat(incomes)
-        .map((obj: Record) => ({
+        .map((obj) => ({
           ...obj,
           description: obj.description || '',
           category: obj?.exp
@@ -74,7 +44,7 @@ export const selectRecords = (number: number, search: Search) =>
             : null,
         }));
 
-      tR = tR.filter((exp: Expense) => {
+      tR = tR.filter((exp) => {
         return filterTxt(exp, txt) && filterCat(exp, fc);
       });
       return _.chain(tR)
@@ -104,7 +74,7 @@ export const selectExpense = (id: number) =>
     };
   });
 
-export const selectIncome = (id) =>
+export const selectIncome = (id: string | number) =>
   createSelector([selectIncomes], (inc) => {
     const income = inc.find((inc) => inc.id === +id);
     if (!income) return;
@@ -138,19 +108,20 @@ export const selectMainCategories = createSelector(
   },
 );
 
-export const selectComparison = (num) =>
+export const selectComparison = (num: number | string) =>
   createSelector([selectIncomes, selectExpensesAll], (income, expenses) => {
-    const pattern = +num === 1 ? 'MM/yyyy' : 'yyyy';
-    const calPrice = (price, vat = 0) => price - price * (vat / 100);
+    const pattern: string = +num === 1 ? 'MM/yyyy' : 'yyyy';
+    const calPrice = (price: number, vat: number = 0): number =>
+      price - price * (vat / 100);
 
     /** {
       2023: {income, date, outcome}
       11/2023: {income, date, outcome}
      }*/
-    const tR = {};
+    const tR: any = {};
     income.forEach((obj) => {
       const {date, price, vat} = obj;
-      const fd = format(new Date(date), pattern);
+      const fd: string = format(new Date(date), pattern);
       if (!tR[fd]) tR[fd] = {income: 0, date: fd, outcome: 0, costs: {}};
 
       tR[fd].income += calPrice(price, vat);
@@ -168,7 +139,7 @@ export const selectComparison = (num) =>
 
     const arr = Object.values(tR);
     const ids = makeNewIdArr(arr.length);
-    arr.forEach((ob, idx) => (ob.id = ids[idx]));
+    arr.forEach((object, idx) => (object.id = ids[idx]));
     return _.orderBy(arr, ['year', 'month'], ['desc', 'desc']);
   });
 

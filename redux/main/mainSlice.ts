@@ -2,7 +2,7 @@ import {createSlice} from '@reduxjs/toolkit';
 
 import _ from 'lodash';
 
-import {fetchIni, handleCategory, uploadExpense} from './thunks';
+import {fetchIni, handleCategory, uploadExpense, uploadFile} from './thunks';
 import {format} from 'date-fns';
 
 type Snackbar = {
@@ -11,11 +11,41 @@ type Snackbar = {
   msg: string;
 };
 
-// TODO: write propper types 
+type Income = {
+  date: string;
+  id: number;
+  owner: string;
+  price: number;
+  source: string;
+  valt: number;
+};
+
+export type Expense = {
+  category: string;
+  date: string;
+  description: string;
+  id: number;
+  image: string;
+  owner: string;
+  price: number;
+  receipt: string;
+  exp: boolean;
+};
+interface Category {
+  catId: number;
+  category: string;
+  color: string;
+}
+
+interface Group {
+  categories: Category[];
+  groupName: string;
+}
+
 interface MainSlice {
-  expenses: Array<{[key: string]: any}>;
-  incomes: Array<{[key: string]: any}>;
-  categories: {[key: string]: any};
+  expenses: Array<Expense>;
+  incomes: Array<Income>;
+  categories: {[key: number]: Group};
   snackbar: Snackbar;
 }
 
@@ -43,7 +73,7 @@ const mainSlice = createSlice({
       state.snackbar = {type, msg, open};
     },
     initState: (state, action) => {
-      state.expenses = action.payload.expenses.map((ex) => ({
+      state.expenses = action.payload.expenses.map((ex: Expense) => ({
         ...ex,
         date: format(ex.date, 'yyyy-MM-dd'),
       }));
@@ -53,7 +83,7 @@ const mainSlice = createSlice({
     addExpense: (state, action) => {
       state.expenses = [
         ...state.expenses,
-        ...action.payload.map((ex) => ({
+        ...action.payload.map((ex: Expense) => ({
           ...ex,
           date: format(ex.date, 'yyyy-MM-dd'),
         })),
@@ -67,7 +97,7 @@ const mainSlice = createSlice({
 
       state.expenses = [
         ...stateNew,
-        ...exp.map((ex) => ({
+        ...exp.map((ex: Expense) => ({
           ...ex,
           date: format(ex.date, 'yyyy-MM-dd'),
         })),
@@ -75,7 +105,7 @@ const mainSlice = createSlice({
     },
     addIncome: (state, action) => {
       if (!action.payload?.length) return;
-      state.incomes = action.payload.map((inc) => ({
+      state.incomes = action.payload.map((inc: Income) => ({
         ...inc,
         date: format(inc.date, 'yyyy-MM-dd'),
       }));
@@ -92,12 +122,12 @@ const mainSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchIni.fulfilled, (state, action) => {
-        state.expenses = action.payload.expenses.map((ex) => ({
+        state.expenses = action.payload.expenses.map((ex: Expense) => ({
           ...ex,
           date: format(ex.date, 'yyyy-MM-dd'),
         }));
         state.categories = action.payload.categories;
-        state.incomes = action.payload.income.map((inc) => ({
+        state.incomes = action.payload.income.map((inc: Income) => ({
           ...inc,
           date: format(inc.date, 'yyyy-MM-dd'),
         }));
@@ -115,8 +145,13 @@ const mainSlice = createSlice({
         state.snackbar.type = 'error';
         state.snackbar.msg = action.error.message;
       })
+      .addCase(uploadFile.rejected, (state, action) => {
+        state.snackbar.open = true;
+        state.snackbar.type = 'error';
+        state.snackbar.msg = action.error.message;
+      })
       .addCase(uploadExpense.rejected, (state, action) => {
-        console.log('rejected expense', action.payload);
+        console.log('rejected expense', action.error);
       });
   },
 });
