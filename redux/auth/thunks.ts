@@ -24,7 +24,6 @@ export const signIn = createAsyncThunk(
         body: JSON.stringify({email, password}),
       });
       data = await resp.json();
-      console.log('data', data);
       if (data.err) throw data.err;
     } catch (err) {
       throw err;
