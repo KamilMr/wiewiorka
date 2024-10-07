@@ -25,10 +25,12 @@ const LeftContent = (props: {icon: string}) => (
 
 const SummaryCard = (props: Props) => {
   const {income, outcome, date, costs, icon = ''} = props;
- // the amount of costs total
+  // the amount of costs total
   const sumCosts = _.sumBy(_.values(costs));
 
-  const handleNavigate = (whereTo: string) => router.navigate(whereTo);
+  const handleNavigate = (date: string) => () =>
+    router.navigate({pathname: '/summary/main-summary', params: {date}});
+
   return (
     <Card style={styles.root}>
       <Card.Title
@@ -71,7 +73,10 @@ const SummaryCard = (props: Props) => {
         </View>
       </Card.Content>
       <Card.Actions>
-        <Button>Zobacz Szczegóły</Button>
+        <Button
+          onPress={handleNavigate(date.split('/').reverse().join('-') + '-01')}>
+          Zobacz Szczegóły
+        </Button>
       </Card.Actions>
     </Card>
   );

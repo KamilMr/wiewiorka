@@ -1,3 +1,4 @@
+import { isAfter, isBefore, isSameDay } from 'date-fns';
 import {NativeScrollEvent, NativeSyntheticEvent} from 'react-native';
 import uniqueId from 'react-native-uuid';
 
@@ -43,4 +44,9 @@ export const isCloseToBottom = ({
   contentSize,
 }: NativeSyntheticEvent<NativeScrollEvent>['nativeEvent']): boolean => {
   return layoutMeasurement.height + contentOffset.y >= contentSize.height - 20;
+};
+
+export const dh = {
+  isBetweenDates: (d, s, e) =>
+    (isBefore(d, e) && isAfter(d, s)) || isSameDay(d, s) || isSameDay(d, e),
 };

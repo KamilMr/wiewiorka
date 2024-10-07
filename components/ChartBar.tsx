@@ -13,7 +13,9 @@ interface Props {
 
 const CustomBar = (props: Props) => {
   const {barData, title = ''} = props;
-  return <BarChart data={barData} />;
+  return <BarChart data={barData} 
+xAxisTextNumberOfLines={3} 
+  />;
 };
 
 export default CustomBar;

@@ -48,22 +48,6 @@ const Summary = () => {
   const summary = useAppSelector(selectComparison(filter));
   const handleChange = (f) => setFilter(f);
 
-  const data = summary.map((obj) =>
-    ['income', 'outcome'].map((key, i) => {
-      const tR = {
-        value: parseInt(obj[key]),
-        frontColor: '#3BE9DE',
-      };
-
-      if (!(i % 2)) {
-        tR.spacing = 6;
-        tR.label = obj.date;
-        tR.frontColor = '#006DFF';
-      }
-      return tR;
-    }),
-  );
-
   return (
     <SafeAreaView>
       <ScrollView>
@@ -84,7 +68,6 @@ const Summary = () => {
             costs={sumObj.costs}
           />
         ))}
-        <BarChart barData={data.flat()} />
       </ScrollView>
     </SafeAreaView>
   );
