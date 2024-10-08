@@ -1,9 +1,9 @@
 import {useState} from 'react';
 import {useLocalSearchParams} from 'expo-router';
 import {ScrollView, View} from 'react-native';
-import {Text} from 'react-native-paper';
+import {Button, Text} from 'react-native-paper';
 
-import {BarChart, DatePicker} from '@/components';
+import {BarChart, Chip, DatePicker} from '@/components';
 import {lastDayOfMonth} from 'date-fns';
 import {useAppSelector} from '@/hooks';
 import {aggregateExpenses} from '@/redux/main/selectors';
@@ -37,13 +37,19 @@ const Summary = () => {
 
   const aggrExpenses = useAppSelector(aggregateExpenses(filterDates)) || [];
 
-  const categories = aggrExpenses.map((o: any) => ({name: o.name, id: o.id}));
+  const categories = aggrExpenses.map((o: any) => ({
+    name: o.name,
+    id: o.id,
+    color: o.color,
+  }));
   const [filters, setFilters] = useState(
     categories.filter((c) => !EXCLUDED_CAT.includes(c.id)),
   );
 
   const setCat = new Set(filters.map((o) => o.name));
+
   const handleRemoveFilters = () => setFilters([]);
+  const handleResetFilters = () => setFilters(categories);
 
   const data: ToReturn[] = aggrExpenses
     .filter((obj) => (setCat.size > 0 ? setCat.has(obj.name) : true))
@@ -66,6 +72,15 @@ const Summary = () => {
       return tR;
     });
 
+  const handleFilters = (catId: number) => () => {
+    const isThere = filters.findIndex((f) => f.id === catId);
+    setFilters(
+      isThere > -1
+        ? filters.filter((f) => f.id !== catId)
+        : [...filters, categories.find((f) => f.id === catId)],
+    );
+  };
+
   return (
     <SafeAreaView>
       <ScrollView>
@@ -74,15 +89,60 @@ const Summary = () => {
             <DatePicker
               value={filterDates[0]}
               style={{marginRight: 8, marginBottom: 8}}
-              onChange={(date = filterDates[0]) => setFilterDates([date, filterDates[1]])}
+              onChange={(date = filterDates[0]) =>
+                setFilterDates([date, filterDates[1]])
+              }
             />
             <DatePicker
               style={{marginRight: 8, marginBottom: 8}}
               value={filterDates[1]}
-              onChange={(date = filterDates[1])=> setFilterDates([filterDates[0], date])}
+              onChange={(date = filterDates[1]) =>
+                setFilterDates([filterDates[0], date])
+              }
             />
           </View>
-          <Text>{date}</Text>
+          <ScrollView
+            style={{maxHeight: 150}}
+            showsVerticalScrollIndicator={true}>
+            <View
+              style={{
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+              }}>
+              {categories.map((c) => (
+                <Chip
+                  key={c.id}
+                  selectedColor={
+                    filters.find((f) => f.id === c.id)?.color || '#808080'
+                  }
+                  rippleColor={c.color}
+                  mode="outlined"
+                  showSelectedCheck={false}
+                  icon={undefined}
+                  style={{margin: 4}}
+                  selected={!!filters.find((f) => f.id === c.id)}
+                  onPress={handleFilters(c.id)}>
+                  <Text
+                    style={{
+                      fontSize: 10,
+                      fontWeight: !!filters.find((f) => f.id === c.id)
+                        ? 600
+                        : 400,
+                      color:
+                        filters.find((f) => f.id === c.id)?.color || '#808080',
+                    }}>
+                    {c.name}
+                  </Text>
+                </Chip>
+              ))}
+            </View>
+          </ScrollView>
+          <Button
+            onPress={
+              filters.length > 0 ? handleRemoveFilters : handleResetFilters
+            }>
+            {filters.length > 0 ? 'Usuń filtry' : 'Zaznacz wszystkie'}
+          </Button>
           <BarChart title="title" barData={data} />
         </View>
       </ScrollView>
