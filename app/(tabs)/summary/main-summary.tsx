@@ -1,19 +1,30 @@
 import {useState} from 'react';
 import {useLocalSearchParams} from 'expo-router';
-import {View} from 'react-native';
+import {ScrollView, View} from 'react-native';
 import {Text} from 'react-native-paper';
 
-import {BarChart} from '@/components';
+import {BarChart, DatePicker} from '@/components';
 import {lastDayOfMonth} from 'date-fns';
 import {useAppSelector} from '@/hooks';
 import {aggregateExpenses} from '@/redux/main/selectors';
-import {formatPrice} from '@/common';
+import {EXCLUDED_CAT, formatPrice} from '@/common';
 import {parseInt} from 'lodash';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 type AggrExpense = {
   v: number;
   color: string;
   name: string;
+  id: string;
+};
+
+type ToReturn = {
+  value: number;
+  frontColor: string;
+  label: string;
+  spacing: number;
+  barWidth: number;
+  topLabelComponent: () => JSX.Element;
 };
 
 const Summary = () => {
@@ -26,31 +37,56 @@ const Summary = () => {
 
   const aggrExpenses = useAppSelector(aggregateExpenses(filterDates)) || [];
 
-  const data = aggrExpenses.map((obj: AggrExpense) => {
-    const tR = {
-      value: obj.v,
-      frontColor: obj.color,
-      label: obj.name,
-      spacing: 10,
-      barWidth: 50,
-      topLabelComponent: () => (
-        <>
-          <Text style={{fontSize: 8}}>
-            {formatPrice(parseInt(obj.v.toString()))}
-          </Text>
-        </>
-      ),
-    };
+  const categories = aggrExpenses.map((o: any) => ({name: o.name, id: o.id}));
+  const [filters, setFilters] = useState(
+    categories.filter((c) => !EXCLUDED_CAT.includes(c.id)),
+  );
 
-    return tR;
-  });
+  const setCat = new Set(filters.map((o) => o.name));
+  const handleRemoveFilters = () => setFilters([]);
+
+  const data: ToReturn[] = aggrExpenses
+    .filter((obj) => (setCat.size > 0 ? setCat.has(obj.name) : true))
+    .map((obj: AggrExpense) => {
+      const tR: ToReturn = {
+        value: obj.v,
+        frontColor: obj.color,
+        label: obj.name,
+        spacing: 10,
+        barWidth: 50,
+        topLabelComponent: () => (
+          <>
+            <Text style={{fontSize: 8}}>
+              {formatPrice(parseInt(obj.v.toString()))}
+            </Text>
+          </>
+        ),
+      };
+
+      return tR;
+    });
 
   return (
-    <View>
-      <Text>Hello from summary: </Text>
-      <Text>{date}</Text>
-      <BarChart title="title" barData={data} />
-    </View>
+    <SafeAreaView>
+      <ScrollView>
+        <View>
+          <View style={{marginBottom: 16}}>
+            <DatePicker
+              value={filterDates[0]}
+              style={{marginRight: 8, marginBottom: 8}}
+              onChange={(date = filterDates[0]) => setFilterDates([date, filterDates[1]])}
+            />
+            <DatePicker
+              style={{marginRight: 8, marginBottom: 8}}
+              value={filterDates[1]}
+              onChange={(date = filterDates[1])=> setFilterDates([filterDates[0], date])}
+            />
+          </View>
+          <Text>{date}</Text>
+          <BarChart title="title" barData={data} />
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 

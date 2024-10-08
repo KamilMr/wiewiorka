@@ -2,7 +2,7 @@ import {createSelector} from '@reduxjs/toolkit';
 import {format} from 'date-fns';
 import _ from 'lodash';
 
-import {dh, makeNewIdArr} from '@/common';
+import {EXCLUDED_CAT, dh, makeNewIdArr} from '@/common';
 import {RootState} from '../store';
 import {Expense} from './mainSlice';
 
@@ -134,7 +134,7 @@ export const selectComparison = (num: number | string) =>
       if (!tR[fd]) tR[fd] = {income: 0, date: fd, outcome: 0, costs: {}};
       tR[fd].outcome += price;
       tR[fd].costs[owner] ??= 0;
-      tR[fd].costs[owner] += [72, 83].includes(categoryId) ? price : 0;
+      tR[fd].costs[owner] += EXCLUDED_CAT.includes(categoryId) ? price : 0;
     });
 
     const arr = Object.values(tR);
@@ -158,6 +158,7 @@ export const aggregateExpenses = (agrDates = [new Date(), new Date()]) =>
           v: 0,
           name: cat.category,
           color: '#' + cat.color,
+          id: cat.catId,
         };
 
         tR[categoryId].v += price;

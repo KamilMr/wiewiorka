@@ -4,6 +4,7 @@ import uniqueId from 'react-native-uuid';
 
 const URL = process.env.EXPO_PUBLIC_API_URL;
 
+
 export const CATEGORY_LIST_ADD_EDIT_PATH = 'category-list/:param';
 export const CATS_PATH = 'cats';
 export const EXPENSE_ADD_EDIT_PATH = 'expense-list/:param';
@@ -14,6 +15,8 @@ export const INCOME_LIST_PATH = 'income-list';
 export const LOGIN_PATH = 'login';
 export const SUMMARY_PATH = 'summary';
 export const SUMMARY_CHART = 'summary/chart/:param';
+
+export const EXCLUDED_CAT = [72, 83];
 
 export const getURL = (p = '') => {
   return `${URL}/${p}`;
