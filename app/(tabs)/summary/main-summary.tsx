@@ -74,11 +74,11 @@ const Summary = () => {
 
   const handleFilters = (catId: number) => () => {
     const isThere = filters.findIndex((f) => f.id === catId);
-    setFilters(
+    const newState =
       isThere > -1
         ? filters.filter((f) => f.id !== catId)
-        : [...filters, categories.find((f) => f.id === catId)],
-    );
+        : [...filters, categories.find((f) => f.id === catId)];
+    setFilters(newState);
   };
 
   return (
@@ -101,50 +101,50 @@ const Summary = () => {
               }
             />
           </View>
-          <ScrollView
-            style={{maxHeight: 150}}
-            showsVerticalScrollIndicator={true}>
-            <View
-              style={{
-                flexDirection: 'row',
-                flexWrap: 'wrap',
-              }}>
-              {categories.map((c) => (
-                <Chip
-                  key={c.id}
-                  selectedColor={
-                    filters.find((f) => f.id === c.id)?.color || '#808080'
-                  }
-                  rippleColor={c.color}
-                  mode="outlined"
-                  showSelectedCheck={false}
-                  icon={undefined}
-                  style={{margin: 4}}
-                  selected={!!filters.find((f) => f.id === c.id)}
-                  onPress={handleFilters(c.id)}>
-                  <Text
-                    style={{
-                      fontSize: 10,
-                      fontWeight: !!filters.find((f) => f.id === c.id)
-                        ? 600
-                        : 400,
-                      color:
-                        filters.find((f) => f.id === c.id)?.color || '#808080',
-                    }}>
-                    {c.name}
-                  </Text>
-                </Chip>
-              ))}
-            </View>
-          </ScrollView>
-          <Button
-            onPress={
-              filters.length > 0 ? handleRemoveFilters : handleResetFilters
-            }>
-            {filters.length > 0 ? 'Usuń filtry' : 'Zaznacz wszystkie'}
-          </Button>
           <BarChart title="title" barData={data} />
         </View>
+        <ScrollView
+          style={{maxHeight: 150}}
+          showsVerticalScrollIndicator={true}>
+          <View
+            style={{
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+            }}>
+            {categories.map((c) => (
+              <Chip
+                key={c.id}
+                selectedColor={
+                  filters.find((f) => f.id === c.id)?.color || '#808080'
+                }
+                rippleColor={c.color}
+                mode="outlined"
+                showSelectedCheck={false}
+                icon={undefined}
+                style={{margin: 4}}
+                selected={!!filters.find((f) => f.id === c.id)}
+                onPress={handleFilters(c.id)}>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontWeight: !!filters.find((f) => f.id === c.id)
+                      ? 600
+                      : 400,
+                    color:
+                      filters.find((f) => f.id === c.id)?.color || '#808080',
+                  }}>
+                  {c.name}
+                </Text>
+              </Chip>
+            ))}
+          </View>
+        </ScrollView>
+        <Button
+          onPress={
+            filters.length > 0 ? handleRemoveFilters : handleResetFilters
+          }>
+          {filters.length > 0 ? 'Usuń filtry' : 'Zaznacz wszystkie'}
+        </Button>
       </ScrollView>
     </SafeAreaView>
   );

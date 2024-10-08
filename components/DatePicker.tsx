@@ -7,10 +7,10 @@ import {
 registerTranslation('pl', pl);
 
 interface CustomeDatePickerProps {
-  editable: boolean;
-  disabled: boolean;
+  editable?: boolean;
+  disabled?: boolean;
   readOnly?: boolean;
-  label: string;
+  label?: string;
   onChange: (date: Date | undefined) => void;
   style?: any;
   value: Date | null;
