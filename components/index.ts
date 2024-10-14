@@ -1,17 +1,19 @@
+import CustomImage from './CustomImage';
+import CustomModal from './CustomModal';
 import CustomSnackBar from './Snackbar';
 import CustomTextInput from './CustomTextInput';
 import CustomeDatePicker from './DatePicker';
 import DropdownComponent from './CustomSelect';
-import CustomImage from './CustomImage';
-import CustomModal from './CustomModal';
 import FullWidthImage from './FullImage';
+import MyTabBar from './CustomTab';
 
 export {
-  CustomeDatePicker as DatePicker,
-  CustomTextInput as TextInput,
-  CustomSnackBar as SnackBar,
-  DropdownComponent as Select,
   CustomImage as Image,
   CustomModal as Modal,
+  CustomSnackBar as SnackBar,
+  CustomTextInput as TextInput,
+  CustomeDatePicker as DatePicker,
+  DropdownComponent as Select,
   FullWidthImage as FullWidthImage,
+  MyTabBar as TabBar,
 };
