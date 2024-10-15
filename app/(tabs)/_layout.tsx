@@ -21,7 +21,7 @@ const TabLayout = () => {
 
   return (
     <Tabs
-      tabBar={props =>  <TabBar {...props} />}
+      tabBar={(props) => <TabBar {...props} />}
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
@@ -34,8 +34,6 @@ const TabLayout = () => {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({color, focused}) => (
-          ),
         }}
       />
       <Tabs.Screen
