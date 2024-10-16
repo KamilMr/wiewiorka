@@ -11,7 +11,7 @@ import {
 } from 'react-native-paper';
 import {useAppDispatch} from '@/hooks';
 import {uploadFile} from '@/redux/main/thunks';
-import * as Modal from './CustomModal';
+import Modal from './CustomModal';
 import FullWidthImage from './FullImage';
 
 const isPDF = ({url = ''}: {url: string}) =>

@@ -10,14 +10,15 @@ import {useAppSelector} from '@/hooks';
 
 const MONTH = 1;
 const YEAR = 12;
+const SUMMARY_TITLE = 'Podsumowanie';
+const MONTH_LABEL = 'miesiac';
+const YEAR_LABEL = 'rok';
 
 const Config = ({selection, onChange, title}) => {
   const [active, setActive] = useState(0);
 
   const handleChange = (f) => {
-    if (typeof onChange === 'function') {
-      onChange(f);
-    }
+      onChange?.(f);
     setActive(selection.map((el) => el[0]).findIndex((n) => n === +f));
   };
 
@@ -53,11 +54,11 @@ const Summary = () => {
       <ScrollView>
         <Config
           selection={[
-            [MONTH, 'miesiac'],
-            [YEAR, 'rok'],
+            [MONTH, MONTH_LABEL],
+            [YEAR, YEAR_LABEL],
           ]}
           onChange={handleChange}
-          title="Podsumowanie"
+          title={SUMMARY_TITLE}
         />
         {summary.map((sumObj) => (
           <SummaryCard

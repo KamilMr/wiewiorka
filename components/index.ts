@@ -18,6 +18,6 @@ export {
   CustomTextInput as TextInput,
   CustomeDatePicker as DatePicker,
   DropdownComponent as Select,
-  FullWidthImage as FullWidthImage,
+  FullWidthImage,
   SummaryCard,
 };

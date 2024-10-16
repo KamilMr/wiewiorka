@@ -32,7 +32,7 @@ const Summary = () => {
   const isNotYear: boolean = date.split('-').length > 2;
   const [filterDates, setFilterDates] = useState([
     new Date(date),
-    new Date(lastDayOfMonth(isNotYear ? new Date(date) : new Date())),
+    lastDayOfMonth(isNotYear ? new Date(date) : new Date()),
   ]);
 
   const aggrExpenses = useAppSelector(aggregateExpenses(filterDates)) || [];
@@ -73,11 +73,15 @@ const Summary = () => {
     });
 
   const handleFilters = (catId: number) => () => {
+    const categoryToAdd = categories.find((f) => f.id === catId);
+    if (!categoryToAdd) {
+      return;
+    }
     const isThere = filters.findIndex((f) => f.id === catId);
     const newState =
       isThere > -1
         ? filters.filter((f) => f.id !== catId)
-        : [...filters, categories.find((f) => f.id === catId)];
+        : [...filters, categoryToAdd];
     setFilters(newState);
   };
 
@@ -111,32 +115,33 @@ const Summary = () => {
               flexDirection: 'row',
               flexWrap: 'wrap',
             }}>
-            {categories.map((c) => (
-              <Chip
-                key={c.id}
-                selectedColor={
-                  filters.find((f) => f.id === c.id)?.color || '#808080'
-                }
-                rippleColor={c.color}
-                mode="outlined"
-                showSelectedCheck={false}
-                icon={undefined}
-                style={{margin: 4}}
-                selected={!!filters.find((f) => f.id === c.id)}
-                onPress={handleFilters(c.id)}>
-                <Text
-                  style={{
-                    fontSize: 14,
-                    fontWeight: !!filters.find((f) => f.id === c.id)
-                      ? 600
-                      : 400,
-                    color:
-                      filters.find((f) => f.id === c.id)?.color || '#808080',
-                  }}>
-                  {c.name}
-                </Text>
-              </Chip>
-            ))}
+            {categories.map((c) => {
+              const isSelected = !!filters.find((f) => f.id === c.id);
+              return (
+                <Chip
+                  key={c.id}
+                  selectedColor={
+                    filters.find((f) => f.id === c.id)?.color || '#808080'
+                  }
+                  rippleColor={c.color}
+                  mode="outlined"
+                  showSelectedCheck={false}
+                  icon={undefined}
+                  style={{margin: 4}}
+                  selected={isSelected}
+                  onPress={handleFilters(c.id)}>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      fontWeight: isSelected ? 600 : 400,
+                      color:
+                        filters.find((f) => f.id === c.id)?.color || '#808080',
+                    }}>
+                    {c.name}
+                  </Text>
+                </Chip>
+              );
+            })}
           </View>
         </ScrollView>
         <Button

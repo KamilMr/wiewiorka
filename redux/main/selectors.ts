@@ -157,7 +157,7 @@ export const aggregateExpenses = (agrDates = [new Date(), new Date()]) =>
         tR[categoryId] ??= {
           v: 0,
           name: cat.category,
-          color: '#' + cat.color,
+          color: '#' + (typeof cat.color !== 'string' ? '000000': cat.color),
           id: cat.catId,
         };
 
