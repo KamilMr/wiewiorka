@@ -1,7 +1,9 @@
+import { isAfter, isBefore, isSameDay } from 'date-fns';
 import {NativeScrollEvent, NativeSyntheticEvent} from 'react-native';
-import {v4 as uniqueId} from 'uuid';
+import uniqueId from 'react-native-uuid';
 
 const URL = process.env.EXPO_PUBLIC_API_URL;
+
 
 export const CATEGORY_LIST_ADD_EDIT_PATH = 'category-list/:param';
 export const CATS_PATH = 'cats';
@@ -13,6 +15,8 @@ export const INCOME_LIST_PATH = 'income-list';
 export const LOGIN_PATH = 'login';
 export const SUMMARY_PATH = 'summary';
 export const SUMMARY_CHART = 'summary/chart/:param';
+
+export const EXCLUDED_CAT = [72, 83];
 
 export const getURL = (p = '') => {
   return `${URL}/${p}`;
@@ -28,7 +32,7 @@ export const makeNewIdArr = (number: number) => {
   let num = number;
 
   while (num > 0) {
-    const id: string = uniqueId();
+    const id: string | number[] = uniqueId.v4();
     if (set.has(id)) continue;
     set.add(id);
     --num;
@@ -43,4 +47,9 @@ export const isCloseToBottom = ({
   contentSize,
 }: NativeSyntheticEvent<NativeScrollEvent>['nativeEvent']): boolean => {
   return layoutMeasurement.height + contentOffset.y >= contentSize.height - 20;
+};
+
+export const dh = {
+  isBetweenDates: (d, s, e) =>
+    (isBefore(d, e) && isAfter(d, s)) || isSameDay(d, s) || isSameDay(d, e),
 };
