@@ -226,6 +226,7 @@ const Expense = () => {
             </>
           )}
         </View>
+        <View style={{height: 60}}/>
       </ScrollView>
     </SafeAreaView>
   );

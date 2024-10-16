@@ -2,20 +2,28 @@ import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 
 import {BottomTabBarProps} from '@react-navigation/bottom-tabs';
 import {TabBarIcon} from './navigation/TabBarIcon';
-
-const NOT_SHOWN = ['income'];
+import Menu from './Menu.tsx';
+import {useState} from 'react';
+import {Button} from 'react-native-paper';
 
 type IconProp = {
   color: string;
   isFocus: boolean;
 };
 
+type Items = {
+  title: string;
+  onPress: () => void;
+};
+type ContextMenuAction = {
+  [key: string]: Items[];
+};
 const MyTabBar = ({
   state,
   descriptors,
   navigation,
   showLabel = false,
-}: BottomTabBarProps & {showLabel: boolean}) => {
+}: BottomTabBarProps & {showLabel?: boolean}) => {
   const icons = {
     index: (props: IconProp) => (
       <TabBarIcon name={props.isFocus ? 'home' : 'home-outline'} {...props} />
@@ -23,7 +31,7 @@ const MyTabBar = ({
     records: (props: IconProp) => (
       <TabBarIcon name={props.isFocus ? 'cash' : 'cash-outline'} {...props} />
     ),
-    expense: (props: IconProp) => (
+    addnew: (props: IconProp) => (
       <TabBarIcon name={props.isFocus ? 'add' : 'add-outline'} {...props} />
     ),
     summary: (props: IconProp) => (
@@ -39,6 +47,28 @@ const MyTabBar = ({
       />
     ),
   };
+
+  const [visible, setVisible] = useState<boolean[]>([]);
+
+  const closeMenu = () => setVisible([]);
+  const contextMenuAction: ContextMenuAction = {
+    addnew: [
+      {
+        title: 'Dodaj Wpływ',
+        onPress: () => {
+          navigation.navigate('income');
+          closeMenu();
+        },
+      },
+    ],
+  };
+
+  const openMenu = (idx: number) => {
+    const _visible = [...visible];
+    _visible[idx] = true;
+    setVisible(_visible);
+  };
+
   return (
     <View style={styles.root}>
       {state.routes.map((route, index) => {
@@ -64,35 +94,43 @@ const MyTabBar = ({
           }
         };
 
-        const onLongPress = () => {
+        const onLongPress = (idx: number) => () => {
+          openMenu(idx);
           navigation.emit({
             type: 'tabLongPress',
             target: route.key,
           });
         };
 
-        if (NOT_SHOWN.includes(route.name)) return null;
 
         return (
-          <TouchableOpacity
-            key={route.name}
-            accessibilityRole="button"
-            accessibilityState={isFocused ? {selected: true} : {}}
-            accessibilityLabel={options.tabBarAccessibilityLabel}
-            testID={options.tabBarTestID}
-            onPress={onPress}
-            onLongPress={onLongPress}
-            style={styles.tabBarItem}>
-            {icons[route.name]?.({
-              color: isFocused ? '#673ab7' : '#222',
-              isFocus: isFocused,
-            })}
-            {showLabel && (
-              <Text style={{color: isFocused ? '#673ab7' : '#222'}}>
-                {label}
-              </Text>
-            )}
-          </TouchableOpacity>
+          <Button style={styles.tabBarItem}>
+            <Menu
+              key={route.name}
+              visible={visible[index] || false}
+              closeMenu={closeMenu}
+              items={contextMenuAction[route.name] || []}
+              anchor={
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  accessibilityState={isFocused ? {selected: true} : {}}
+                  accessibilityLabel={options.tabBarAccessibilityLabel}
+                  testID={options.tabBarTestID}
+                  onPress={onPress}
+                  onLongPress={onLongPress(index)}>
+                  {icons[route.name]?.({
+                    color: isFocused ? '#673ab7' : '#222',
+                    isFocus: isFocused,
+                  })}
+                  {showLabel && (
+                    <Text style={{color: isFocused ? '#673ab7' : '#222'}}>
+                      {label}
+                    </Text>
+                  )}
+                </TouchableOpacity>
+              }
+            />
+          </Button>
         );
       })}
     </View>
@@ -102,7 +140,7 @@ const MyTabBar = ({
 const styles = StyleSheet.create({
   root: {
     position: 'absolute',
-    bottom: 50,
+    bottom: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',

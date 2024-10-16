@@ -1,4 +1,4 @@
-import CustomBar from "./ChartBar";
+import CustomBar from './ChartBar';
 import CustomImage from './CustomImage';
 import CustomModal from './CustomModal';
 import CustomSnackBar from './Snackbar';
@@ -7,13 +7,14 @@ import CustomeDatePicker from './DatePicker';
 import DropdownComponent from './CustomSelect';
 import FullWidthImage from './FullImage';
 import MyTabBar from './CustomTab';
-import SummaryCard from "./SummaryCard";
-import CustomChip from "./Chip";
-
+import SummaryCard from './SummaryCard';
+import CustomChip from './Chip';
+import CustomMenu from './Menu';
 
 export {
   CustomBar as BarChart,
   CustomChip as Chip,
+  CustomMenu as Menu,
   CustomImage as Image,
   CustomModal as Modal,
   CustomSnackBar as SnackBar,

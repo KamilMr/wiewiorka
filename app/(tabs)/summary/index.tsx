@@ -69,6 +69,7 @@ const Summary = () => {
             costs={sumObj.costs}
           />
         ))}
+        <View style={{height: 80}}/>
       </ScrollView>
     </SafeAreaView>
   );

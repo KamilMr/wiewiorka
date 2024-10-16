@@ -88,7 +88,7 @@ const Summary = () => {
   return (
     <SafeAreaView>
       <ScrollView>
-        <View>
+        <View >
           <View style={{marginBottom: 16}}>
             <DatePicker
               value={filterDates[0]}
