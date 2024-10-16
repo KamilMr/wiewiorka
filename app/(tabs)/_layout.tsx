@@ -5,13 +5,14 @@ import {TabBarIcon} from '@/components/navigation/TabBarIcon';
 import {selectToken} from '@/redux/auth/authSlice';
 import {fetchIni} from '@/redux/main/thunks';
 import {useAppDispatch, useAppSelector} from '@/hooks';
+import {TabBar} from '@/components';
 
 const TabLayout = () => {
   const token = useAppSelector(selectToken);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    console.log('works')
+    console.log('works');
     if (!token) return;
     dispatch(fetchIni());
   }, [dispatch]);
@@ -20,6 +21,7 @@ const TabLayout = () => {
 
   return (
     <Tabs
+      tabBar={(props) => <TabBar {...props} />}
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
@@ -32,12 +34,6 @@ const TabLayout = () => {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({color, focused}) => (
-            <TabBarIcon
-              name={focused ? 'home' : 'home-outline'}
-              color={color}
-            />
-          ),
         }}
       />
       <Tabs.Screen

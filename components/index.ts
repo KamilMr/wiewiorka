@@ -6,8 +6,10 @@ import CustomTextInput from './CustomTextInput';
 import CustomeDatePicker from './DatePicker';
 import DropdownComponent from './CustomSelect';
 import FullWidthImage from './FullImage';
+import MyTabBar from './CustomTab';
 import SummaryCard from "./SummaryCard";
 import CustomChip from "./Chip";
+
 
 export {
   CustomBar as BarChart,
@@ -19,5 +21,6 @@ export {
   CustomeDatePicker as DatePicker,
   DropdownComponent as Select,
   FullWidthImage,
+  MyTabBar as TabBar,
   SummaryCard,
 };
