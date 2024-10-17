@@ -1,6 +1,12 @@
 import {useCallback, useRef, useState} from 'react';
 import {View, StyleSheet, ScrollView} from 'react-native';
-import {Link, router, useFocusEffect, useLocalSearchParams, useNavigation} from 'expo-router';
+import {
+  Link,
+  router,
+  useFocusEffect,
+  useLocalSearchParams,
+  useNavigation,
+} from 'expo-router';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Button, Text} from 'react-native-paper';
 
@@ -126,7 +132,7 @@ const Expense = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        <Text style={{fontSize: 24,marginBottom: 24}}>Wydatek</Text>
+        <Text style={{fontSize: 24, marginBottom: 24}}>Wydatek</Text>
         <View style={styles.detailsContainer}>
           <TextInput
             style={styles.input}
@@ -136,6 +142,14 @@ const Expense = () => {
             onChangeText={(text: string) =>
               setEditedExpense({...editedExpense, description: text})
             }
+          />
+          <CustomeDatePicker
+            editable={!isEditMode}
+            label="Wybierz datę"
+            disabled={!isEditMode}
+            style={styles.input}
+            value={new Date(editedExpense.date.split('/').reverse().join('-'))}
+            onChange={handleDate}
           />
           <TextInput
             style={styles.input}
@@ -148,25 +162,19 @@ const Expense = () => {
               setEditedExpense({...editedExpense, price: parseFloat(text)})
             }
           />
-          <CustomeDatePicker
-            editable={!isEditMode}
-            label="Wybierz datę"
-            disabled={!isEditMode}
-            style={styles.input}
-            value={new Date(editedExpense.date.split('/').reverse().join('-'))}
-            onChange={handleDate}
-          />
 
-          <TextInput
-            style={styles.input}
-            label="Kto dokonał zakupu"
-            readOnly={true}
-            disabled={true}
-            value={editedExpense.owner}
-            onChangeText={(text) =>
-              setEditedExpense({...editedExpense, owner: text})
-            }
-          />
+          {isEditMode ? null : (
+            <TextInput
+              style={styles.input}
+              label="Kto dokonał zakupu"
+              readOnly={true}
+              disabled={true}
+              value={editedExpense.owner}
+              onChangeText={(text) =>
+                setEditedExpense({...editedExpense, owner: text})
+              }
+            />
+          )}
 
           <Select
             value={
@@ -224,7 +232,7 @@ const Expense = () => {
             </>
           )}
         </View>
-        <View style={{height: 60}}/>
+        <View style={{height: 60}} />
       </ScrollView>
     </SafeAreaView>
   );

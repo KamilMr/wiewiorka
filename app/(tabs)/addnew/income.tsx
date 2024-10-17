@@ -121,22 +121,7 @@ const Income = () => {
             <Text style={styles.value}>{income.description}</Text>
           )}
 
-          <Text style={styles.label}>Kwota:</Text>
-          {isEditMode ? (
-            <TextInput
-              style={styles.input}
-              value={String(editedIncome.price)}
-              autoFocus={true}
-              keyboardType="numeric"
-              onChangeText={(text) =>
-                setEditedIncome({...editedIncome, price: text})
-              }
-            />
-          ) : (
-            <Text style={styles.value}>{income.price} zł</Text>
-          )}
-
-          <Text style={styles.label}>Date:</Text>
+          <Text style={styles.label}>Data:</Text>
           {isEditMode ? (
             <CustomeDatePicker
               editable={!isEditMode}
@@ -156,6 +141,22 @@ const Income = () => {
               <Text style={styles.value}>{income.owner}</Text>
             </>
           )}
+
+          <Text style={styles.label}>Kwota:</Text>
+          {isEditMode ? (
+            <TextInput
+              style={styles.input}
+              value={String(editedIncome.price)}
+              autoFocus={true}
+              keyboardType="numeric"
+              onChangeText={(text) =>
+                setEditedIncome({...editedIncome, price: text})
+              }
+            />
+          ) : (
+            <Text style={styles.value}>{income.price} zł</Text>
+          )}
+
 
           <Text style={styles.label}>Źródło:</Text>
           {isEditMode ? (
