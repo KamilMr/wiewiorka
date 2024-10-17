@@ -127,6 +127,7 @@ const Income = () => {
             <TextInput
               style={styles.input}
               value={String(editedIncome.price)}
+              autoFocus={true}
               keyboardType="numeric"
               onChangeText={(text) =>
                 setEditedIncome({...editedIncome, price: text})
@@ -150,17 +151,11 @@ const Income = () => {
             <Text style={styles.value}>{income.date}</Text>
           )}
 
-          <Text style={styles.label}>Dostawca:</Text>
-          {isEditMode ? (
-            <TextInput
-              style={styles.input}
-              value={editedIncome.owner}
-              onChangeText={(text) =>
-                setEditedIncome({...editedIncome, owner: text})
-              }
-            />
-          ) : (
-            <Text style={styles.value}>{income.owner}</Text>
+          {isEditMode ? null : (
+            <>
+              <Text style={styles.label}>Zarobił</Text>
+              <Text style={styles.value}>{income.owner}</Text>
+            </>
           )}
 
           <Text style={styles.label}>Źródło:</Text>
