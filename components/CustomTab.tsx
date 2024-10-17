@@ -7,8 +7,18 @@ import {useState} from 'react';
 import {Button} from 'react-native-paper';
 
 type IconProp = {
-  color: string;
   isFocus: boolean;
+  size?: number;
+  color?: string;
+};
+
+// Define the type for the icons object
+type Icons = {
+  index: (props: IconProp) => JSX.Element;
+  records: (props: IconProp) => JSX.Element;
+  addnew: (props: IconProp) => JSX.Element;
+  summary: (props: IconProp) => JSX.Element;
+  profile: (props: IconProp) => JSX.Element;
 };
 
 type Items = {
@@ -24,7 +34,7 @@ const MyTabBar = ({
   navigation,
   showLabel = false,
 }: BottomTabBarProps & {showLabel?: boolean}) => {
-  const icons = {
+  const icons: Icons = {
     index: (props: IconProp) => (
       <TabBarIcon name={props.isFocus ? 'home' : 'home-outline'} {...props} />
     ),

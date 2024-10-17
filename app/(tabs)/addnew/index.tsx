@@ -1,6 +1,6 @@
 import {useCallback, useRef, useState} from 'react';
 import {View, StyleSheet, ScrollView} from 'react-native';
-import {router, useFocusEffect, useLocalSearchParams} from 'expo-router';
+import {Link, router, useFocusEffect, useLocalSearchParams, useNavigation} from 'expo-router';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Button} from 'react-native-paper';
 
@@ -38,6 +38,7 @@ const initState = (expense?: Expense) => ({
 
 const Expense = () => {
   const dispatch = useAppDispatch();
+  const navigation = useNavigation();
   const {id} = useLocalSearchParams();
   const expense = useAppSelector(selectExpense(+id)) || initState();
   const categories = useAppSelector(selectCategories);
@@ -52,13 +53,14 @@ const Expense = () => {
   useFocusEffect(
     useCallback(() => {
       console.log('focus expense', id);
-      setIsEditMode(!id);
+      setIsEditMode(!Number.isInteger(+id));
       setEditedExpense(initState(expense));
 
       return () => {
         console.log('lost focus expense');
         setEditedExpense(initState());
         setIsEditMode(false);
+        navigation.setParams({id: ''});
       };
     }, [id]),
   );
@@ -144,7 +146,6 @@ const Expense = () => {
             label="Cena"
             readOnly={!isEditMode}
             autoFocus={true}
-            innerRef={focusElem}
             keyboardType="numeric"
             onChangeText={(text) =>
               setEditedExpense({...editedExpense, price: parseFloat(text)})

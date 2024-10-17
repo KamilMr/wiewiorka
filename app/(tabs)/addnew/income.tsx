@@ -1,5 +1,10 @@
-import {useState} from 'react';
-import {router, useLocalSearchParams} from 'expo-router';
+import {useCallback, useState} from 'react';
+import {
+  router,
+  useFocusEffect,
+  useLocalSearchParams,
+  useNavigation,
+} from 'expo-router';
 import {View, StyleSheet, ScrollView} from 'react-native';
 import {Text, Button} from 'react-native-paper';
 
@@ -33,9 +38,11 @@ const initState = (income: Income) => ({
 
 const Income = () => {
   const dispatch = useAppDispatch();
+  const navigation = useNavigation();
   const param = useLocalSearchParams();
   const income = useAppSelector(selectIncome(param.id)) || {};
 
+  console.log('income param', param);
   // State for edit mode and editing fields
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedIncome, setEditedIncome] = useState(initState(income));
@@ -45,6 +52,27 @@ const Income = () => {
     setEditedIncome({...editedIncome});
     setIsEditMode(true);
   };
+  useFocusEffect(
+    useCallback(() => {
+      console.log(isEditMode);
+      setIsEditMode(!Number.isInteger(+param.id));
+      setEditedIncome(initState(income));
+
+      return () => {
+        setEditedIncome(initState({}));
+        setIsEditMode(false);
+      };
+    }, [param.id]),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      const unsubscribe = navigation.addListener('blur', () => {
+        navigation.setParams({id: undefined});
+      });
+      return unsubscribe;
+    }, [navigation]),
+  );
 
   const handleSave = () => {
     const newD = _.chain(editedIncome)
@@ -110,14 +138,14 @@ const Income = () => {
 
           <Text style={styles.label}>Date:</Text>
           {isEditMode ? (
-          <CustomeDatePicker
-            editable={!isEditMode}
-            label="Wybierz datę"
-            disabled={!isEditMode}
-            style={styles.input}
-            value={new Date(editedIncome.date.split('/').reverse().join('-'))}
-            onChange={handleDate}
-          />
+            <CustomeDatePicker
+              editable={!isEditMode}
+              label="Wybierz datę"
+              disabled={!isEditMode}
+              style={styles.input}
+              value={new Date(editedIncome.date.split('/').reverse().join('-'))}
+              onChange={handleDate}
+            />
           ) : (
             <Text style={styles.value}>{income.date}</Text>
           )}
@@ -188,7 +216,7 @@ const Income = () => {
             </>
           )}
         </View>
-        <View style={{height: 60}}/>
+        <View style={{height: 60}} />
       </ScrollView>
     </SafeAreaView>
   );
