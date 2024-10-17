@@ -42,7 +42,6 @@ const Income = () => {
   const param = useLocalSearchParams();
   const income = useAppSelector(selectIncome(param.id)) || {};
 
-  console.log('income param', param);
   // State for edit mode and editing fields
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedIncome, setEditedIncome] = useState(initState(income));
@@ -54,7 +53,6 @@ const Income = () => {
   };
   useFocusEffect(
     useCallback(() => {
-      console.log(isEditMode);
       setIsEditMode(!Number.isInteger(+param.id));
       setEditedIncome(initState(income));
 
@@ -68,7 +66,7 @@ const Income = () => {
   useFocusEffect(
     useCallback(() => {
       const unsubscribe = navigation.addListener('blur', () => {
-        navigation.setParams({id: undefined});
+        navigation.setParams({id: undefined,screen: undefined});
       });
       return unsubscribe;
     }, [navigation]),
@@ -108,6 +106,7 @@ const Income = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
+        <Text style={{fontSize: 24,marginBottom: 24}}>Wpływ</Text>
         <View style={styles.detailsContainer}>
           <Text style={styles.label}>Opis:</Text>
           {isEditMode ? (

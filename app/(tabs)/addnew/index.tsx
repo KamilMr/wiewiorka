@@ -2,7 +2,7 @@ import {useCallback, useRef, useState} from 'react';
 import {View, StyleSheet, ScrollView} from 'react-native';
 import {Link, router, useFocusEffect, useLocalSearchParams, useNavigation} from 'expo-router';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {Button} from 'react-native-paper';
+import {Button, Text} from 'react-native-paper';
 
 import _ from 'lodash';
 import {format} from 'date-fns';
@@ -28,12 +28,12 @@ interface Expense {
 const initState = (expense?: Expense) => ({
   id: '',
   description: '',
-  date: format(new Date(), 'dd/MM/yyyy'),
   price: '',
   owner: '',
   categoryId: '',
   image: '',
   ...expense,
+  date: format(new Date(), 'dd/MM/yyyy'),
 });
 
 const Expense = () => {
@@ -48,19 +48,15 @@ const Expense = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedExpense, setEditedExpense] = useState(initState(expense));
 
-  const focusElem = useRef<any>();
-
   useFocusEffect(
     useCallback(() => {
-      console.log('focus expense', id);
       setIsEditMode(!Number.isInteger(+id));
       setEditedExpense(initState(expense));
 
       return () => {
-        console.log('lost focus expense');
         setEditedExpense(initState());
         setIsEditMode(false);
-        navigation.setParams({id: ''});
+        navigation.setParams({id: undefined});
       };
     }, [id]),
   );
@@ -130,6 +126,7 @@ const Expense = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
+        <Text style={{fontSize: 24,marginBottom: 24}}>Wydatek</Text>
         <View style={styles.detailsContainer}>
           <TextInput
             style={styles.input}
