@@ -102,11 +102,9 @@ const MyTabBar = ({
           });
         };
 
-
         return (
-          <Button style={styles.tabBarItem}>
+          <Button style={styles.tabBarItem} key={route.name}>
             <Menu
-              key={route.name}
               visible={visible[index] || false}
               closeMenu={closeMenu}
               items={contextMenuAction[route.name] || []}
@@ -145,10 +143,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: '#fff',
-    marginHorizontal: 20,
     paddingVertical: 5,
     padding: 15,
-    borderRadius: 35,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 20},
     shadowRadius: 10,

@@ -41,14 +41,11 @@ const Records = () => {
   };
 
   const handleNavigate = (id: number, isExpense: boolean) => () => {
-    router.push({pathname: isExpense ? '/expense' : '/income', params: {id}});
+    router.push({pathname: isExpense ? '/addnew/expense' : '/addnew/income', params: {id}});
   };
 
   return (
     <SafeAreaView style={{padding: 16}}>
-      <Text style={{fontSize: 18, fontWeight: 'bold'}}>
-        Historia tranzakcji
-      </Text>
       <Searchbar
         placeholder="Szukaj"
         onChangeText={setSearchQuery}

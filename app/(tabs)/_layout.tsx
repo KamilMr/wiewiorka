@@ -7,8 +7,7 @@ import {useAppDispatch, useAppSelector} from '@/hooks';
 import {TabBar} from '@/components';
 
 const TabLayout = () => {
-  const token = useAppSelector(selectToken);
-  const dispatch = useAppDispatch();
+  const token = useAppSelector(selectToken); const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (!token) return;

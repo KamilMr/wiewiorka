@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {router, useLocalSearchParams} from 'expo-router';
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, ScrollView} from 'react-native';
 import {Text, Button} from 'react-native-paper';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -11,6 +11,7 @@ import {selectIncome} from '@/redux/main/selectors';
 import {uploadIncome} from '@/redux/main/thunks';
 import {useAppDispatch, useAppSelector} from '@/hooks';
 import {TextInput} from '@/components';
+import CustomeDatePicker from '@/components/DatePicker';
 
 interface Income {
   id?: string;
@@ -41,7 +42,7 @@ const Income = () => {
 
   // Toggle between edit and view modes
   const handleEdit = () => {
-    setEditedIncome({...income});
+    setEditedIncome({...editedIncome});
     setIsEditMode(true);
   };
 
@@ -68,109 +69,127 @@ const Income = () => {
     setIsEditMode(false);
   };
 
+  const handleDate = (date: Date | undefined) => {
+    if (!date) return;
+    setEditedIncome({
+      ...editedIncome,
+      date: format(date, 'dd/MM/yyyy'),
+    });
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.detailsContainer}>
-        <Text style={styles.label}>Opis:</Text>
-        {isEditMode ? (
-          <TextInput
-            style={styles.input}
-            value={editedIncome.description}
-            onChangeText={(text) =>
-              setEditedIncome({...editedIncome, description: text})
-            }
-          />
-        ) : (
-          <Text style={styles.value}>{income.description}</Text>
-        )}
+      <ScrollView>
+        <View style={styles.detailsContainer}>
+          <Text style={styles.label}>Opis:</Text>
+          {isEditMode ? (
+            <TextInput
+              style={styles.input}
+              value={editedIncome.description}
+              onChangeText={(text) =>
+                setEditedIncome({...editedIncome, description: text})
+              }
+            />
+          ) : (
+            <Text style={styles.value}>{income.description}</Text>
+          )}
 
-        <Text style={styles.label}>Kwota:</Text>
-        {isEditMode ? (
-          <TextInput
-            style={styles.input}
-            value={String(editedIncome.price)}
-            keyboardType="numeric"
-            onChangeText={(text) =>
-              setEditedIncome({...editedIncome, price: text})
-            }
-          />
-        ) : (
-          <Text style={styles.value}>{income.price} zł</Text>
-        )}
+          <Text style={styles.label}>Kwota:</Text>
+          {isEditMode ? (
+            <TextInput
+              style={styles.input}
+              value={String(editedIncome.price)}
+              keyboardType="numeric"
+              onChangeText={(text) =>
+                setEditedIncome({...editedIncome, price: text})
+              }
+            />
+          ) : (
+            <Text style={styles.value}>{income.price} zł</Text>
+          )}
 
-        <Text style={styles.label}>Date:</Text>
-        {isEditMode ? (
-          <TextInput
+          <Text style={styles.label}>Date:</Text>
+          {isEditMode ? (
+          <CustomeDatePicker
+            editable={!isEditMode}
+            label="Wybierz datę"
+            disabled={!isEditMode}
             style={styles.input}
-            value={editedIncome.date}
-            onChangeText={(text) =>
-              setEditedIncome({...editedIncome, date: text})
-            }
+            value={new Date(editedIncome.date.split('/').reverse().join('-'))}
+            onChange={handleDate}
           />
-        ) : (
-          <Text style={styles.value}>{income.date}</Text>
-        )}
+          ) : (
+            <Text style={styles.value}>{income.date}</Text>
+          )}
 
-        <Text style={styles.label}>Dostawca:</Text>
-        {isEditMode ? (
-          <TextInput
-            style={styles.input}
-            value={editedIncome.owner}
-            onChangeText={(text) =>
-              setEditedIncome({...editedIncome, owner: text})
-            }
-          />
-        ) : (
-          <Text style={styles.value}>{income.owner}</Text>
-        )}
+          <Text style={styles.label}>Dostawca:</Text>
+          {isEditMode ? (
+            <TextInput
+              style={styles.input}
+              value={editedIncome.owner}
+              onChangeText={(text) =>
+                setEditedIncome({...editedIncome, owner: text})
+              }
+            />
+          ) : (
+            <Text style={styles.value}>{income.owner}</Text>
+          )}
 
-        <Text style={styles.label}>Źródło:</Text>
-        {isEditMode ? (
-          <TextInput
-            style={styles.input}
-            value={editedIncome.source}
-            onChangeText={(text) =>
-              setEditedIncome({...editedIncome, source: text})
-            }
-          />
-        ) : (
-          <Text
-            style={{...styles.value, backgroundColor: `#${income.catColor}`}}>
-            {income.source || 'brak'}
-          </Text>
-        )}
-      </View>
+          <Text style={styles.label}>Źródło:</Text>
+          {isEditMode ? (
+            <TextInput
+              style={styles.input}
+              value={editedIncome.source}
+              onChangeText={(text) =>
+                setEditedIncome({...editedIncome, source: text})
+              }
+            />
+          ) : (
+            <Text
+              style={{...styles.value, backgroundColor: `#${income.catColor}`}}>
+              {income.source || 'brak'}
+            </Text>
+          )}
+        </View>
 
-      {/* Buttons for Edit, Save, Cancel */}
-      <View style={styles.buttonContainer}>
-        {isEditMode ? (
-          <>
-            <Button mode="contained" onPress={handleSave} style={styles.button}>
-              Save
-            </Button>
-            <Button
-              mode="outlined"
-              onPress={handleCancel}
-              style={styles.button}>
-              Cancel
-            </Button>
-          </>
-        ) : (
-          <>
-            <Button mode="contained" onPress={handleEdit} style={styles.button}>
-              Edit
-            </Button>
-            <Button
-              mode="outlined"
-              onPress={() => {
-                router.navigate('/(tabs)/records');
-              }}
-              style={styles.button}>
-              Close
-            </Button>
-          </>
-        )}
-      </View>
+        {/* Buttons for Edit, Save, Cancel */}
+        <View style={styles.buttonContainer}>
+          {isEditMode ? (
+            <>
+              <Button
+                mode="contained"
+                onPress={handleSave}
+                style={styles.button}>
+                Save
+              </Button>
+              <Button
+                mode="outlined"
+                onPress={handleCancel}
+                style={styles.button}>
+                Cancel
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                mode="contained"
+                onPress={handleEdit}
+                style={styles.button}>
+                Edit
+              </Button>
+              <Button
+                mode="outlined"
+                onPress={() => {
+                  router.navigate('/(tabs)/records');
+                }}
+                style={styles.button}>
+                Close
+              </Button>
+            </>
+          )}
+        </View>
+        <View style={{height: 60}}/>
+      </ScrollView>
     </SafeAreaView>
   );
 };
