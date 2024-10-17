@@ -62,10 +62,18 @@ const Expense = () => {
       return () => {
         setEditedExpense(initState());
         setIsEditMode(false);
-        navigation.setParams({id: undefined});
       };
     }, [id]),
   );
+  useFocusEffect(
+    useCallback(() => {
+      const unsubscribe = navigation.addListener('blur', () => {
+        navigation.setParams({id: undefined,screen: undefined});
+      });
+      return unsubscribe;
+    }, [navigation]),
+  );
+
 
   // Toggle between edit and view modes
   const handleEdit = () => {
