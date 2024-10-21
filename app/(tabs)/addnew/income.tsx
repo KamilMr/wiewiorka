@@ -70,7 +70,7 @@ const Income = () => {
   useFocusEffect(
     useCallback(() => {
       const unsubscribe = navigation.addListener('blur', () => {
-        navigation.setParams({id: undefined, screen: undefined});
+        navigation.setParams({id: null, screen: undefined});
       });
       return unsubscribe;
     }, [navigation]),
