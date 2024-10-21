@@ -47,6 +47,8 @@ const Income = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedIncome, setEditedIncome] = useState(initState(income));
 
+  const [addNew, setAddNew] = useState(false);
+
   // Toggle between edit and view modes
   const handleEdit = () => {
     setEditedIncome({...editedIncome});
@@ -162,19 +164,23 @@ const Income = () => {
           )}
 
           <Text style={styles.label}>Źródło:</Text>
-          {isEditMode ? (
+          {isEditMode && !addNew ? (
             <Select
               value={editedIncome.source}
-              onChange={({value}) =>
-                setEditedIncome({...editedIncome, source: value})
-              }
-              items={sources.map((s) => ({label: s, value: s}))}
+              onChange={({value}) => {
+                if (value === 'new') return setAddNew(true);
+                setEditedIncome({...editedIncome, source: value});
+              }}
+              items={sources.concat(['new']).map((s) => ({label: s, value: s}))}
             />
           ) : (
-            <Text
-              style={{...styles.value, backgroundColor: `#${income.catColor}`}}>
-              {income.source || 'brak'}
-            </Text>
+            <TextInput
+              style={{...styles.value, backgroundColor: `#${income.catColor}`}}
+              value={editedIncome.source}
+              onChangeText={(txt) => {
+                setEditedIncome({...editedIncome, source: txt});
+              }}
+            />
           )}
         </View>
 
