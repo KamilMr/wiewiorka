@@ -68,12 +68,11 @@ const Expense = () => {
   useFocusEffect(
     useCallback(() => {
       const unsubscribe = navigation.addListener('blur', () => {
-        navigation.setParams({id: undefined,screen: undefined});
+        navigation.setParams({id: undefined, screen: undefined});
       });
       return unsubscribe;
     }, [navigation]),
   );
-
 
   // Toggle between edit and view modes
   const handleEdit = () => {
@@ -114,7 +113,9 @@ const Expense = () => {
 
   const handleCancel = () => {
     setEditedExpense({...expense}); // Revert changes
+
     setIsEditMode(false);
+    if(!id || id === 'null') router.navigate('/(tabs)/records');
   };
 
   const handleDate = (date: Date | undefined) => {
@@ -139,8 +140,7 @@ const Expense = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView>
-        <Text style={{fontSize: 24, marginBottom: 24}}>Wydatek</Text>
+      <ScrollView keyboardShouldPersistTaps="always">
         <View style={styles.detailsContainer}>
           <TextInput
             style={styles.input}

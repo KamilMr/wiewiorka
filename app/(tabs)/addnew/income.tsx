@@ -100,7 +100,7 @@ const Income = () => {
   const handleCancel = () => {
     setEditedIncome(initState(income)); // Revert changes
     setIsEditMode(false);
-    if (!param.id || param.id === 'undefined') {
+    if (!param.id || param.id === 'null') {
       router.navigate('/(tabs)/records');
     }
   };
@@ -115,8 +115,7 @@ const Income = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView>
-        <Text style={{fontSize: 24, marginBottom: 24}}>Wpływ</Text>
+      <ScrollView keyboardShouldPersistTaps="always">
         <View style={styles.detailsContainer}>
           {isEditMode ? (
             <TextInput
@@ -174,7 +173,7 @@ const Income = () => {
               }}
               items={sources
                 .concat(['nowe źródło'])
-                .map((s) => ({label: s, value: s}))}
+                .map((s:string) => ({label: s, value: s}))}
             />
           ) : (
             <TextInput

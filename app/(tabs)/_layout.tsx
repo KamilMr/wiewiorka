@@ -7,7 +7,8 @@ import {useAppDispatch, useAppSelector} from '@/hooks';
 import {TabBar} from '@/components';
 
 const TabLayout = () => {
-  const token = useAppSelector(selectToken); const dispatch = useAppDispatch();
+  const token = useAppSelector(selectToken);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (!token) return;
@@ -20,13 +21,19 @@ const TabLayout = () => {
     <Tabs
       tabBar={(props) => <TabBar {...props} />}
       screenOptions={{
-        headerShown: true,
+        headerShown: false,
       }}>
-      <Tabs.Screen name="index" options={{title: 'Stron główna'}}/>
-      <Tabs.Screen name="records" options={{title: 'Wydatki/Wpływy'}}/>
-      <Tabs.Screen name="addnew" options={{title: 'Dodaj'}}/>
-      <Tabs.Screen name="summary" options={{title: 'Podsumowanie'}} />
-      <Tabs.Screen name="profile" options={{title: 'Profil'}}/>
+      <Tabs.Screen name="index" options={{title: 'Stron główna'}} />
+      <Tabs.Screen
+        name="records"
+        options={{title: 'Wydatki/Wpływy', headerShown: true}}
+      />
+      <Tabs.Screen name="addnew" options={{title: 'Dodaj'}} />
+      <Tabs.Screen
+        name="summary"
+        options={{title: 'Podsumowanie', headerShown: true}}
+      />
+      <Tabs.Screen name="profile" options={{title: 'Profil'}} />
     </Tabs>
   );
 };
