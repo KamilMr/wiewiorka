@@ -46,6 +46,7 @@ interface MainSlice {
   expenses: Array<Expense>;
   incomes: Array<Income>;
   categories: {[key: number]: Group};
+  sources: {[key: string]: string[]};
   snackbar: Snackbar;
 }
 
@@ -53,6 +54,7 @@ const emptyState: MainSlice = {
   expenses: [],
   incomes: [],
   categories: {},
+  sources: {},
   snackbar: {
     open: false,
     type: 'success',
@@ -79,6 +81,15 @@ const mainSlice = createSlice({
       }));
       state.categories = action.payload.categories;
       state.incomes = action.payload.income;
+      console.log('income', action.payload.income);
+      state.sources = action.payload.income.reduce(
+        (pv: {[key: string]: string[]}, cv: Income) => {
+          pv[cv.owner] ??= [];
+          if (!pv[cv.owner].includes(cv.source)) pv[cv.owner].push(cv.source);
+          return pv;
+        },
+        {},
+      );
     },
     addExpense: (state, action) => {
       state.expenses = [
@@ -109,6 +120,15 @@ const mainSlice = createSlice({
         ...inc,
         date: format(inc.date, 'yyyy-MM-dd'),
       }));
+
+      state.sources = action.payload.income.reduce(
+        (pv: {[key: string]: string[]}, cv: Income) => {
+          pv[cv.owner] ??= [];
+          if (!pv[cv.owner].includes(cv.source)) pv[cv.owner].push(cv.source);
+          return pv;
+        },
+        {},
+      );
     },
     dropMain: () => {
       return emptyState;
@@ -134,6 +154,15 @@ const mainSlice = createSlice({
         state.snackbar.open = true;
         state.snackbar.type = 'success';
         state.snackbar.msg = 'Pobrano dane';
+
+        state.sources = action.payload.income.reduce(
+          (pv: {[key: string]: string[]}, cv: Income) => {
+            pv[cv.owner] ??= [];
+            if (!pv[cv.owner].includes(cv.source)) pv[cv.owner].push(cv.source);
+            return pv;
+          },
+          {},
+        );
       })
       .addCase(fetchIni.rejected, (state, action) => {
         state.snackbar.open = true;

@@ -12,7 +12,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import _ from 'lodash';
 import {format} from 'date-fns';
 
-import {selectIncome} from '@/redux/main/selectors';
+import {selectIncome, selectSources} from '@/redux/main/selectors';
 import {uploadIncome} from '@/redux/main/thunks';
 import {useAppDispatch, useAppSelector} from '@/hooks';
 import {TextInput} from '@/components';
@@ -41,6 +41,8 @@ const Income = () => {
   const navigation = useNavigation();
   const param = useLocalSearchParams();
   const income = useAppSelector(selectIncome(param.id)) || {};
+  const sources = useAppSelector(selectSources)
+  console.log(sources)
 
   // State for edit mode and editing fields
   const [isEditMode, setIsEditMode] = useState(false);

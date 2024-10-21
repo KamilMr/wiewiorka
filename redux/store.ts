@@ -21,7 +21,15 @@ const rootReducer = combineReducers({
 });
 
 const migrations = {
-  0: (state) => {
+  0: (state: RootState) => {
+    // migration: flush store
+    return {
+      ...state,
+      auth: authEmptyState(),
+      main: mainEmptyState(),
+    };
+  },
+  1: (state: RootState) => {
     // migration: flush store
     return {
       ...state,
@@ -33,7 +41,7 @@ const migrations = {
 
 const persistConfig = {
   key: 'squirrel',
-  version: 0,
+  version: 1,
   storage: AsyncStorage,
   whitelist: ['auth', 'main'],
   migrate: createMigrate(migrations, {debug: false}),
@@ -57,6 +65,6 @@ const persistor = persistStore(store);
 
 export {store, persistor};
 // Infer the `RootState` and `AppDispatch` types from the store itself
-export type RootState = ReturnType<typeof store.getState>
+export type RootState = ReturnType<typeof store.getState>;
 // Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
-export type AppDispatch = typeof store.dispatch
+export type AppDispatch = typeof store.dispatch;
