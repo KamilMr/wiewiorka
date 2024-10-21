@@ -12,7 +12,7 @@ interface CustomeDatePickerProps {
   readOnly?: boolean;
   label?: string;
   onChange: (date: Date | undefined) => void;
-  style?: any;
+  style?: object;
   value: Date | null;
 }
 

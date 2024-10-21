@@ -47,7 +47,7 @@ const Income = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedIncome, setEditedIncome] = useState(initState(income));
 
-  const [addNew, setAddNew] = useState(false);
+  const [isNewSource, setIsNewSource] = useState(false);
 
   // Toggle between edit and view modes
   const handleEdit = () => {
@@ -62,6 +62,7 @@ const Income = () => {
       return () => {
         setEditedIncome(initState({}));
         setIsEditMode(false);
+        setIsNewSource(false);
       };
     }, [param.id]),
   );
@@ -97,8 +98,11 @@ const Income = () => {
   };
 
   const handleCancel = () => {
-    setEditedIncome({...income}); // Revert changes
+    setEditedIncome(initState(income)); // Revert changes
     setIsEditMode(false);
+    if (!param.id || param.id === 'undefined') {
+      router.navigate('/(tabs)/records');
+    }
   };
 
   const handleDate = (date: Date | undefined) => {
@@ -114,10 +118,10 @@ const Income = () => {
       <ScrollView>
         <Text style={{fontSize: 24, marginBottom: 24}}>Wpływ</Text>
         <View style={styles.detailsContainer}>
-          <Text style={styles.label}>Opis:</Text>
           {isEditMode ? (
             <TextInput
               style={styles.input}
+              label="Opis"
               value={editedIncome.description}
               onChangeText={(text) =>
                 setEditedIncome({...editedIncome, description: text})
@@ -127,13 +131,11 @@ const Income = () => {
             <Text style={styles.value}>{income.description}</Text>
           )}
 
-          <Text style={styles.label}>Data:</Text>
           {isEditMode ? (
             <CustomeDatePicker
               editable={!isEditMode}
               label="Wybierz datę"
               disabled={!isEditMode}
-              style={styles.input}
               value={new Date(editedIncome.date.split('/').reverse().join('-'))}
               onChange={handleDate}
             />
@@ -148,10 +150,10 @@ const Income = () => {
             </>
           )}
 
-          <Text style={styles.label}>Kwota:</Text>
           {isEditMode ? (
             <TextInput
               style={styles.input}
+              label={'Kwota'}
               value={String(editedIncome.price)}
               autoFocus={true}
               keyboardType="numeric"
@@ -163,19 +165,20 @@ const Income = () => {
             <Text style={styles.value}>{income.price} zł</Text>
           )}
 
-          <Text style={styles.label}>Źródło:</Text>
-          {isEditMode && !addNew ? (
+          {isEditMode && !isNewSource ? (
             <Select
               value={editedIncome.source}
               onChange={({value}) => {
-                if (value === 'new') return setAddNew(true);
+                if (value === 'nowe źródło') return setIsNewSource(true);
                 setEditedIncome({...editedIncome, source: value});
               }}
-              items={sources.concat(['new']).map((s) => ({label: s, value: s}))}
+              items={sources
+                .concat(['nowe źródło'])
+                .map((s) => ({label: s, value: s}))}
             />
           ) : (
             <TextInput
-              style={{...styles.value, backgroundColor: `#${income.catColor}`}}
+              style={styles.input}
               value={editedIncome.source}
               onChangeText={(txt) => {
                 setEditedIncome({...editedIncome, source: txt});
