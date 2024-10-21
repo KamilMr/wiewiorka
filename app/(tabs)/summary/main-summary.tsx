@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {useLocalSearchParams} from 'expo-router';
-import {ScrollView, View} from 'react-native';
+import {KeyboardAvoidingView, ScrollView, View} from 'react-native';
 import {Button, Text} from 'react-native-paper';
 
 import {BarChart, Chip, DatePicker} from '@/components';
@@ -86,72 +86,64 @@ const Summary = () => {
   };
 
   return (
-    <SafeAreaView>
-      <ScrollView>
-        <View >
-          <View style={{marginBottom: 16}}>
-            <DatePicker
-              value={filterDates[0]}
-              style={{marginRight: 8, marginBottom: 8}}
-              onChange={(date = filterDates[0]) =>
-                setFilterDates([date, filterDates[1]])
+    <ScrollView>
+      <DatePicker
+        value={filterDates[0]}
+        label="Start"
+        style={{marginBottom: 8}}
+        onChange={(date = filterDates[0]) =>
+          setFilterDates([date, filterDates[1]])
+        }
+      />
+      <DatePicker
+        value={filterDates[1]}
+        label="Koniec"
+        style={{marginBottom: 44}}
+        onChange={(date = filterDates[1]) =>
+          setFilterDates([filterDates[0], date])
+        }
+      />
+      <BarChart title="title" barData={data} />
+
+      <View
+        style={{
+          marginTop: 48,
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+        }}>
+        {categories.map((c) => {
+          const isSelected = !!filters.find((f) => f.id === c.id);
+          return (
+            <Chip
+              key={c.id}
+              selectedColor={
+                filters.find((f) => f.id === c.id)?.color || '#a6a6a6'
               }
-            />
-            <DatePicker
-              style={{marginRight: 8, marginBottom: 8}}
-              value={filterDates[1]}
-              onChange={(date = filterDates[1]) =>
-                setFilterDates([filterDates[0], date])
-              }
-            />
-          </View>
-          <BarChart title="title" barData={data} />
-        </View>
-        <ScrollView
-          style={{maxHeight: 150}}
-          showsVerticalScrollIndicator={true}>
-          <View
-            style={{
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-            }}>
-            {categories.map((c) => {
-              const isSelected = !!filters.find((f) => f.id === c.id);
-              return (
-                <Chip
-                  key={c.id}
-                  selectedColor={
-                    filters.find((f) => f.id === c.id)?.color || '#808080'
-                  }
-                  rippleColor={c.color}
-                  mode="outlined"
-                  showSelectedCheck={false}
-                  icon={undefined}
-                  style={{margin: 4}}
-                  selected={isSelected}
-                  onPress={handleFilters(c.id)}>
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      fontWeight: isSelected ? 600 : 400,
-                      color:
-                        filters.find((f) => f.id === c.id)?.color || '#808080',
-                    }}>
-                    {c.name}
-                  </Text>
-                </Chip>
-              );
-            })}
-          </View>
-        </ScrollView>
-        <Button
-          onPress={
-            filters.length > 0 ? handleRemoveFilters : handleResetFilters
-          }>
-          {filters.length > 0 ? 'Usuń filtry' : 'Zaznacz wszystkie'}
-        </Button>
-      </ScrollView>
-    </SafeAreaView>
+              rippleColor={c.color}
+              mode="outlined"
+              showSelectedCheck={false}
+              icon={undefined}
+              style={{margin: 2, maxWidth: '50%'}}
+              selected={isSelected}
+              onPress={handleFilters(c.id)}>
+              <Text
+                style={{
+                  fontSize: 14,
+                  fontWeight: isSelected ? 600 : 400,
+                  color: filters.find((f) => f.id === c.id)?.color || '#a6a6a6',
+                }}>
+                {c.name}
+              </Text>
+            </Chip>
+          );
+        })}
+      </View>
+      <Button
+        onPress={filters.length > 0 ? handleRemoveFilters : handleResetFilters}>
+        {filters.length > 0 ? 'Usuń filtry' : 'Zaznacz wszystkie'}
+      </Button>
+      <View style={{height: 80}} />
+    </ScrollView>
   );
 };
 
