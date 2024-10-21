@@ -2,7 +2,13 @@ import {createSlice} from '@reduxjs/toolkit';
 
 import _ from 'lodash';
 
-import {fetchIni, handleCategory, uploadExpense, uploadFile} from './thunks';
+import {
+  fetchIni,
+  handleCategory,
+  uploadExpense,
+  uploadFile,
+  uploadIncome,
+} from './thunks';
 import {format} from 'date-fns';
 
 type Snackbar = {
@@ -181,6 +187,16 @@ const mainSlice = createSlice({
       })
       .addCase(uploadExpense.rejected, (state, action) => {
         console.log('rejected expense', action.error);
+      })
+      .addCase(uploadIncome.fulfilled, (state, action) => {
+        state.snackbar.open = true;
+        state.snackbar.type = 'info';
+        state.snackbar.msg = 'Zapisano wpływ';
+      })
+      .addCase(uploadIncome.rejected, (state, action) => {
+        state.snackbar.open = true;
+        state.snackbar.type = 'error';
+        state.snackbar.msg = action.error.message;
       });
   },
 });

@@ -7,7 +7,7 @@ interface Props {
   onChange: (data: any) => any;
   value: any;
   styles?: Object;
-  items: Array<any>;
+  items: Array<{label: string, value: string}>;
   title?: string;
   disable?: boolean;
 }

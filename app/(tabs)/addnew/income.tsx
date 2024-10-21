@@ -15,7 +15,7 @@ import {format} from 'date-fns';
 import {selectIncome, selectSources} from '@/redux/main/selectors';
 import {uploadIncome} from '@/redux/main/thunks';
 import {useAppDispatch, useAppSelector} from '@/hooks';
-import {TextInput} from '@/components';
+import {Select, TextInput} from '@/components';
 import CustomeDatePicker from '@/components/DatePicker';
 
 interface Income {
@@ -41,8 +41,7 @@ const Income = () => {
   const navigation = useNavigation();
   const param = useLocalSearchParams();
   const income = useAppSelector(selectIncome(param.id)) || {};
-  const sources = useAppSelector(selectSources)
-  console.log(sources)
+  const sources = useAppSelector(selectSources);
 
   // State for edit mode and editing fields
   const [isEditMode, setIsEditMode] = useState(false);
@@ -68,7 +67,7 @@ const Income = () => {
   useFocusEffect(
     useCallback(() => {
       const unsubscribe = navigation.addListener('blur', () => {
-        navigation.setParams({id: undefined,screen: undefined});
+        navigation.setParams({id: undefined, screen: undefined});
       });
       return unsubscribe;
     }, [navigation]),
@@ -88,8 +87,11 @@ const Income = () => {
         id: param.id,
         ...newD,
       }),
-    );
-    setIsEditMode(false);
+    )
+      .unwrap()
+      .then(() => router.navigate('/records'))
+      .catch(() => console.log('coś nie tak'));
+    // setIsEditMode(false);
   };
 
   const handleCancel = () => {
@@ -108,7 +110,7 @@ const Income = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        <Text style={{fontSize: 24,marginBottom: 24}}>Wpływ</Text>
+        <Text style={{fontSize: 24, marginBottom: 24}}>Wpływ</Text>
         <View style={styles.detailsContainer}>
           <Text style={styles.label}>Opis:</Text>
           {isEditMode ? (
@@ -159,15 +161,14 @@ const Income = () => {
             <Text style={styles.value}>{income.price} zł</Text>
           )}
 
-
           <Text style={styles.label}>Źródło:</Text>
           {isEditMode ? (
-            <TextInput
-              style={styles.input}
+            <Select
               value={editedIncome.source}
-              onChangeText={(text) =>
-                setEditedIncome({...editedIncome, source: text})
+              onChange={({value}) =>
+                setEditedIncome({...editedIncome, source: value})
               }
+              items={sources.map((s) => ({label: s, value: s}))}
             />
           ) : (
             <Text
