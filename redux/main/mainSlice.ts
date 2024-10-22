@@ -183,10 +183,17 @@ const mainSlice = createSlice({
       .addCase(uploadFile.rejected, (state, action) => {
         state.snackbar.open = true;
         state.snackbar.type = 'error';
-        state.snackbar.msg = action.error.message;
+        state.snackbar.msg = action.error.message || 'Coś poszło nie tak';
       })
       .addCase(uploadExpense.rejected, (state, action) => {
-        console.log('rejected expense', action.error);
+        state.snackbar.open = true;
+        state.snackbar.type = 'error';
+        state.snackbar.msg = action.error.message || 'Coś poszło nie tak';
+      })
+      .addCase(uploadExpense.fulfilled, (state, action) => {
+        state.snackbar.open = true;
+        state.snackbar.type = 'info';
+        state.snackbar.msg = 'Zapisano wydatek';
       })
       .addCase(uploadIncome.fulfilled, (state, action) => {
         state.snackbar.open = true;

@@ -104,10 +104,10 @@ const Expense = () => {
 
     dispatch(
       uploadExpense({
-        id: id,
+        id: Number.isInteger(id * 1) ? id : '',
         ...newD,
       }),
-    );
+    ).unwrap().then(() => router.navigate('/(tabs)/records'));
     setIsEditMode(false);
   };
 
@@ -115,7 +115,7 @@ const Expense = () => {
     setEditedExpense({...expense}); // Revert changes
 
     setIsEditMode(false);
-    if(!id || id === 'null') router.navigate('/(tabs)/records');
+    if (!id || id === 'null') router.navigate('/(tabs)/records');
   };
 
   const handleDate = (date: Date | undefined) => {

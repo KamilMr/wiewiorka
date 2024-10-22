@@ -32,7 +32,6 @@ export const uploadExpense = createAsyncThunk(
   'expense/add',
   async ({id, ...rest}: Expense, thunkAPI) => {
     const token = thunkAPI.getState().auth.token;
-    console.log(rest);
     let data;
     const path = 'expenses' + (id ? `/${id}` : '');
     try {
