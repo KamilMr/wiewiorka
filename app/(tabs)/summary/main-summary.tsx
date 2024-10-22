@@ -1,15 +1,14 @@
 import {useState} from 'react';
 import {useLocalSearchParams} from 'expo-router';
-import {KeyboardAvoidingView, ScrollView, View} from 'react-native';
+import {ScrollView, View} from 'react-native';
 import {Button, Text} from 'react-native-paper';
 
-import {BarChart, Chip, DatePicker} from '@/components';
+import {BarChart, Chip, DatePicker, PieChartBar} from '@/components';
 import {lastDayOfMonth} from 'date-fns';
 import {useAppSelector} from '@/hooks';
 import {aggregateExpenses} from '@/redux/main/selectors';
 import {EXCLUDED_CAT, formatPrice} from '@/common';
 import {parseInt} from 'lodash';
-import {SafeAreaView} from 'react-native-safe-area-context';
 
 type AggrExpense = {
   v: number;
@@ -103,7 +102,7 @@ const Summary = () => {
           setFilterDates([filterDates[0], date])
         }
       />
-      <BarChart title="title" barData={data} />
+      <PieChartBar barData={data} />
 
       <View
         style={{

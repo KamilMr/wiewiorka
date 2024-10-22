@@ -10,12 +10,12 @@ import MyTabBar from './CustomTab';
 import SummaryCard from './SummaryCard';
 import CustomChip from './Chip';
 import CustomMenu from './Menu';
-
+import PieChartBar from './PieChartBar.tsx';
 export {
   CustomBar as BarChart,
   CustomChip as Chip,
-  CustomMenu as Menu,
   CustomImage as Image,
+  CustomMenu as Menu,
   CustomModal as Modal,
   CustomSnackBar as SnackBar,
   CustomTextInput as TextInput,
@@ -23,5 +23,6 @@ export {
   DropdownComponent as Select,
   FullWidthImage,
   MyTabBar as TabBar,
+  PieChartBar,
   SummaryCard,
 };
