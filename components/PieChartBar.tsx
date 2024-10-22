@@ -9,16 +9,15 @@ type DataValue = {
 };
 
 interface Props {
-  barData: Array<DataValue>;
   title?: string;
 }
 
 const CustomBar = (props: Props & PieChartPropsType) => {
-  const {barData, title = '', ...rest} = props;
+  const {data, title = '', ...rest} = props;
   return (
     <View style={{alignItems: 'center'}}>
       <Text>{title}</Text>
-      <PieChart data={barData} {...rest} showText />
+      <PieChart data={data} donut {...rest} />
     </View>
   );
 };

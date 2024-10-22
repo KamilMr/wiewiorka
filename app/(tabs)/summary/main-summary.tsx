@@ -102,7 +102,7 @@ const Summary = () => {
           setFilterDates([filterDates[0], date])
         }
       />
-      <PieChartBar barData={data} />
+      <BarChart barData={data} />
 
       <View
         style={{
