@@ -107,8 +107,12 @@ const Expense = () => {
         id: Number.isInteger(id * 1) ? id : '',
         ...newD,
       }),
-    ).unwrap().then(() => router.navigate('/(tabs)/records'));
-    setIsEditMode(false);
+    )
+      .unwrap()
+      .then(() => {
+        setIsEditMode(false);
+        router.navigate('/(tabs)/records');
+      });
   };
 
   const handleCancel = () => {
@@ -167,7 +171,7 @@ const Expense = () => {
             autoFocus={true}
             keyboardType="numeric"
             onChangeText={(text) =>
-              setEditedExpense({...editedExpense, price: parseFloat(text)})
+              setEditedExpense({...editedExpense, price: text.replace(',', '.')})
             }
           />
 
