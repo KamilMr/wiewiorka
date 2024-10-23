@@ -171,7 +171,10 @@ const Expense = () => {
             autoFocus={true}
             keyboardType="numeric"
             onChangeText={(text) =>
-              setEditedExpense({...editedExpense, price: text.replace(',', '.')})
+              setEditedExpense({
+                ...editedExpense,
+                price: text.replace(',', '.'),
+              })
             }
           />
 

@@ -157,7 +157,10 @@ const Income = () => {
               autoFocus={true}
               keyboardType="numeric"
               onChangeText={(text) =>
-                setEditedIncome({...editedIncome, price: text})
+                setEditedIncome({
+                  ...editedIncome,
+                  price: text.replace(',', '.'),
+                })
               }
             />
           ) : (
@@ -173,7 +176,7 @@ const Income = () => {
               }}
               items={sources
                 .concat(['nowe źródło'])
-                .map((s:string) => ({label: s, value: s}))}
+                .map((s: string) => ({label: s, value: s}))}
             />
           ) : (
             <TextInput
