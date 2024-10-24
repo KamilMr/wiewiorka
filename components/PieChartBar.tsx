@@ -12,7 +12,7 @@ interface Props {
   title?: string;
 }
 
-const CustomBar = (props: Props & PieChartPropsType) => {
+const CustomPieChart = (props: Props & PieChartPropsType) => {
   const {data, title = '', ...rest} = props;
   return (
     <View style={{alignItems: 'center'}}>
@@ -22,4 +22,4 @@ const CustomBar = (props: Props & PieChartPropsType) => {
   );
 };
 
-export default CustomBar;
+export default CustomPieChart;

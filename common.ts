@@ -53,3 +53,8 @@ export const dh = {
   isBetweenDates: (d, s, e) =>
     (isBefore(d, e) && isAfter(d, s)) || isSameDay(d, s) || isSameDay(d, e),
 };
+
+export const shortenText = (text: string, maxLength: number = 10) => {
+  return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+};
+
