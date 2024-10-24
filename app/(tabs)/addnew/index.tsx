@@ -1,8 +1,14 @@
 import {useCallback, useRef, useState} from 'react';
 import {View, StyleSheet, ScrollView} from 'react-native';
-import {router, useFocusEffect, useLocalSearchParams} from 'expo-router';
+import {
+  Link,
+  router,
+  useFocusEffect,
+  useLocalSearchParams,
+  useNavigation,
+} from 'expo-router';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {Button} from 'react-native-paper';
+import {Button, Text} from 'react-native-paper';
 
 import _ from 'lodash';
 import {format} from 'date-fns';
@@ -28,16 +34,17 @@ interface Expense {
 const initState = (expense?: Expense) => ({
   id: '',
   description: '',
-  date: format(new Date(), 'dd/MM/yyyy'),
   price: '',
   owner: '',
   categoryId: '',
   image: '',
   ...expense,
+  date: format(new Date(), 'dd/MM/yyyy'),
 });
 
 const Expense = () => {
   const dispatch = useAppDispatch();
+  const navigation = useNavigation();
   const {id} = useLocalSearchParams();
   const expense = useAppSelector(selectExpense(+id)) || initState();
   const categories = useAppSelector(selectCategories);
@@ -47,20 +54,24 @@ const Expense = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedExpense, setEditedExpense] = useState(initState(expense));
 
-  const focusElem = useRef<any>();
-
   useFocusEffect(
     useCallback(() => {
-      console.log('focus expense', id);
-      setIsEditMode(!id);
+      setIsEditMode(!Number.isInteger(+id));
       setEditedExpense(initState(expense));
 
       return () => {
-        console.log('lost focus expense');
         setEditedExpense(initState());
         setIsEditMode(false);
       };
     }, [id]),
+  );
+  useFocusEffect(
+    useCallback(() => {
+      const unsubscribe = navigation.addListener('blur', () => {
+        navigation.setParams({id: undefined, screen: undefined});
+      });
+      return unsubscribe;
+    }, [navigation]),
   );
 
   // Toggle between edit and view modes
@@ -93,16 +104,22 @@ const Expense = () => {
 
     dispatch(
       uploadExpense({
-        id: id,
+        id: Number.isInteger(id * 1) ? id : '',
         ...newD,
       }),
-    );
-    setIsEditMode(false);
+    )
+      .unwrap()
+      .then(() => {
+        setIsEditMode(false);
+        router.navigate('/(tabs)/records');
+      });
   };
 
   const handleCancel = () => {
     setEditedExpense({...expense}); // Revert changes
+
     setIsEditMode(false);
+    if (!id || id === 'null') router.navigate('/(tabs)/records');
   };
 
   const handleDate = (date: Date | undefined) => {
@@ -127,7 +144,7 @@ const Expense = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView>
+      <ScrollView keyboardShouldPersistTaps="always">
         <View style={styles.detailsContainer}>
           <TextInput
             style={styles.input}
@@ -138,18 +155,6 @@ const Expense = () => {
               setEditedExpense({...editedExpense, description: text})
             }
           />
-          <TextInput
-            style={styles.input}
-            value={String(editedExpense.price)}
-            label="Cena"
-            readOnly={!isEditMode}
-            autoFocus={true}
-            innerRef={focusElem}
-            keyboardType="numeric"
-            onChangeText={(text) =>
-              setEditedExpense({...editedExpense, price: parseFloat(text)})
-            }
-          />
           <CustomeDatePicker
             editable={!isEditMode}
             label="Wybierz datę"
@@ -158,17 +163,33 @@ const Expense = () => {
             value={new Date(editedExpense.date.split('/').reverse().join('-'))}
             onChange={handleDate}
           />
-
           <TextInput
             style={styles.input}
-            label="Kto dokonał zakupu"
-            readOnly={true}
-            disabled={true}
-            value={editedExpense.owner}
+            value={String(editedExpense.price)}
+            label="Cena"
+            readOnly={!isEditMode}
+            autoFocus={true}
+            keyboardType="numeric"
             onChangeText={(text) =>
-              setEditedExpense({...editedExpense, owner: text})
+              setEditedExpense({
+                ...editedExpense,
+                price: text.replace(',', '.'),
+              })
             }
           />
+
+          {isEditMode ? null : (
+            <TextInput
+              style={styles.input}
+              label="Kto dokonał zakupu"
+              readOnly={true}
+              disabled={true}
+              value={editedExpense.owner}
+              onChangeText={(text) =>
+                setEditedExpense({...editedExpense, owner: text})
+              }
+            />
+          )}
 
           <Select
             value={
@@ -226,6 +247,7 @@ const Expense = () => {
             </>
           )}
         </View>
+        <View style={{height: 60}} />
       </ScrollView>
     </SafeAreaView>
   );
