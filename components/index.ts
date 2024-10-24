@@ -10,7 +10,9 @@ import MyTabBar from './CustomTab';
 import SummaryCard from './SummaryCard';
 import CustomChip from './Chip';
 import CustomMenu from './Menu';
-import PieChartBar from './PieChartBar.tsx';
+import PieChartBar from './PieChartBar';
+import CustomSwitch from './Switch';
+
 export {
   CustomBar as BarChart,
   CustomChip as Chip,
@@ -18,6 +20,7 @@ export {
   CustomMenu as Menu,
   CustomModal as Modal,
   CustomSnackBar as SnackBar,
+  CustomSwitch as Switch,
   CustomTextInput as TextInput,
   CustomeDatePicker as DatePicker,
   DropdownComponent as Select,

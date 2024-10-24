@@ -8,7 +8,7 @@ type DataValue = {
 
 interface Props {
   barData: Array<DataValue>;
-  title: string;
+  title?: string;
 }
 
 const CustomBar = (props: Props) => {

@@ -122,9 +122,8 @@ export const uploadFile = createAsyncThunk(
         },
         body: file,
       });
-      console.log('response', resp);
       data = await resp.json();
-      console.log('ds', data);
+
       if (data.err) throw data;
     } catch (err) {
       console.log(err);

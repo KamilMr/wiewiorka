@@ -3,7 +3,7 @@ import {useLocalSearchParams} from 'expo-router';
 import {ScrollView, View} from 'react-native';
 import {Button, Text} from 'react-native-paper';
 
-import {BarChart, Chip, DatePicker, PieChartBar} from '@/components';
+import {BarChart, Chip, DatePicker, PieChartBar, Switch} from '@/components';
 import {lastDayOfMonth} from 'date-fns';
 import {useAppSelector} from '@/hooks';
 import {aggregateExpenses} from '@/redux/main/selectors';
@@ -33,6 +33,10 @@ const Summary = () => {
     new Date(date),
     lastDayOfMonth(isNotYear ? new Date(date) : new Date()),
   ]);
+
+  const [chartDisplay, setChartDisplay] = useState<string>('pie');
+
+  const handlePieChange = (str: string) => () => setChartDisplay(str);
 
   const aggrExpenses = useAppSelector(aggregateExpenses(filterDates)) || [];
 
@@ -102,7 +106,25 @@ const Summary = () => {
           setFilterDates([filterDates[0], date])
         }
       />
-      <BarChart barData={data} />
+      <View style={{flexDirection: 'row', alignSelf: 'flex-end'}}>
+        <Button
+          icon="chart-donut"
+          onPress={handlePieChange('pie')}
+          textColor={chartDisplay === 'pie' ? 'blue' : undefined}>
+          Pie
+        </Button>
+        <Button
+          icon="chart-bar"
+          onPress={handlePieChange('bar')}
+          textColor={chartDisplay === 'bar' ? 'blue' : undefined}>
+          Bar
+        </Button>
+      </View>
+      {chartDisplay === 'pie' ? (
+        <PieChartBar data={data} />
+      ) : (
+        <BarChart barData={data} />
+      )}
 
       <View
         style={{
