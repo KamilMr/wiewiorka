@@ -10,21 +10,24 @@ import {useAppSelector} from '@/hooks';
 
 const MONTH = 1;
 const YEAR = 12;
-const SUMMARY_TITLE = 'Podsumowanie';
 const MONTH_LABEL = 'miesiac';
 const YEAR_LABEL = 'rok';
 
-const Config = ({selection, onChange, title}) => {
-  const [active, setActive] = useState(0);
+const Config: React.FC<{
+  selection: [number, string][];
+  onChange: (value: string) => void;
+  title?: string;
+}> = ({selection, onChange, title = ''}) => {
+  const [active, setActive] = useState<number>(0);
 
-  const handleChange = (f) => {
-      onChange?.(f);
+  const handleChange = (f: string) => {
+    onChange?.(f);
     setActive(selection.map((el) => el[0]).findIndex((n) => n === +f));
   };
 
   return (
     <View style={{alignItems: 'center', marginBottom: 16}}>
-      <Text variant="headlineLarge">{title}</Text>
+      {title && <Text variant="headlineLarge">{title}</Text>}
       <RadioButton.Group
         onValueChange={(value) => handleChange(value)}
         value={selection[active][0].toString()}>
@@ -58,7 +61,6 @@ const Summary = () => {
             [YEAR, YEAR_LABEL],
           ]}
           onChange={handleChange}
-          title={SUMMARY_TITLE}
         />
         {summary.map((sumObj) => (
           <SummaryCard
@@ -69,6 +71,7 @@ const Summary = () => {
             costs={sumObj.costs}
           />
         ))}
+        <View style={{height: 80}} />
       </ScrollView>
     </SafeAreaView>
   );

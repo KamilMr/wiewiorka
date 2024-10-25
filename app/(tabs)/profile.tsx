@@ -1,9 +1,8 @@
 import {Button} from 'react-native-paper';
-import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {useAppDispatch} from '@/hooks';
 import {logout} from '@/redux/auth/thunks';
-import {DatePicker, TextInput, Select} from '@/components';
+import {StyleSheet, View} from 'react-native';
 
 const Profile = () => {
   const dispatch = useAppDispatch();
@@ -11,7 +10,7 @@ const Profile = () => {
     dispatch(logout());
   };
   return (
-    <SafeAreaView>
+    <View style={styles.root}>
       <Button
         icon="logout"
         mode="contained"
@@ -19,16 +18,17 @@ const Profile = () => {
         style={{marginBottom: 40}}>
         logout
       </Button>
-      <DatePicker />
-      <TextInput style={{marginTop: 40}} />
-      <Select
-        items={[
-          {label: 'test1', value: 'test1'},
-          {label: 'test2', value: 'test2'},
-        ]}
-      />
-    </SafeAreaView>
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    marginBottom: 90,
+  },
+});
 
 export default Profile;

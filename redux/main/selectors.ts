@@ -49,7 +49,7 @@ export const selectRecords = (number: number, search: Search) =>
       });
       return _.chain(tR)
         .sortBy(['date'])
-        .reverse()
+       .reverse()
         .slice(0, number)
         .map((obj) => ({
           ...obj,
@@ -157,7 +157,7 @@ export const aggregateExpenses = (agrDates = [new Date(), new Date()]) =>
         tR[categoryId] ??= {
           v: 0,
           name: cat.category,
-          color: '#' + (typeof cat.color !== 'string' ? '000000': cat.color),
+          color: '#' + (typeof cat.color !== 'string' ? '000000' : cat.color),
           id: cat.catId,
         };
 
@@ -171,3 +171,7 @@ export const aggregateExpenses = (agrDates = [new Date(), new Date()]) =>
       );
     },
   );
+
+export const selectSources = (state: RootState) => {
+  return state.main.sources[state.auth.name];
+};

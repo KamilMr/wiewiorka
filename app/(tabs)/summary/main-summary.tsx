@@ -3,28 +3,19 @@ import {useLocalSearchParams} from 'expo-router';
 import {ScrollView, View} from 'react-native';
 import {Button, Text} from 'react-native-paper';
 
-import {BarChart, Chip, DatePicker} from '@/components';
+import {BarChart, Chip, DatePicker, PieChartBar} from '@/components';
 import {lastDayOfMonth} from 'date-fns';
 import {useAppSelector} from '@/hooks';
 import {aggregateExpenses} from '@/redux/main/selectors';
-import {EXCLUDED_CAT, formatPrice} from '@/common';
-import {parseInt} from 'lodash';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {EXCLUDED_CAT, formatPrice, shortenText} from '@/common';
+import _, {parseInt} from 'lodash';
+import {barDataItem, pieDataItem} from 'react-native-gifted-charts';
 
 type AggrExpense = {
   v: number;
   color: string;
   name: string;
   id: string;
-};
-
-type ToReturn = {
-  value: number;
-  frontColor: string;
-  label: string;
-  spacing: number;
-  barWidth: number;
-  topLabelComponent: () => JSX.Element;
 };
 
 const Summary = () => {
@@ -34,6 +25,10 @@ const Summary = () => {
     new Date(date),
     lastDayOfMonth(isNotYear ? new Date(date) : new Date()),
   ]);
+
+  const [chartDisplay, setChartDisplay] = useState<string>('pie');
+
+  const handlePieChange = (str: string) => () => setChartDisplay(str);
 
   const aggrExpenses = useAppSelector(aggregateExpenses(filterDates)) || [];
 
@@ -51,10 +46,9 @@ const Summary = () => {
   const handleRemoveFilters = () => setFilters([]);
   const handleResetFilters = () => setFilters(categories);
 
-  const data: ToReturn[] = aggrExpenses
-    .filter((obj) => (setCat.size > 0 ? setCat.has(obj.name) : true))
-    .map((obj: AggrExpense) => {
-      const tR: ToReturn = {
+  const buildBarChart = (arr) => {
+    return arr.map((obj) => {
+      const tR: barDataItem = {
         value: obj.v,
         frontColor: obj.color,
         label: obj.name,
@@ -71,6 +65,37 @@ const Summary = () => {
 
       return tR;
     });
+  };
+
+  interface Test {
+    label: string;
+  }
+
+  const buildPieChart = (arr) => {
+    const max = parseInt(_.sumBy(arr, 'v'));
+    const perc = (n) => ((n * 100) / max).toFixed(2);
+
+    return _.orderBy(arr, ['v'], ['desc']).map((obj, idx) => {
+      const percentage: string = perc(obj.v);
+      const tR: {label: string} & pieDataItem = {
+        value: obj.v,
+        text: +percentage < 4 ? '' : `${percentage}%`,
+        color: obj.color,
+        label: obj.name,
+      };
+
+      return tR;
+    });
+  };
+
+  const filteredData = aggrExpenses.filter((obj) =>
+    setCat.size > 0 ? setCat.has(obj.name) : true,
+  );
+
+  const data =
+    chartDisplay === 'pie'
+      ? buildPieChart(filteredData)
+      : buildBarChart(filteredData);
 
   const handleFilters = (catId: number) => () => {
     const categoryToAdd = categories.find((f) => f.id === catId);
@@ -86,72 +111,107 @@ const Summary = () => {
   };
 
   return (
-    <SafeAreaView>
-      <ScrollView>
-        <View>
-          <View style={{marginBottom: 16}}>
-            <DatePicker
-              value={filterDates[0]}
-              style={{marginRight: 8, marginBottom: 8}}
-              onChange={(date = filterDates[0]) =>
-                setFilterDates([date, filterDates[1]])
-              }
-            />
-            <DatePicker
-              style={{marginRight: 8, marginBottom: 8}}
-              value={filterDates[1]}
-              onChange={(date = filterDates[1]) =>
-                setFilterDates([filterDates[0], date])
-              }
-            />
-          </View>
-          <BarChart title="title" barData={data} />
-        </View>
-        <ScrollView
-          style={{maxHeight: 150}}
-          showsVerticalScrollIndicator={true}>
-          <View
-            style={{
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-            }}>
-            {categories.map((c) => {
-              const isSelected = !!filters.find((f) => f.id === c.id);
-              return (
-                <Chip
-                  key={c.id}
-                  selectedColor={
-                    filters.find((f) => f.id === c.id)?.color || '#808080'
-                  }
-                  rippleColor={c.color}
-                  mode="outlined"
-                  showSelectedCheck={false}
-                  icon={undefined}
-                  style={{margin: 4}}
-                  selected={isSelected}
-                  onPress={handleFilters(c.id)}>
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      fontWeight: isSelected ? 600 : 400,
-                      color:
-                        filters.find((f) => f.id === c.id)?.color || '#808080',
-                    }}>
-                    {c.name}
-                  </Text>
-                </Chip>
-              );
-            })}
-          </View>
-        </ScrollView>
+    <ScrollView>
+      <DatePicker
+        value={filterDates[0]}
+        label="Start"
+        style={{marginBottom: 8}}
+        onChange={(date = filterDates[0]) =>
+          setFilterDates([date, filterDates[1]])
+        }
+      />
+      <DatePicker
+        value={filterDates[1]}
+        label="Koniec"
+        style={{marginBottom: 44}}
+        onChange={(date = filterDates[1]) =>
+          setFilterDates([filterDates[0], date])
+        }
+      />
+      <View style={{flexDirection: 'row', alignSelf: 'flex-end'}}>
         <Button
-          onPress={
-            filters.length > 0 ? handleRemoveFilters : handleResetFilters
-          }>
-          {filters.length > 0 ? 'Usuń filtry' : 'Zaznacz wszystkie'}
+          icon="chart-donut"
+          onPress={handlePieChange('pie')}
+          textColor={chartDisplay === 'pie' ? 'blue' : undefined}>
+          Pie
         </Button>
-      </ScrollView>
-    </SafeAreaView>
+        <Button
+          icon="chart-bar"
+          onPress={handlePieChange('bar')}
+          textColor={chartDisplay === 'bar' ? 'blue' : undefined}>
+          Bar
+        </Button>
+      </View>
+      {chartDisplay === 'pie' ? (
+        <PieChartBar
+          data={data}
+          labelsPosition="onBorder"
+          innerRadius={70}
+          showText
+          centerLabelComponent={() => {
+            return (
+              <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                <Text
+                  style={{fontSize: 12, color: 'black', fontWeight: 'bold'}}>
+                  {formatPrice(_.sumBy(data, 'value'))}
+                </Text>
+                {data.slice(0, 4).map(({label, value}) => (
+                  <Text
+                    key={label}
+                    style={{
+                      fontSize: 10,
+                      color: 'black',
+                    }}>{`${shortenText(label)}(${formatPrice(value)})`}</Text>
+                ))}
+                <Text style={{fontSize: 10, color: 'black'}}>...więcej</Text>
+              </View>
+            );
+          }}
+        />
+      ) : (
+        <BarChart barData={data} />
+      )}
+
+      <View
+        style={{
+          marginTop: 48,
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+        }}>
+        {categories.map((c) => {
+          const isSelected = !!filters.find((f) => f.id === c.id);
+          return (
+            <Chip
+              key={c.id}
+              selectedColor={
+                filters.find((f) => f.id === c.id)?.color || '#a6a6a6'
+              }
+              // rippleColor={c.color}
+              mode="outlined"
+              showSelectedCheck={false}
+              icon={undefined}
+              style={{margin: 2, maxWidth: '50%'}}
+              selected={isSelected}
+              onPress={handleFilters(c.id)}>
+              <Text
+                style={{
+                  fontSize: 14,
+                  fontWeight: isSelected ? 600 : 400,
+                  color: filters.find((f) => f.id === c.id)?.color || '#a6a6a6',
+                  textDecorationLine: isSelected ? undefined : 'line-through',
+                }}>
+                {c.name}
+              </Text>
+            </Chip>
+          );
+        })}
+      </View>
+      <Button
+        onPress={filters.length > 0 ? handleRemoveFilters : handleResetFilters}>
+        {filters.length > 0 ? 'Usuń filtry' : 'Zaznacz wszystkie'}
+      </Button>
+      <View style={{height: 80}} />
+    </ScrollView>
   );
 };
 

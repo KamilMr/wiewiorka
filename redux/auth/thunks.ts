@@ -1,5 +1,6 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {getURL} from '@/common';
+import {dropMain} from '../main/mainSlice';
 
 interface DataResponse {
   err?: string;
@@ -32,10 +33,10 @@ export const signIn = createAsyncThunk(
   },
 );
 
-export const logout = createAsyncThunk('/user/logout', async (thunkAPI) => {
+export const logout = createAsyncThunk('/user/logout', async (_, thunkAPI) => {
   let data: DataResponse;
   try {
-    const resp = await fetch(getURL('users/login'), {
+    const resp = await fetch(getURL('users/logout'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -45,6 +46,8 @@ export const logout = createAsyncThunk('/user/logout', async (thunkAPI) => {
     if (data.err) throw data.err;
   } catch (err) {
     throw err;
+  } finally {
+    thunkAPI.dispatch(dropMain());
   }
   return data.d;
 });

@@ -1,9 +1,8 @@
-import { isAfter, isBefore, isSameDay } from 'date-fns';
+import {formatDate, isAfter, isBefore, isSameDay, parse} from 'date-fns';
 import {NativeScrollEvent, NativeSyntheticEvent} from 'react-native';
 import uniqueId from 'react-native-uuid';
 
 const URL = process.env.EXPO_PUBLIC_API_URL;
-
 
 export const CATEGORY_LIST_ADD_EDIT_PATH = 'category-list/:param';
 export const CATS_PATH = 'cats';
@@ -52,4 +51,16 @@ export const isCloseToBottom = ({
 export const dh = {
   isBetweenDates: (d, s, e) =>
     (isBefore(d, e) && isAfter(d, s)) || isSameDay(d, s) || isSameDay(d, e),
+};
+
+export const convertDate = (
+  str: string,
+  format: string = 'dd/MM/yyyy',
+  newformat: string = 'yyyy-MM-dd',
+): string => {
+  return formatDate(parse(str, format, new Date()), newformat);
+};
+
+export const shortenText = (text: string, maxLength: number = 10) => {
+  return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
 };

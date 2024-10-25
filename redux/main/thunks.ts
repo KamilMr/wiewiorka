@@ -32,7 +32,6 @@ export const uploadExpense = createAsyncThunk(
   'expense/add',
   async ({id, ...rest}: Expense, thunkAPI) => {
     const token = thunkAPI.getState().auth.token;
-    console.log(rest);
     let data;
     const path = 'expenses' + (id ? `/${id}` : '');
     try {
@@ -45,7 +44,7 @@ export const uploadExpense = createAsyncThunk(
         body: JSON.stringify(rest),
       });
       data = await resp.json();
-      if (data.err) throw data;
+      if (data.err) throw data.err;
     } catch (err) {
       console.log(err);
       throw err;
@@ -54,7 +53,7 @@ export const uploadExpense = createAsyncThunk(
   },
 );
 
-export const uploadIncome= createAsyncThunk(
+export const uploadIncome = createAsyncThunk(
   'income/add',
   async ({id, ...rest}: Expense, thunkAPI) => {
     const token = thunkAPI.getState().auth.token;
@@ -71,12 +70,12 @@ export const uploadIncome= createAsyncThunk(
         body: JSON.stringify(rest),
       });
       data = await resp.json();
-      if (data.err) throw data;
+      if (data.err) throw data.err;
+
+      await thunkAPI.dispatch(fetchIni());
     } catch (err) {
-      console.log(err);
       throw err;
     }
-    await thunkAPI.dispatch(fetchIni());
   },
 );
 
@@ -123,9 +122,8 @@ export const uploadFile = createAsyncThunk(
         },
         body: file,
       });
-      console.log('response', resp)
       data = await resp.json();
-      console.log('ds',data)
+
       if (data.err) throw data;
     } catch (err) {
       console.log(err);

@@ -20,7 +20,7 @@ const CustomTextInput = ({
 };
 
 const styles = StyleSheet.create({
-  root: {},
+  root: {marginVertical: 8},
 });
 
 export default CustomTextInput;
