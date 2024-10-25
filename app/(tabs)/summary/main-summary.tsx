@@ -157,6 +157,7 @@ const Summary = () => {
                 </Text>
                 {data.slice(0, 4).map(({label, value}) => (
                   <Text
+                    key={label}
                     style={{
                       fontSize: 10,
                       color: 'black',

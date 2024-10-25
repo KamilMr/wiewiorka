@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const CustomPieChart = React.memo((props: Props & PieChartPropsType) => {
+const CustomPieChart = ((props: Props & PieChartPropsType) => {
   const {data, title = '', ...rest} = props;
   return (
     <View style={styles.container}>
@@ -29,7 +29,5 @@ const CustomPieChart = React.memo((props: Props & PieChartPropsType) => {
     </View>
   );
 });
-
-CustomPieChart.displayName = 'CustomPieChart';
 
 export default CustomPieChart;

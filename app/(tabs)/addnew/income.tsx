@@ -17,6 +17,7 @@ import {uploadIncome} from '@/redux/main/thunks';
 import {useAppDispatch, useAppSelector} from '@/hooks';
 import {Select, TextInput} from '@/components';
 import CustomeDatePicker from '@/components/DatePicker';
+import {convertDate} from '@/common';
 
 interface Income {
   id?: string;
@@ -79,10 +80,10 @@ const Income = () => {
   const handleSave = () => {
     const newD = _.chain(editedIncome)
       .pick(['date', 'source', 'vat', 'price'])
-      .omitBy(editedIncome, (d) => !d || d === 'undefined')
+      .omitBy((d) => !d || d === 'undefined')
       .value();
 
-    newD.date = newD.date.split('/').reverse().join('-');
+    newD.date = convertDate(newD.date);
     newD.price = +newD.price;
 
     dispatch(
@@ -197,13 +198,13 @@ const Income = () => {
                 mode="contained"
                 onPress={handleSave}
                 style={styles.button}>
-                Save
+                Zapisz
               </Button>
               <Button
                 mode="outlined"
                 onPress={handleCancel}
                 style={styles.button}>
-                Cancel
+                Stop
               </Button>
             </>
           ) : (
@@ -212,7 +213,7 @@ const Income = () => {
                 mode="contained"
                 onPress={handleEdit}
                 style={styles.button}>
-                Edit
+                Edytuj
               </Button>
               <Button
                 mode="outlined"
@@ -220,7 +221,7 @@ const Income = () => {
                   router.navigate('/(tabs)/records');
                 }}
                 style={styles.button}>
-                Close
+                Zamknij
               </Button>
             </>
           )}
