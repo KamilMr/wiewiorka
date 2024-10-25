@@ -12,14 +12,24 @@ interface Props {
   title?: string;
 }
 
-const CustomPieChart = (props: Props & PieChartPropsType) => {
+import {StyleSheet} from 'react-native';
+
+const styles = StyleSheet.create({
+  container: {
+    alignItems: 'center',
+  },
+});
+
+const CustomPieChart = React.memo((props: Props & PieChartPropsType) => {
   const {data, title = '', ...rest} = props;
   return (
-    <View style={{alignItems: 'center'}}>
+    <View style={styles.container}>
       <Text>{title}</Text>
-      <PieChart data={data} donut {...rest} />
+      <PieChart data={data} {...rest} />
     </View>
   );
-};
+});
+
+CustomPieChart.displayName = 'CustomPieChart';
 
 export default CustomPieChart;
