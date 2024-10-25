@@ -1,4 +1,4 @@
-import {useCallback, useRef, useState} from 'react';
+import {useCallback, useState} from 'react';
 import {View, StyleSheet, ScrollView} from 'react-native';
 import {
   Link,
@@ -8,13 +8,13 @@ import {
   useNavigation,
 } from 'expo-router';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {Button, Text} from 'react-native-paper';
+import {Button, IconButton} from 'react-native-paper';
 
 import _ from 'lodash';
 import {format} from 'date-fns';
 
 import {selectCategories, selectExpense} from '@/redux/main/selectors';
-import {uploadExpense} from '@/redux/main/thunks';
+import {deleteExpense, uploadExpense} from '@/redux/main/thunks';
 import {useAppDispatch, useAppSelector} from '@/hooks';
 import {Select, TextInput, Image} from '@/components';
 import CustomeDatePicker from '@/components/DatePicker';
@@ -42,17 +42,24 @@ const initState = (expense?: Expense) => ({
   date: format(new Date(), 'dd/MM/yyyy'),
 });
 
+const validateInput = (ob: Pick<Expense, 'date' | 'categoryId' | 'price'>) => {
+  if (ob.date && ob.price && ob.categoryId) return true;
+  return false;
+};
+
 const Expense = () => {
   const dispatch = useAppDispatch();
   const navigation = useNavigation();
   const {id} = useLocalSearchParams();
   const expense = useAppSelector(selectExpense(+id)) || initState();
   const categories = useAppSelector(selectCategories);
-  const user = useAppSelector(selectMe);
 
   // State for edit mode and editing fields
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedExpense, setEditedExpense] = useState(initState(expense));
+
+  const [isLoading, setIsLoading] = useState(false);
+  const isValid = validateInput(editedExpense);
 
   useFocusEffect(
     useCallback(() => {
@@ -65,6 +72,7 @@ const Expense = () => {
       };
     }, [id]),
   );
+
   useFocusEffect(
     useCallback(() => {
       const unsubscribe = navigation.addListener('blur', () => {
@@ -81,6 +89,8 @@ const Expense = () => {
   };
 
   const handleSave = () => {
+    if (isLoading) return;
+    setIsLoading(true);
     const newD = _.chain(editedExpense)
       .pick(['date', 'description', 'categoryId', 'price', 'image'])
       .omitBy((d) => !d || d === 'undefined')
@@ -111,6 +121,7 @@ const Expense = () => {
       .unwrap()
       .then(() => {
         setIsEditMode(false);
+        setIsLoading(false);
         router.navigate('/(tabs)/records');
       });
   };
@@ -142,10 +153,26 @@ const Expense = () => {
     setEditedExpense({...editedExpense, image: url});
   };
 
+  const handleDeleteExpense = () => {
+    if (!id) return;
+    dispatch(deleteExpense({id}))
+      .unwrap()
+      .then(() => router.navigate('/(tabs)/records'));
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView keyboardShouldPersistTaps="always">
         <View style={styles.detailsContainer}>
+          {Number.isInteger(id * 1) && (
+            <IconButton
+              icon={'trash-can'}
+              style={{
+                alignSelf: 'flex-end',
+              }}
+              onPress={handleDeleteExpense}
+            />
+          )}
           <TextInput
             style={styles.input}
             value={editedExpense.description}
@@ -218,6 +245,8 @@ const Expense = () => {
               <Button
                 mode="contained"
                 onPress={handleSave}
+                loading={isLoading}
+                disabled={!isValid}
                 style={styles.button}>
                 Save
               </Button>
@@ -234,7 +263,7 @@ const Expense = () => {
                 mode="contained"
                 onPress={handleEdit}
                 style={styles.button}>
-                Edit
+                Edytuj
               </Button>
               <Button
                 mode="outlined"
@@ -242,12 +271,12 @@ const Expense = () => {
                   router.navigate('/(tabs)/records');
                 }}
                 style={styles.button}>
-                Close
+                Zamknij
               </Button>
             </>
           )}
         </View>
-        <View style={{height: 60}} />
+        <View style={{height: 80}} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -257,11 +286,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'space-between', // Ensure buttons stay at the bottom
-    padding: 12,
   },
-  detailsContainer: {
-    flex: 1,
-  },
+  detailsContainer: {},
   label: {
     fontSize: 16,
     fontWeight: 'bold',

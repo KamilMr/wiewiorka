@@ -3,6 +3,8 @@ import {createSlice} from '@reduxjs/toolkit';
 import _ from 'lodash';
 
 import {
+  deleteExpense,
+  deleteIncome,
   fetchIni,
   handleCategory,
   uploadExpense,
@@ -185,15 +187,25 @@ const mainSlice = createSlice({
         state.snackbar.type = 'error';
         state.snackbar.msg = action.error.message || 'Coś poszło nie tak';
       })
+      .addCase(uploadExpense.fulfilled, (state, action) => {
+        state.snackbar.open = true;
+        state.snackbar.type = 'info';
+        state.snackbar.msg = 'Zapisano wydatek';
+      })
       .addCase(uploadExpense.rejected, (state, action) => {
         state.snackbar.open = true;
         state.snackbar.type = 'error';
         state.snackbar.msg = action.error.message || 'Coś poszło nie tak';
       })
-      .addCase(uploadExpense.fulfilled, (state, action) => {
+      .addCase(deleteExpense.fulfilled, (state, action) => {
         state.snackbar.open = true;
         state.snackbar.type = 'info';
-        state.snackbar.msg = 'Zapisano wydatek';
+        state.snackbar.msg = 'Usunięto wydatek';
+      })
+      .addCase(deleteExpense.rejected, (state, action) => {
+        state.snackbar.open = true;
+        state.snackbar.type = 'info';
+        state.snackbar.msg = action.error.message || 'Coś poszło nie tak';
       })
       .addCase(uploadIncome.fulfilled, (state, action) => {
         state.snackbar.open = true;
@@ -204,6 +216,16 @@ const mainSlice = createSlice({
         state.snackbar.open = true;
         state.snackbar.type = 'error';
         state.snackbar.msg = action.error.message;
+      })
+      .addCase(deleteIncome.fulfilled, (state, action) => {
+        state.snackbar.open = true;
+        state.snackbar.type = 'info';
+        state.snackbar.msg = 'Usunięto wpływ';
+      })
+      .addCase(deleteIncome.rejected, (state, action) => {
+        state.snackbar.open = true;
+        state.snackbar.type = 'info';
+        state.snackbar.msg = action.error.message || 'Coś poszło nie tak';
       });
   },
 });

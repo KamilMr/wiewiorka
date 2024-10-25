@@ -133,3 +133,52 @@ export const uploadFile = createAsyncThunk(
     return data.d;
   },
 );
+
+export const deleteExpense = createAsyncThunk(
+  'expense/delete',
+  async ({id}: Expense, thunkAPI) => {
+    const token = thunkAPI.getState().auth.token;
+
+    let data;
+    const path = 'expenses' + (id ? `/${id}` : '');
+    console.log(path)
+    try {
+      let resp = await fetch(getURL(path), {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      data = await resp.json();
+      if (data.err) throw data.err;
+
+      await thunkAPI.dispatch(fetchIni());
+    } catch (err) {
+      throw err;
+    }
+  },
+);
+
+export const deleteIncome = createAsyncThunk(
+  'income/delete',
+  async ({id}: Expense, thunkAPI) => {
+    const token = thunkAPI.getState().auth.token;
+
+    let data;
+    const path = 'income' + (id ? `/${id}` : '');
+    try {
+      let resp = await fetch(getURL(path), {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      data = await resp.json();
+      if (data.err) throw data.err;
+
+      await thunkAPI.dispatch(fetchIni());
+    } catch (err) {
+      throw err;
+    }
+  },
+);

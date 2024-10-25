@@ -6,14 +6,14 @@ import {
   useNavigation,
 } from 'expo-router';
 import {View, StyleSheet, ScrollView} from 'react-native';
-import {Text, Button} from 'react-native-paper';
+import {Text, Button, IconButton} from 'react-native-paper';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 import _ from 'lodash';
 import {format} from 'date-fns';
 
 import {selectIncome, selectSources} from '@/redux/main/selectors';
-import {uploadIncome} from '@/redux/main/thunks';
+import {deleteIncome, uploadIncome} from '@/redux/main/thunks';
 import {useAppDispatch, useAppSelector} from '@/hooks';
 import {Select, TextInput} from '@/components';
 import CustomeDatePicker from '@/components/DatePicker';
@@ -114,9 +114,25 @@ const Income = () => {
     });
   };
 
+  const handleDeleteExpense = () => {
+    if (!param.id) return;
+    dispatch(deleteIncome({id: param.id}))
+      .unwrap()
+      .then(() => router.navigate('/(tabs)/records'));
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView keyboardShouldPersistTaps="always">
+        {Number.isInteger(param.id * 1) && (
+          <IconButton
+            icon={'trash-can'}
+            style={{
+              alignSelf: 'flex-end',
+            }}
+            onPress={handleDeleteExpense}
+          />
+        )}
         <View style={styles.detailsContainer}>
           {isEditMode ? (
             <TextInput
