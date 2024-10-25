@@ -1,12 +1,32 @@
-import * as React from 'react';
-import {Switch} from 'react-native-paper';
+import {useEffect, useState} from 'react';
+import {Switch, SwitchProps} from 'react-native-paper';
 
-const CustomSwitch = () => {
-  const [isSwitchOn, setIsSwitchOn] = React.useState(false);
+interface CustomSwitchProps {
+  value?: boolean;
+  onChange?: (value: boolean) => void;
+  disabled?: boolean;
+}
 
-  const onToggleSwitch = () => setIsSwitchOn(!isSwitchOn);
+const CustomSwitch = (props: CustomSwitchProps & SwitchProps) => {
+  const {value = false, onChange, disabled = false} = props;
+  const [isSwitchOn, setIsSwitchOn] = useState(value);
 
-  return <Switch value={isSwitchOn} onValueChange={onToggleSwitch} />;
+  useEffect(() => {
+    setIsSwitchOn(value);
+  }, [value]);
+
+  const onToggleSwitch = () => {
+    setIsSwitchOn(!isSwitchOn);
+    onChange?.(!isSwitchOn);
+  };
+
+  return (
+    <Switch
+      value={isSwitchOn}
+      onValueChange={onToggleSwitch}
+      disabled={disabled}
+    />
+  );
 };
 
 export default CustomSwitch;
