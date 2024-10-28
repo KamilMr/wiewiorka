@@ -30,7 +30,13 @@ const migrations = {
     };
   },
   1: (state: RootState) => {
-    // migration: flush store
+    return {
+      ...state,
+      auth: authEmptyState(),
+      main: mainEmptyState(),
+    };
+  },
+  2: (state: RootState) => {
     return {
       ...state,
       auth: authEmptyState(),

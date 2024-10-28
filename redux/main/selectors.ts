@@ -1,10 +1,11 @@
 import {createSelector} from '@reduxjs/toolkit';
-import {format} from 'date-fns';
+import {format, isAfter, isBefore} from 'date-fns';
 import _ from 'lodash';
 
 import {EXCLUDED_CAT, dh, makeNewIdArr} from '@/common';
 import {RootState} from '../store';
 import {Expense} from './mainSlice';
+import {groupBy} from '@/utils/aggregateData';
 
 type Search = {
   txt: string;
@@ -49,7 +50,7 @@ export const selectRecords = (number: number, search: Search) =>
       });
       return _.chain(tR)
         .sortBy(['date'])
-       .reverse()
+        .reverse()
         .slice(0, number)
         .map((obj) => ({
           ...obj,
@@ -174,4 +175,20 @@ export const aggregateExpenses = (agrDates = [new Date(), new Date()]) =>
 
 export const selectSources = (state: RootState) => {
   return state.main.sources[state.auth.name];
+};
+
+const withinRange = (date: Date, dates: [Date, Date]) => {
+  return (
+    (isAfter(date, dates[0]) && isBefore(new Date(date), dates[1])) ||
+    _.isEqual(date, dates[0]) ||
+    _.isEqual(date, dates[1])
+  );
+};
+
+export const selectByTimeRange = (dates: [Date, Date]) => {
+  return createSelector([(state) => state.main._aggregated], (data) => {
+    if (dates?.length === 2)
+      return _.pickBy(data, (_, date) => withinRange(new Date(date), dates));
+    else return data;
+  });
 };
