@@ -1,12 +1,12 @@
 import {useState} from 'react';
 import {useLocalSearchParams} from 'expo-router';
 import {ScrollView, View} from 'react-native';
-import {Button, Text} from 'react-native-paper';
+import {Button, IconButton, Text} from 'react-native-paper';
 
 import {BarChart, Chip, DatePicker, PieChartBar} from '@/components';
 import {lastDayOfMonth} from 'date-fns';
 import {useAppSelector} from '@/hooks';
-import {aggregateExpenses} from '@/redux/main/selectors';
+import {aggregateExpenses, selectByTimeRange} from '@/redux/main/selectors';
 import {EXCLUDED_CAT, formatPrice, shortenText} from '@/common';
 import _, {parseInt} from 'lodash';
 import {barDataItem, pieDataItem} from 'react-native-gifted-charts';
@@ -21,10 +21,12 @@ type AggrExpense = {
 const Summary = () => {
   const {date}: {date: string} = useLocalSearchParams();
   const isNotYear: boolean = date.split('-').length > 2;
-  const [filterDates, setFilterDates] = useState([
+  const [filterDates, setFilterDates] = useState<[Date, Date]>([
     new Date(date),
     lastDayOfMonth(isNotYear ? new Date(date) : new Date()),
   ]);
+
+  const selected = useAppSelector(selectByTimeRange(filterDates));
 
   const [chartDisplay, setChartDisplay] = useState<string>('pie');
 
@@ -66,10 +68,6 @@ const Summary = () => {
       return tR;
     });
   };
-
-  interface Test {
-    label: string;
-  }
 
   const buildPieChart = (arr) => {
     const max = parseInt(_.sumBy(arr, 'v'));
@@ -129,18 +127,16 @@ const Summary = () => {
         }
       />
       <View style={{flexDirection: 'row', alignSelf: 'flex-end'}}>
-        <Button
+        <IconButton
           icon="chart-donut"
           onPress={handlePieChange('pie')}
-          textColor={chartDisplay === 'pie' ? 'blue' : undefined}>
-          Pie
-        </Button>
-        <Button
+          iconColor={chartDisplay === 'pie' ? 'blue' : undefined}
+        />
+        <IconButton
           icon="chart-bar"
           onPress={handlePieChange('bar')}
-          textColor={chartDisplay === 'bar' ? 'blue' : undefined}>
-          Bar
-        </Button>
+          iconColor={chartDisplay === 'bar' ? 'blue' : undefined}
+        />
       </View>
       {chartDisplay === 'pie' ? (
         <PieChartBar
