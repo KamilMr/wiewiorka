@@ -2,10 +2,12 @@ import _ from 'lodash';
 import {AggregatedData} from './types';
 import {convertDate} from '@/common';
 
+type Axis = '1-1' | '1-0';
+
 const groupBy = (
   data: AggregatedData,
   byTime: 'month' | 'year',
-  byCat: '1-1' | '1-0',
+  byCat: Axis,
 ) => {
   const tR: AggregatedData = {};
   _.entries(data).forEach(([dateKey, obj]) => {
@@ -76,18 +78,18 @@ const sumById = (data: AggregatedData) => {
   return tR;
 };
 
-console.log(
-  sumById({
-    '2024-07-01': {
-      '12-11': [10],
-      '12-12': [2],
-    },
-    '2024-07-02': {
-      '12-11': [10],
-      '12-12': [2],
-    },
-  }),
-);
+// console.log(
+//   sumById({
+//     '2024-07-01': {
+//       '12-11': [10],
+//       '12-12': [2],
+//     },
+//     '2024-07-02': {
+//       '12-11': [10],
+//       '12-12': [2],
+//     },
+//   }),
+// );
 
 export default aggregateData;
-export {groupBy, sumById};
+export {groupBy, sumById, Axis};

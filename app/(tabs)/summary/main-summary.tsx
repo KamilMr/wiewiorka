@@ -15,7 +15,7 @@ import {
 import {useAppSelector} from '@/hooks';
 import {BarChart, Chip, DatePicker, PieChartBar} from '@/components';
 import {EXCLUDED_CAT, formatPrice, shortenText} from '@/common';
-import {groupBy, sumById} from '@/utils/aggregateData';
+import {Axis, groupBy, sumById} from '@/utils/aggregateData';
 
 type AggrExpense = {
   v: number;
@@ -45,35 +45,51 @@ const buildBarChart = (arr) => {
 
 const Summary = () => {
   const {date}: {date: string} = useLocalSearchParams();
+  const stateCategories = useAppSelector(selectCategories);
   const isNotYear: boolean = date.split('-').length > 2;
   const [filterDates, setFilterDates] = useState<[Date, Date]>([
     new Date(date),
     lastDayOfMonth(isNotYear ? new Date(date) : new Date()),
   ]);
+  const [axis, setAxis] = useState<Axis>('1-0');
+  const [chartDisplay, setChartDisplay] = useState<string>('pie');
 
   const selected = useAppSelector(selectByTimeRange(filterDates));
-  const grouped = groupBy(selected, 'month', '1-0');
-  const stateCategories = useAppSelector(selectCategories);
+  const grouped = groupBy(selected, 'month', axis);
 
-  const [chartDisplay, setChartDisplay] = useState<string>('pie');
+  // get used categories
+  const idsOfCategories: string[] = _.values(grouped)
+    .map((o) => _.keys(o))
+    .flat();
+  const idsGroupOrCategory: string[] = idsOfCategories.map(
+    (str: string) => str.split('-')[+axis.split('-')[1]],
+  );
+  const currentGroupOrCategory: {
+    name: string;
+    id: number;
+    type: 'category' | 'group';
+    color: string;
+  }[] = idsGroupOrCategory.map((n: string) => {
+    const holer = axis === '1-1' ? 'catId' : 'groupId';
+    const cat = stateCategories.find((o) => +o[holer] === +n);
+    return {
+      name: cat?.[holer === 'catId' ? 'category' : 'groupName'] || 'not found',
+      id: +n,
+      type: holer === 'catId' ? 'category' : 'group',
+      color: cat ? cat?.color || '' : '',
+    };
+  });
 
   const handlePieChange = (str: string) => () => setChartDisplay(str);
 
-  const aggrExpenses = useAppSelector(aggregateExpenses(filterDates)) || [];
-
-  const categories = aggrExpenses.map((o: any) => ({
-    name: o.name,
-    id: o.id,
-    color: o.color,
-  }));
   const [filters, setFilters] = useState(
-    categories.filter((c: {id: number}) => !EXCLUDED_CAT.includes(c.id)),
+    currentGroupOrCategory.filter((c: {id: number}) => !EXCLUDED_CAT.includes(c.id)),
   );
 
   const setCat = new Set(filters.map((o: {name: string}) => o.name));
 
   const handleRemoveFilters = () => setFilters([]);
-  const handleResetFilters = () => setFilters(categories);
+  const handleResetFilters = () => setFilters(currentGroupOrCategory);
 
   const buildPieChart = (obj, setFilter) => {
     const values = _.entries(sumById(obj));
@@ -88,7 +104,7 @@ const Summary = () => {
         const isCat = +catId > 0;
         // console.log(grId, valueArr);
 
-        const name = stateCategories.find((o) =>
+        const foundCategory = stateCategories.find((o) =>
           isCat ? o.catId === +catId : o.groupId === +grId,
         );
         // console.log(name,isCat,grId)
@@ -96,28 +112,16 @@ const Summary = () => {
         const percentage: string = perc(value);
         const tR: {label: string} & pieDataItem = {
           value,
-          label: isCat ? name.category : name?.groupName || '',
+          label: isCat
+            ? foundCategory.category
+            : foundCategory?.groupName || '',
           text: +percentage < 4 ? '' : `${percentage}%`,
           // color: name.color,
         };
         return tR;
       })
       .sort((a, b) => b.value - a.value);
-    // return _.orderBy(arr, ['v'], ['desc']).map((obj, idx) => {
-    //   const percentage: string = perc(obj.v);
-    //   const tR: {label: string} & pieDataItem = {
-    //     value: obj.v,
-    //     color: obj.color,
-    //     label: obj.name,
-    //   };
-    //
-    //   return tR;
-    // });
   };
-
-  const filteredData = aggrExpenses.filter((obj) =>
-    setCat.size > 0 ? setCat.has(obj.name) : true,
-  );
 
   const data =
     chartDisplay === 'pie'
@@ -125,7 +129,7 @@ const Summary = () => {
       : buildBarChart(selected, setCat);
 
   const handleFilters = (catId: number) => () => {
-    const categoryToAdd = categories.find((f) => f.id === catId);
+    const categoryToAdd = currentGroupOrCategory.find((f) => f.id === catId);
     if (!categoryToAdd) {
       return;
     }
@@ -172,7 +176,10 @@ const Summary = () => {
           data={data}
           labelsPosition="onBorder"
           innerRadius={70}
-          onPress={(item) => {console.log('item',item)}}
+          onPress={(item) => {
+            if (axis === '1-0') setAxis('1-1');
+            //else do navigation
+          }}
           showText
           centerLabelComponent={() => {
             return (
@@ -204,13 +211,13 @@ const Summary = () => {
           flexDirection: 'row',
           flexWrap: 'wrap',
         }}>
-        {categories.map((c) => {
-          const isSelected = !!filters.find((f) => f.id === c.id);
+        {currentGroupOrCategory.map((c) => {
+          const isSelected = !!filters.find((f) => f.name === c.name);
           return (
             <Chip
               key={c.id}
               selectedColor={
-                filters.find((f) => f.id === c.id)?.color || '#a6a6a6'
+                filters.find((f) => f.name === c.name)?.color || '#a6a6a6'
               }
               // rippleColor={c.color}
               mode="outlined"
@@ -223,7 +230,7 @@ const Summary = () => {
                 style={{
                   fontSize: 14,
                   fontWeight: isSelected ? 600 : 400,
-                  color: filters.find((f) => f.id === c.id)?.color || '#a6a6a6',
+                  color: filters.find((f) => f.name === c.name)?.color || '#a6a6a6',
                   textDecorationLine: isSelected ? undefined : 'line-through',
                 }}>
                 {c.name}
