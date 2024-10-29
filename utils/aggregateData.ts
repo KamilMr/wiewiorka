@@ -16,7 +16,6 @@ const groupBy = (
         : convertDate(dateKey, 'yyyy-MM-dd', 'yyyy');
     const isCat = +byCat.split('-')[1] > 0;
     if (isCat) {
-      console.log('this should notwork now');
       tR[dateKey] ??= {...obj};
       _.entries(obj).forEach(([innerId, valueArr]) => {
         tR[dateKey][innerId] ??= [0];
@@ -63,5 +62,32 @@ const aggregateData = (expenses: [], categories: {}) => {
   return tR;
 };
 
+const sumById = (data: AggregatedData) => {
+  const tR: {[key: string]: [number]} = {};
+  const values = _.values(data); // [{12:13: [2], 12-14: [2]}]
+  values.forEach((obj) => {
+    const catAndValue = _.entries(obj); // [[12-11, [10]]]
+    catAndValue.forEach(([id, valueArr]: [string, [number]]) => {
+      tR[id] ??= [0];
+      tR[id][0] += valueArr[0];
+    });
+  });
+
+  return tR;
+};
+
+console.log(
+  sumById({
+    '2024-07-01': {
+      '12-11': [10],
+      '12-12': [2],
+    },
+    '2024-07-02': {
+      '12-11': [10],
+      '12-12': [2],
+    },
+  }),
+);
+
 export default aggregateData;
-export {groupBy};
+export {groupBy, sumById};

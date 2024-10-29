@@ -3,19 +3,44 @@ import {useLocalSearchParams} from 'expo-router';
 import {ScrollView, View} from 'react-native';
 import {Button, IconButton, Text} from 'react-native-paper';
 
-import {BarChart, Chip, DatePicker, PieChartBar} from '@/components';
-import {lastDayOfMonth} from 'date-fns';
-import {useAppSelector} from '@/hooks';
-import {aggregateExpenses, selectByTimeRange} from '@/redux/main/selectors';
-import {EXCLUDED_CAT, formatPrice, shortenText} from '@/common';
-import _, {parseInt} from 'lodash';
 import {barDataItem, pieDataItem} from 'react-native-gifted-charts';
+import {lastDayOfMonth} from 'date-fns';
+import _, {parseInt} from 'lodash';
+
+import {
+  aggregateExpenses,
+  selectByTimeRange,
+  selectCategories,
+} from '@/redux/main/selectors';
+import {useAppSelector} from '@/hooks';
+import {BarChart, Chip, DatePicker, PieChartBar} from '@/components';
+import {EXCLUDED_CAT, formatPrice, shortenText} from '@/common';
+import {groupBy, sumById} from '@/utils/aggregateData';
 
 type AggrExpense = {
   v: number;
   color: string;
   name: string;
   id: string;
+};
+
+const buildBarChart = (arr) => {
+  return arr.map((obj) => {
+    const tR: barDataItem = {
+      value: obj.v,
+      frontColor: obj.color,
+      label: obj.name,
+      spacing: 10,
+      barWidth: 50,
+      topLabelComponent: () => (
+        <Text style={{fontSize: 8}}>
+          {formatPrice(parseInt(obj.v.toString()))}
+        </Text>
+      ),
+    };
+
+    return tR;
+  });
 };
 
 const Summary = () => {
@@ -27,6 +52,8 @@ const Summary = () => {
   ]);
 
   const selected = useAppSelector(selectByTimeRange(filterDates));
+  const grouped = groupBy(selected, 'month', '1-0');
+  const stateCategories = useAppSelector(selectCategories);
 
   const [chartDisplay, setChartDisplay] = useState<string>('pie');
 
@@ -40,50 +67,52 @@ const Summary = () => {
     color: o.color,
   }));
   const [filters, setFilters] = useState(
-    categories.filter((c) => !EXCLUDED_CAT.includes(c.id)),
+    categories.filter((c: {id: number}) => !EXCLUDED_CAT.includes(c.id)),
   );
 
-  const setCat = new Set(filters.map((o) => o.name));
+  const setCat = new Set(filters.map((o: {name: string}) => o.name));
 
   const handleRemoveFilters = () => setFilters([]);
   const handleResetFilters = () => setFilters(categories);
 
-  const buildBarChart = (arr) => {
-    return arr.map((obj) => {
-      const tR: barDataItem = {
-        value: obj.v,
-        frontColor: obj.color,
-        label: obj.name,
-        spacing: 10,
-        barWidth: 50,
-        topLabelComponent: () => (
-          <>
-            <Text style={{fontSize: 8}}>
-              {formatPrice(parseInt(obj.v.toString()))}
-            </Text>
-          </>
-        ),
-      };
+  const buildPieChart = (obj, setFilter) => {
+    const values = _.entries(sumById(obj));
+    // console.log(values)
+    const max = _.sum(values.map((arr: [number, number]) => arr[1]).flat(2));
+    const perc = (n: number) => ((n * 100) / max).toFixed(2);
+    //
+    // console.log(stateCategories);
+    return values
+      .map(([itemId, valueArr]) => {
+        const [grId, catId] = itemId.split('-');
+        const isCat = +catId > 0;
+        // console.log(grId, valueArr);
 
-      return tR;
-    });
-  };
-
-  const buildPieChart = (arr) => {
-    const max = parseInt(_.sumBy(arr, 'v'));
-    const perc = (n) => ((n * 100) / max).toFixed(2);
-
-    return _.orderBy(arr, ['v'], ['desc']).map((obj, idx) => {
-      const percentage: string = perc(obj.v);
-      const tR: {label: string} & pieDataItem = {
-        value: obj.v,
-        text: +percentage < 4 ? '' : `${percentage}%`,
-        color: obj.color,
-        label: obj.name,
-      };
-
-      return tR;
-    });
+        const name = stateCategories.find((o) =>
+          isCat ? o.catId === +catId : o.groupId === +grId,
+        );
+        // console.log(name,isCat,grId)
+        const value = valueArr[0];
+        const percentage: string = perc(value);
+        const tR: {label: string} & pieDataItem = {
+          value,
+          label: isCat ? name.category : name?.groupName || '',
+          text: +percentage < 4 ? '' : `${percentage}%`,
+          // color: name.color,
+        };
+        return tR;
+      })
+      .sort((a, b) => b.value - a.value);
+    // return _.orderBy(arr, ['v'], ['desc']).map((obj, idx) => {
+    //   const percentage: string = perc(obj.v);
+    //   const tR: {label: string} & pieDataItem = {
+    //     value: obj.v,
+    //     color: obj.color,
+    //     label: obj.name,
+    //   };
+    //
+    //   return tR;
+    // });
   };
 
   const filteredData = aggrExpenses.filter((obj) =>
@@ -92,8 +121,8 @@ const Summary = () => {
 
   const data =
     chartDisplay === 'pie'
-      ? buildPieChart(filteredData)
-      : buildBarChart(filteredData);
+      ? buildPieChart(grouped, setCat)
+      : buildBarChart(selected, setCat);
 
   const handleFilters = (catId: number) => () => {
     const categoryToAdd = categories.find((f) => f.id === catId);
@@ -143,6 +172,7 @@ const Summary = () => {
           data={data}
           labelsPosition="onBorder"
           innerRadius={70}
+          onPress={(item) => {console.log('item',item)}}
           showText
           centerLabelComponent={() => {
             return (

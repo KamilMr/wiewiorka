@@ -89,7 +89,8 @@ export const selectCategories = createSelector(
     return arr.reduce((pv, [key, cv]) => {
       const categories = [...cv.categories].map((obj) => ({
         ...obj,
-        groupId: key,
+        groupId: +key,
+        groupName: cv.groupName,
       }));
       if (Array.isArray(pv)) pv.push(...categories);
       return pv;
