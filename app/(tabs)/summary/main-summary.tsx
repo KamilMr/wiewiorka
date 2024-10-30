@@ -24,25 +24,6 @@ type AggrExpense = {
   id: string;
 };
 
-const buildBarChart = (arr) => {
-  return arr.map((obj) => {
-    const tR: barDataItem = {
-      value: obj.v,
-      frontColor: obj.color,
-      label: obj.name,
-      spacing: 10,
-      barWidth: 50,
-      topLabelComponent: () => (
-        <Text style={{fontSize: 8}}>
-          {formatPrice(parseInt(obj.v.toString()))}
-        </Text>
-      ),
-    };
-
-    return tR;
-  });
-};
-
 const GroupCategory = ({
   axis,
   onPress,
@@ -92,7 +73,6 @@ const Summary = () => {
   // selectors
   const stateCategories = useAppSelector(selectCategories);
   const selected = useAppSelector(selectByTimeRange(filterDates));
-  // console.log(selected);
 
   // grouping
   const grouped = groupBy(selected, 'month', ...axis);
@@ -104,8 +84,8 @@ const Summary = () => {
 
   // get used categories
   const idsOfCategories: string[] = _.values(grouped)
-    .map((o) => _.keys(o))
-    .flat();
+    .map((o) => _.entries(o).sort((a, b) => b[1][0] - a[1][0]))[0]
+    .map(([id]) => id);
   const idsGroupOrCategory: string[] = idsOfCategories.map(
     (str: string) => str.split('-')[+axis[0].split('-')[1]],
   );
@@ -115,12 +95,12 @@ const Summary = () => {
     type: 'category' | 'group';
     color: string;
   }[] = idsGroupOrCategory.map((n: string) => {
-    const holer = axis[0] === '1-1' ? 'catId' : 'groupId';
-    const cat = stateCategories.find((o) => +o[holer] === +n);
+    const holder = axis[0] === '1-1' ? 'catId' : 'groupId';
+    const cat = stateCategories.find((o) => +o[holder] === +n);
     return {
-      name: cat?.[holer === 'catId' ? 'category' : 'groupName'] || 'not found',
+      name: cat?.[holder === 'catId' ? 'category' : 'groupName'] || 'not found',
       id: +n,
-      type: holer === 'catId' ? 'category' : 'group',
+      type: holder === 'catId' ? 'category' : 'group',
       color: cat ? cat?.color || '' : '',
     };
   });
@@ -138,6 +118,44 @@ const Summary = () => {
   const handleRemoveFilters = () => setFilters([]);
   const handleResetFilters = () => setFilters(currentGroupOrCategory);
 
+  const buildBarChart = (obj, f: Set<string>) => {
+    const values = _.entries(sumById(obj));
+    return values
+      .map(([itemId, valueArr]) => {
+        const [grId, catId] = decId(itemId);
+        const isCat = +catId > 0;
+
+        const foundCategory = stateCategories.find((o) =>
+          isCat ? o.catId === +catId : o.groupId === +grId,
+        );
+        if (
+          f.size &&
+          !f.has(isCat ? foundCategory.category : foundCategory?.groupName)
+        )
+          return undefined;
+
+        const value = valueArr[0];
+
+        const tR: barDataItem = {
+          value: value,
+          frontColor: foundCategory.color,
+          label: isCat
+            ? foundCategory.category
+            : foundCategory?.groupName || '',
+          spacing: 10,
+          barWidth: 50,
+          topLabelComponent: () => (
+            <Text style={{fontSize: 8}}>
+              {formatPrice(parseInt(value.toString()))}
+            </Text>
+          ),
+        };
+
+        return tR;
+      })
+      .filter(Boolean)
+      .sort((a, b) => b.value - a.value);
+  };
   const buildPieChart = (obj, f: Set<string>) => {
     const values = _.entries(sumById(obj));
     const max = _.sum(values.map((arr: [number, number]) => arr[1]).flat(2));
@@ -179,7 +197,7 @@ const Summary = () => {
   const data =
     chartDisplay === 'pie'
       ? buildPieChart(grouped, setCat)
-      : buildBarChart(selected, setCat);
+      : buildBarChart(grouped, setCat);
 
   const handleFilters = (catId: number) => () => {
     const categoryToAdd = currentGroupOrCategory.find((f) => f.id === catId);
