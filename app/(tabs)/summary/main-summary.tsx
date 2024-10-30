@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useLocalSearchParams} from 'expo-router';
 import {ScrollView, View} from 'react-native';
 import {Button, IconButton, Text} from 'react-native-paper';
@@ -15,7 +15,7 @@ import {
 import {useAppSelector} from '@/hooks';
 import {BarChart, Chip, DatePicker, PieChartBar} from '@/components';
 import {EXCLUDED_CAT, formatPrice, shortenText} from '@/common';
-import {Axis, groupBy, sumById} from '@/utils/aggregateData';
+import {Axis, PickFilter, decId, groupBy, sumById} from '@/utils/aggregateData';
 
 type AggrExpense = {
   v: number;
@@ -43,26 +43,71 @@ const buildBarChart = (arr) => {
   });
 };
 
+const GroupCategory = ({
+  axis,
+  onPress,
+}: {
+  axis: [Axis, string];
+  onPress: (axis: Axis) => void;
+}) => {
+  const isCat = axis[0] === '1-1';
+  const handleOnPress = (axis: Axis) => () => {
+    onPress?.(axis);
+  };
+  return (
+    <View>
+      <Button
+        style={{height: 40, width: 140}}
+        mode={'text'}
+        labelStyle={{
+          color: !isCat ? 'blue' : undefined,
+          fontSize: 12,
+        }}
+        onPress={handleOnPress('1-0')}>
+        Kategorie
+      </Button>
+      <Button
+        style={{height: 40, width: 140}}
+        mode={'text'}
+        labelStyle={{
+          color: isCat ? 'blue' : undefined,
+          fontSize: 12,
+        }}
+        onPress={handleOnPress('1-1')}>
+        Podkategorie
+      </Button>
+    </View>
+  );
+};
+
 const Summary = () => {
   const {date}: {date: string} = useLocalSearchParams();
-  const stateCategories = useAppSelector(selectCategories);
-  const isNotYear: boolean = date.split('-').length > 2;
   const [filterDates, setFilterDates] = useState<[Date, Date]>([
     new Date(date),
-    lastDayOfMonth(isNotYear ? new Date(date) : new Date()),
+    lastDayOfMonth(date.split('-').length > 2 ? new Date(date) : new Date()),
   ]);
-  const [axis, setAxis] = useState<Axis>('1-0');
+  const [axis, setAxis] = useState<[Axis, PickFilter]>(['1-0', '0-0']);
   const [chartDisplay, setChartDisplay] = useState<string>('pie');
 
+  // selectors
+  const stateCategories = useAppSelector(selectCategories);
   const selected = useAppSelector(selectByTimeRange(filterDates));
-  const grouped = groupBy(selected, 'month', axis);
+  // console.log(selected);
+
+  // grouping
+  const grouped = groupBy(selected, 'month', ...axis);
+
+  // console.log(stateCategories.map((sc: {groupName: string}) => sc.groupName),'as',axis[1])
+  useEffect(() => {
+    setFilters(currentGroupOrCategory);
+  }, [axis]);
 
   // get used categories
   const idsOfCategories: string[] = _.values(grouped)
     .map((o) => _.keys(o))
     .flat();
   const idsGroupOrCategory: string[] = idsOfCategories.map(
-    (str: string) => str.split('-')[+axis.split('-')[1]],
+    (str: string) => str.split('-')[+axis[0].split('-')[1]],
   );
   const currentGroupOrCategory: {
     name: string;
@@ -70,7 +115,7 @@ const Summary = () => {
     type: 'category' | 'group';
     color: string;
   }[] = idsGroupOrCategory.map((n: string) => {
-    const holer = axis === '1-1' ? 'catId' : 'groupId';
+    const holer = axis[0] === '1-1' ? 'catId' : 'groupId';
     const cat = stateCategories.find((o) => +o[holer] === +n);
     return {
       name: cat?.[holer === 'catId' ? 'category' : 'groupName'] || 'not found',
@@ -83,7 +128,9 @@ const Summary = () => {
   const handlePieChange = (str: string) => () => setChartDisplay(str);
 
   const [filters, setFilters] = useState(
-    currentGroupOrCategory.filter((c: {id: number}) => !EXCLUDED_CAT.includes(c.id)),
+    currentGroupOrCategory.filter(
+      (c: {id: number}) => !EXCLUDED_CAT.includes(c.id),
+    ),
   );
 
   const setCat = new Set(filters.map((o: {name: string}) => o.name));
@@ -91,35 +138,41 @@ const Summary = () => {
   const handleRemoveFilters = () => setFilters([]);
   const handleResetFilters = () => setFilters(currentGroupOrCategory);
 
-  const buildPieChart = (obj, setFilter) => {
+  const buildPieChart = (obj, f: Set<string>) => {
     const values = _.entries(sumById(obj));
-    // console.log(values)
     const max = _.sum(values.map((arr: [number, number]) => arr[1]).flat(2));
     const perc = (n: number) => ((n * 100) / max).toFixed(2);
-    //
+
     // console.log(stateCategories);
     return values
       .map(([itemId, valueArr]) => {
-        const [grId, catId] = itemId.split('-');
+        const [grId, catId] = decId(itemId);
         const isCat = +catId > 0;
         // console.log(grId, valueArr);
 
         const foundCategory = stateCategories.find((o) =>
           isCat ? o.catId === +catId : o.groupId === +grId,
         );
+        if (
+          f.size &&
+          !f.has(isCat ? foundCategory.category : foundCategory?.groupName)
+        )
+          return undefined;
         // console.log(name,isCat,grId)
         const value = valueArr[0];
         const percentage: string = perc(value);
-        const tR: {label: string} & pieDataItem = {
+        const tR: {label: string; id: string} & pieDataItem = {
+          id: itemId,
           value,
           label: isCat
             ? foundCategory.category
             : foundCategory?.groupName || '',
           text: +percentage < 4 ? '' : `${percentage}%`,
-          // color: name.color,
+          color: foundCategory.color,
         };
         return tR;
       })
+      .filter(Boolean)
       .sort((a, b) => b.value - a.value);
   };
 
@@ -141,6 +194,10 @@ const Summary = () => {
     setFilters(newState);
   };
 
+  const handleAxisChange = (ax: Axis) => {
+    setAxis([ax, ax === '1-0' ? '0-0' : axis[1]]);
+  };
+
   return (
     <ScrollView>
       <DatePicker
@@ -159,25 +216,33 @@ const Summary = () => {
           setFilterDates([filterDates[0], date])
         }
       />
-      <View style={{flexDirection: 'row', alignSelf: 'flex-end'}}>
-        <IconButton
-          icon="chart-donut"
-          onPress={handlePieChange('pie')}
-          iconColor={chartDisplay === 'pie' ? 'blue' : undefined}
-        />
-        <IconButton
-          icon="chart-bar"
-          onPress={handlePieChange('bar')}
-          iconColor={chartDisplay === 'bar' ? 'blue' : undefined}
-        />
+      <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+        <GroupCategory axis={axis} onPress={handleAxisChange} />
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}>
+          <IconButton
+            icon="chart-donut"
+            onPress={handlePieChange('pie')}
+            iconColor={chartDisplay === 'pie' ? 'blue' : undefined}
+          />
+          <IconButton
+            icon="chart-bar"
+            onPress={handlePieChange('bar')}
+            iconColor={chartDisplay === 'bar' ? 'blue' : undefined}
+          />
+        </View>
       </View>
       {chartDisplay === 'pie' ? (
         <PieChartBar
           data={data}
           labelsPosition="onBorder"
           innerRadius={70}
-          onPress={(item) => {
-            if (axis === '1-0') setAxis('1-1');
+          onPress={(item: {label: string; id: string}) => {
+            if (axis[0] === '1-1') return;
+            setAxis(['1-1', `${decId(item.id)[0]}-0`]);
             //else do navigation
           }}
           showText
@@ -230,7 +295,8 @@ const Summary = () => {
                 style={{
                   fontSize: 14,
                   fontWeight: isSelected ? 600 : 400,
-                  color: filters.find((f) => f.name === c.name)?.color || '#a6a6a6',
+                  color:
+                    filters.find((f) => f.name === c.name)?.color || '#a6a6a6',
                   textDecorationLine: isSelected ? undefined : 'line-through',
                 }}>
                 {c.name}
