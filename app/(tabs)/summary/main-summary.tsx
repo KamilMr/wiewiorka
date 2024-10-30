@@ -89,6 +89,14 @@ const Summary = () => {
   const idsGroupOrCategory: string[] = idsOfCategories.map(
     (str: string) => str.split('-')[+axis[0].split('-')[1]],
   );
+
+  const getCategoryName = (n: number, id: string) => {
+    if (!id) id = axis[0] === '1-1' ? 'catId' : 'groupId';
+    const cat = stateCategories.find((o) => +o[id] === n);
+
+    return cat;
+  };
+
   const currentGroupOrCategory: {
     name: string;
     id: number;
@@ -96,7 +104,7 @@ const Summary = () => {
     color: string;
   }[] = idsGroupOrCategory.map((n: string) => {
     const holder = axis[0] === '1-1' ? 'catId' : 'groupId';
-    const cat = stateCategories.find((o) => +o[holder] === +n);
+    const cat = getCategoryName(+n, holder);
     return {
       name: cat?.[holder === 'catId' ? 'category' : 'groupName'] || 'not found',
       id: +n,
@@ -136,8 +144,9 @@ const Summary = () => {
 
         const value = valueArr[0];
 
-        const tR: barDataItem = {
+        const tR: {id: string} & barDataItem = {
           value: value,
+          id: itemId,
           frontColor: foundCategory.color,
           label: isCat
             ? foundCategory.category
@@ -285,8 +294,24 @@ const Summary = () => {
           }}
         />
       ) : (
-        <BarChart barData={data} />
+        <BarChart
+          barData={data}
+          onPress={(item: {label: string; id: string}) => {
+            if (axis[0] === '1-1') return;
+            setAxis(['1-1', `${decId(item.id)[0]}-0`]);
+          }}
+        />
       )}
+      <View style={{alignItems: 'flex-end'}}>
+        {axis[0] === '1-1' ? (
+          <IconButton
+            style={{marginRight: 48}}
+            mode="contained"
+            onPress={() => handleAxisChange('1-0')}
+            icon={'arrow-left-top'}
+          />
+        ) : null}
+      </View>
 
       <View
         style={{
