@@ -83,11 +83,26 @@ const Summary = () => {
   }, [axis]);
 
   // get used categories
-  const idsOfCategories: string[] = _.values(grouped)
-    .map((o) => _.entries(o).sort((a, b) => b[1][0] - a[1][0]))[0]
-    .map(([id]) => id);
+  const idsOfCategories: string[] = [
+    ...new Set(
+      _.values(grouped)
+        .map((o) => _.entries(o))
+        .flat()
+        .sort(([, va], [, vb]) => vb[0] - va[0])
+        .map(([id, val]) => id),
+    ),
+  ];
   const idsGroupOrCategory: string[] = idsOfCategories.map(
     (str: string) => str.split('-')[+axis[0].split('-')[1]],
+  );
+  console.log(
+    new Set(
+      _.values(grouped)
+        .map((o) => _.entries(o))
+        .flat()
+        .sort(([, va], [, vb]) => vb[0] - va[0])
+        .map(([id, val]) => id),
+    ),
   );
 
   const getCategoryName = (n: number, id: string) => {
@@ -121,6 +136,7 @@ const Summary = () => {
     ),
   );
 
+  // console.log(filters.map((name) => name))
   const setCat = new Set(filters.map((o: {name: string}) => o.name));
 
   const handleRemoveFilters = () => setFilters([]);
