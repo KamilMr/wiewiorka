@@ -331,7 +331,24 @@ const Summary = () => {
         <BarChart
           barData={data}
           onPress={(item: {label: string; id: string}) => {
-            if (axis[0] === '1-1') return;
+            if (axis[0] === '1-1') {
+              const dates = filterDates.map((d) => format(d, 'yyyy-MM-dd'));
+              let category: string | undefined;
+              const cat: Category | undefined = getCategoryName(
+                +decId(item.id)[1],
+                'catId',
+              );
+              if (cat) category = cat.category;
+
+              router.navigate({
+                pathname: '/summary/list',
+                params: {
+                  dates,
+                  category: category || '',
+                },
+              });
+              return;
+            }
             setAxis(['1-1', `${decId(item.id)[0]}-0`]);
           }}
         />
