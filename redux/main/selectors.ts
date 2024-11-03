@@ -4,12 +4,13 @@ import _ from 'lodash';
 
 import {EXCLUDED_CAT, dh, makeNewIdArr} from '@/common';
 import {RootState} from '../store';
-import {Expense} from './mainSlice';
+import {Expense, Income} from './mainSlice';
 import {groupBy} from '@/utils/aggregateData';
 
-type Search = {
+export type Search = {
   txt: string;
   categories: Array<string>;
+  dates?: [string, string];
 };
 
 export const selectSnackbar = (state: RootState) => state.main.snackbar;
@@ -20,7 +21,10 @@ const filterCat = (exp: Expense, f: Array<string>) => {
   return f.includes(exp.category);
 };
 
-const filterTxt = (exp: Expense, f: string) => {
+const filterTxt = (
+  exp: Pick<Expense, 'description' | 'category'>,
+  f: string,
+) => {
   if (!f) return true;
   const string = exp.description + exp.category;
   return string.toLowerCase().includes(f.toLowerCase());
@@ -30,22 +34,36 @@ export const selectRecords = (number: number, search: Search) =>
   createSelector(
     [selectExpensesAll, selectCategories, selectIncomes],
     (expenses, categories, incomes) => {
-      const {txt, categories: fc} = search;
+      const {txt, categories: fc, dates} = search;
+      const isDate = Array.isArray(dates) ? dates.every((e) => e) : false;
       let tR = expenses
-        .map((exp) => ({...exp, exp: true}))
+        .map((exp: Expense): Expense & {exp: true} => ({...exp, exp: true}))
         .concat(incomes)
-        .map((obj) => ({
+        .filter((item: Expense | Income) =>
+          isDate && dates
+            ? dh.isBetweenDates(
+                new Date(item.date),
+                new Date(dates[0]),
+                new Date(dates[1]),
+              )
+            : true,
+        )
+        .map((obj: Expense) => ({
           ...obj,
           description: obj.description || '',
           category: obj?.exp
-            ? categories.find(({catId}) => catId === obj.categoryId).category
+            ? categories.find(
+                ({catId}: {catId: number}) => catId === obj.categoryId,
+              ).category
             : null,
           color: obj?.exp
-            ? categories.find(({catId}) => catId === obj.categoryId)?.color
+            ? categories.find(
+                ({catId}: {catId: number}) => catId === obj.categoryId,
+              )?.color
             : null,
         }));
 
-      tR = tR.filter((exp) => {
+      tR = tR.filter((exp: Expense & Income) => {
         return filterTxt(exp, txt) && filterCat(exp, fc);
       });
       return _.chain(tR)
@@ -91,7 +109,7 @@ export const selectCategories = createSelector(
         ...obj,
         groupId: +key,
         groupName: cv.groupName,
-        color: `#${obj.color || '#FFFFFF'}`
+        color: `#${obj.color || '#FFFFFF'}`,
       }));
       if (Array.isArray(pv)) pv.push(...categories);
       return pv;

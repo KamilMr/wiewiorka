@@ -1,10 +1,10 @@
 import {useEffect, useState} from 'react';
-import {useLocalSearchParams} from 'expo-router';
+import {router, useLocalSearchParams} from 'expo-router';
 import {ScrollView, View} from 'react-native';
 import {Button, IconButton, Text} from 'react-native-paper';
 
 import {barDataItem, pieDataItem} from 'react-native-gifted-charts';
-import {lastDayOfMonth} from 'date-fns';
+import {format, lastDayOfMonth} from 'date-fns';
 import _, {parseInt} from 'lodash';
 
 import {
@@ -16,6 +16,7 @@ import {useAppSelector} from '@/hooks';
 import {BarChart, Chip, DatePicker, PieChartBar} from '@/components';
 import {EXCLUDED_CAT, formatPrice, shortenText} from '@/common';
 import {Axis, PickFilter, decId, groupBy, sumById} from '@/utils/aggregateData';
+import {Category} from '@/redux/main/mainSlice';
 
 type AggrExpense = {
   v: number;
@@ -95,15 +96,15 @@ const Summary = () => {
   const idsGroupOrCategory: string[] = idsOfCategories.map(
     (str: string) => str.split('-')[+axis[0].split('-')[1]],
   );
-  console.log(
-    new Set(
-      _.values(grouped)
-        .map((o) => _.entries(o))
-        .flat()
-        .sort(([, va], [, vb]) => vb[0] - va[0])
-        .map(([id, val]) => id),
-    ),
-  );
+  // console.log(
+  //   new Set(
+  //     _.values(grouped)
+  //       .map((o) => _.entries(o))
+  //       .flat()
+  //       .sort(([, va], [, vb]) => vb[0] - va[0])
+  //       .map(([id, val]) => id),
+  //   ),
+  // );
 
   const getCategoryName = (n: number, id: string) => {
     if (!id) id = axis[0] === '1-1' ? 'catId' : 'groupId';
@@ -284,7 +285,24 @@ const Summary = () => {
           labelsPosition="onBorder"
           innerRadius={70}
           onPress={(item: {label: string; id: string}) => {
-            if (axis[0] === '1-1') return;
+            if (axis[0] === '1-1') {
+              const dates = filterDates.map((d) => format(d, 'yyyy-MM-dd'));
+              let category: string | undefined;
+              const cat: Category | undefined = getCategoryName(
+                +decId(item.id)[1],
+                'catId',
+              );
+              if (cat) category = cat.category;
+
+              router.navigate({
+                pathname: '/summary/list',
+                params: {
+                  dates,
+                  category: category || '',
+                },
+              });
+              return;
+            }
             setAxis(['1-1', `${decId(item.id)[0]}-0`]);
             //else do navigation
           }}
@@ -318,10 +336,9 @@ const Summary = () => {
           }}
         />
       )}
-      <View style={{alignItems: 'flex-end'}}>
+      <View style={{alignItems: 'center'}}>
         {axis[0] === '1-1' ? (
           <IconButton
-            style={{marginRight: 48}}
             mode="contained"
             onPress={() => handleAxisChange('1-0')}
             icon={'arrow-left-top'}

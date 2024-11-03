@@ -21,7 +21,7 @@ type Snackbar = {
   msg: string;
 };
 
-type Income = {
+export type Income = {
   date: string;
   id: number;
   owner: string;
@@ -32,6 +32,7 @@ type Income = {
 
 export type Expense = {
   category: string;
+  categoryId: number;
   date: string;
   description: string;
   id: number;
@@ -41,18 +42,19 @@ export type Expense = {
   receipt: string;
   exp: boolean;
 };
-interface Category {
+
+export interface Category {
   catId: number;
   category: string;
   color: string;
 }
 
-interface Group {
+export interface Group {
   categories: Category[];
   groupName: string;
 }
 
-interface MainSlice {
+export interface MainSlice {
   expenses: Array<Expense>;
   incomes: Array<Income>;
   categories: {[key: number]: Group};

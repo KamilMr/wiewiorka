@@ -41,7 +41,10 @@ const Records = () => {
   };
 
   const handleNavigate = (id: number, isExpense: boolean) => () => {
-    router.push({pathname: isExpense ? '/addnew' : '/addnew/income', params: {id}});
+    router.push({
+      pathname: isExpense ? '/addnew' : '/addnew/income',
+      params: {id},
+    });
   };
 
   return (
