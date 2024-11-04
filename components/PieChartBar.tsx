@@ -1,12 +1,7 @@
 import {View} from 'react-native';
-import {PieChart, PieChartPropsType} from 'react-native-gifted-charts';
-import {Text} from 'react-native-paper';
 
-type DataValue = {
-  value: number;
-  frontColor: string;
-  label: string;
-};
+import {Text} from 'react-native-paper';
+import {PieChart, PieChartPropsType} from 'react-native-gifted-charts';
 
 interface Props {
   title?: string;

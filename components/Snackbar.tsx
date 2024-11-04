@@ -17,7 +17,7 @@ const CustomSnackBar = () => {
   useEffect(() => {
     const id = setTimeout(() => {
       dispatch(setSnackbar({}));
-    }, 4000);
+    }, 2000);
 
     return () => {
       clearTimeout(id);
@@ -29,7 +29,7 @@ const CustomSnackBar = () => {
       visible={visible}
       onDismiss={onDismissSnackBar}
       action={{
-        label: 'Undo',
+        label: 'Zamknij',
         onPress: () => {
           onDismissSnackBar();
         },

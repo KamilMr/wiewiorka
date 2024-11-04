@@ -1,6 +1,6 @@
 import {PayloadAction, createSlice} from '@reduxjs/toolkit';
-
 import _ from 'lodash';
+
 import {logout, signIn} from './thunks';
 import {RootState} from '../store';
 

@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react';
+
 import {Switch, SwitchProps} from 'react-native-paper';
 
 interface CustomSwitchProps {
