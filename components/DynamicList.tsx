@@ -25,11 +25,11 @@ interface SelExpense {
 }
 
 interface Props {
-  handleNavigate: (
+  handleNavigate?: (
     number: number,
     exp: boolean,
   ) => (event: GestureResponderEvent) => void;
-  handleScroll: ({
+  handleScroll?: ({
     nativeEvent,
   }: {
     nativeEvent: NativeSyntheticEvent<NativeScrollEvent>['nativeEvent'];
@@ -39,7 +39,11 @@ interface Props {
   };
 }
 
-const DynamicRecordList = ({records, handleScroll, handleNavigate}: Props) => {
+const DynamicRecordList = ({
+  records,
+  handleScroll = () => {},
+  handleNavigate = () => () => {},
+}: Props) => {
   return (
     <ScrollView onScroll={handleScroll}>
       {_.keys(records).map((dateKey) => (
@@ -91,6 +95,7 @@ const DynamicRecordList = ({records, handleScroll, handleNavigate}: Props) => {
           ))}
         </View>
       ))}
+      <View style={{height: 80}}></View>
     </ScrollView>
   );
 };
