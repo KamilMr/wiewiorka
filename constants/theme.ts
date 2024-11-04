@@ -1,4 +1,15 @@
-import {MD3DarkTheme, MD3LightTheme} from 'react-native-paper';
+import {MD3LightTheme} from 'react-native-paper';
+
+const SM = 2;
+
+const colorNames = {};
+
+export const sizes = {
+  sm: SM,
+  md: SM ** 2,
+  lg: SM ** 3,
+  xl: SM ** 4,
+};
 
 export const paperTheme = {
   ...MD3LightTheme,
@@ -23,4 +34,3 @@ export const paperTheme = {
     error: '#D32F2F', // Standard error color for clear visibility
   },
 };
-
