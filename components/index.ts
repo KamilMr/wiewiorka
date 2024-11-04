@@ -3,7 +3,7 @@ import CustomImage from './CustomImage';
 import CustomModal from './CustomModal';
 import CustomSnackBar from './Snackbar';
 import CustomTextInput from './CustomTextInput';
-import CustomeDatePicker from './DatePicker';
+import CustomDatePicker from './DatePicker';
 import DropdownComponent from './CustomSelect';
 import FullWidthImage from './FullImage';
 import MyTabBar from './CustomTab';
@@ -22,7 +22,7 @@ export {
   CustomSnackBar as SnackBar,
   CustomSwitch as Switch,
   CustomTextInput as TextInput,
-  CustomeDatePicker as DatePicker,
+  CustomDatePicker as DatePicker,
   DropdownComponent as Select,
   FullWidthImage,
   MyTabBar as TabBar,
