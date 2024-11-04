@@ -14,7 +14,6 @@ export const fetchIni = createAsyncThunk(
         },
       });
       data = await resp.json();
-      console.log(data.err);
       if (data.err) throw data.err;
     } catch (err) {
       throw err;
@@ -141,7 +140,6 @@ export const deleteExpense = createAsyncThunk(
 
     let data;
     const path = 'expenses' + (id ? `/${id}` : '');
-    console.log(path)
     try {
       let resp = await fetch(getURL(path), {
         method: 'DELETE',

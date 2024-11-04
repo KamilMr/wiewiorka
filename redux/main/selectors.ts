@@ -1,14 +1,16 @@
 import {createSelector} from '@reduxjs/toolkit';
-import {format} from 'date-fns';
+import {format, isAfter, isBefore} from 'date-fns';
 import _ from 'lodash';
 
 import {EXCLUDED_CAT, dh, makeNewIdArr} from '@/common';
 import {RootState} from '../store';
-import {Expense} from './mainSlice';
+import {Expense, Income} from './mainSlice';
+import {groupBy} from '@/utils/aggregateData';
 
-type Search = {
+export type Search = {
   txt: string;
   categories: Array<string>;
+  dates?: [string, string];
 };
 
 export const selectSnackbar = (state: RootState) => state.main.snackbar;
@@ -19,7 +21,10 @@ const filterCat = (exp: Expense, f: Array<string>) => {
   return f.includes(exp.category);
 };
 
-const filterTxt = (exp: Expense, f: string) => {
+const filterTxt = (
+  exp: Pick<Expense, 'description' | 'category'>,
+  f: string,
+) => {
   if (!f) return true;
   const string = exp.description + exp.category;
   return string.toLowerCase().includes(f.toLowerCase());
@@ -29,27 +34,43 @@ export const selectRecords = (number: number, search: Search) =>
   createSelector(
     [selectExpensesAll, selectCategories, selectIncomes],
     (expenses, categories, incomes) => {
-      const {txt, categories: fc} = search;
+      const {txt, categories: fc, dates} = search;
+      const isValidArr =
+        Array.isArray(dates) &&
+        dates.length === 2 &&
+        dates.every((d: string) => typeof d === 'string' && Boolean(d));
       let tR = expenses
-        .map((exp) => ({...exp, exp: true}))
+        .map((exp: Expense): Expense & {exp: true} => ({...exp, exp: true}))
         .concat(incomes)
-        .map((obj) => ({
-          ...obj,
-          description: obj.description || '',
-          category: obj?.exp
-            ? categories.find(({catId}) => catId === obj.categoryId).category
-            : null,
-          color: obj?.exp
-            ? categories.find(({catId}) => catId === obj.categoryId)?.color
-            : null,
-        }));
+        .filter((item: Expense | Income) => {
+          if (!isValidArr || !dates) return true;
+          const d = new Date(item.date);
+          const ds = new Date(dates[0]);
+          const de = new Date(dates[1]);
 
-      tR = tR.filter((exp) => {
+          return dh.isBetweenDates(d, ds, de);
+        })
+        .map((obj: Expense) => {
+          const catObj = obj?.exp
+            ? categories.find(
+                ({catId}: {catId: number}) => catId === obj.categoryId,
+              )
+            : null;
+
+          return {
+            ...obj,
+            description: obj.description || '',
+            category: catObj?.category ?? '',
+            color: catObj?.color ?? '',
+          };
+        });
+
+      tR = tR.filter((exp: Expense & Income) => {
         return filterTxt(exp, txt) && filterCat(exp, fc);
       });
       return _.chain(tR)
         .sortBy(['date'])
-       .reverse()
+        .reverse()
         .slice(0, number)
         .map((obj) => ({
           ...obj,
@@ -88,7 +109,9 @@ export const selectCategories = createSelector(
     return arr.reduce((pv, [key, cv]) => {
       const categories = [...cv.categories].map((obj) => ({
         ...obj,
-        groupId: key,
+        groupId: +key,
+        groupName: cv.groupName,
+        color: `#${obj.color || 'FFFFFF'}`,
       }));
       if (Array.isArray(pv)) pv.push(...categories);
       return pv;
@@ -174,4 +197,20 @@ export const aggregateExpenses = (agrDates = [new Date(), new Date()]) =>
 
 export const selectSources = (state: RootState) => {
   return state.main.sources[state.auth.name];
+};
+
+const withinRange = (date: Date, dates: [Date, Date]) => {
+  return (
+    (isAfter(date, dates[0]) && isBefore(new Date(date), dates[1])) ||
+    _.isEqual(date, dates[0]) ||
+    _.isEqual(date, dates[1])
+  );
+};
+
+export const selectByTimeRange = (dates: [Date, Date]) => {
+  return createSelector([(state) => state.main._aggregated], (data) => {
+    if (dates?.length === 2)
+      return _.pickBy(data, (_, date) => withinRange(new Date(date), dates));
+    else return data;
+  });
 };
