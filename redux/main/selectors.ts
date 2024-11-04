@@ -109,7 +109,7 @@ export const selectCategories = createSelector(
         ...obj,
         groupId: +key,
         groupName: cv.groupName,
-        color: `#${obj.color || '#FFFFFF'}`,
+        color: `#${obj.color || 'FFFFFF'}`,
       }));
       if (Array.isArray(pv)) pv.push(...categories);
       return pv;
