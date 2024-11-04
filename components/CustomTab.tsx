@@ -1,9 +1,9 @@
+import {useState} from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 
 import {BottomTabBarProps} from '@react-navigation/bottom-tabs';
 import {TabBarIcon} from './navigation/TabBarIcon';
-import Menu from './Menu.tsx';
-import {useState} from 'react';
+import Menu from './Menu';
 import {Button} from 'react-native-paper';
 
 type IconProp = {

@@ -7,9 +7,9 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import {Text} from 'react-native-paper';
 
 import {FontAwesome} from '@expo/vector-icons';
+import {Text} from 'react-native-paper';
 import _ from 'lodash';
 
 interface SelExpense {

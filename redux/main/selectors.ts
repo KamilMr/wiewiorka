@@ -5,7 +5,6 @@ import _ from 'lodash';
 import {EXCLUDED_CAT, dh, makeNewIdArr} from '@/common';
 import {RootState} from '../store';
 import {Expense, Income} from './mainSlice';
-import {groupBy} from '@/utils/aggregateData';
 
 export type Search = {
   txt: string;
