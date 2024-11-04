@@ -35,33 +35,35 @@ export const selectRecords = (number: number, search: Search) =>
     [selectExpensesAll, selectCategories, selectIncomes],
     (expenses, categories, incomes) => {
       const {txt, categories: fc, dates} = search;
-      const isDate = Array.isArray(dates) ? dates.every((e) => e) : false;
+      const isValidArr =
+        Array.isArray(dates) &&
+        dates.length === 2 &&
+        dates.every((d: string) => typeof d === 'string' && Boolean(d));
       let tR = expenses
         .map((exp: Expense): Expense & {exp: true} => ({...exp, exp: true}))
         .concat(incomes)
-        .filter((item: Expense | Income) =>
-          isDate && dates
-            ? dh.isBetweenDates(
-                new Date(item.date),
-                new Date(dates[0]),
-                new Date(dates[1]),
+        .filter((item: Expense | Income) => {
+          if (!isValidArr || !dates) return true;
+          const d = new Date(item.date);
+          const ds = new Date(dates[0]);
+          const de = new Date(dates[1]);
+
+          return dh.isBetweenDates(d, ds, de);
+        })
+        .map((obj: Expense) => {
+          const catObj = obj?.exp
+            ? categories.find(
+                ({catId}: {catId: number}) => catId === obj.categoryId,
               )
-            : true,
-        )
-        .map((obj: Expense) => ({
-          ...obj,
-          description: obj.description || '',
-          category: obj?.exp
-            ? categories.find(
-                ({catId}: {catId: number}) => catId === obj.categoryId,
-              ).category
-            : null,
-          color: obj?.exp
-            ? categories.find(
-                ({catId}: {catId: number}) => catId === obj.categoryId,
-              )?.color
-            : null,
-        }));
+            : null;
+
+          return {
+            ...obj,
+            description: obj.description || '',
+            category: catObj?.category ?? '',
+            color: catObj?.color ?? '',
+          };
+        });
 
       tR = tR.filter((exp: Expense & Income) => {
         return filterTxt(exp, txt) && filterCat(exp, fc);

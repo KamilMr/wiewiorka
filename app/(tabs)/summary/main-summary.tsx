@@ -5,7 +5,7 @@ import {Button, IconButton, Text} from 'react-native-paper';
 
 import {barDataItem, pieDataItem} from 'react-native-gifted-charts';
 import {format, lastDayOfMonth} from 'date-fns';
-import _, {parseInt} from 'lodash';
+import _ from 'lodash';
 
 import {
   aggregateExpenses,
@@ -78,9 +78,12 @@ const Summary = () => {
   // grouping
   const grouped = groupBy(selected, 'month', ...axis);
 
-  // console.log(stateCategories.map((sc: {groupName: string}) => sc.groupName),'as',axis[1])
   useEffect(() => {
-    setFilters(currentGroupOrCategory);
+    setFilters(
+      currentGroupOrCategory.filter(
+        (c: {id: number}) => !EXCLUDED_CAT.includes(c.id),
+      ),
+    );
   }, [axis]);
 
   // get used categories
@@ -172,7 +175,7 @@ const Summary = () => {
           barWidth: 50,
           topLabelComponent: () => (
             <Text style={{fontSize: 8}}>
-              {formatPrice(parseInt(value.toString()))}
+              {formatPrice(_.parseInt(value.toString()))}
             </Text>
           ),
         };

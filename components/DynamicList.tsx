@@ -39,6 +39,8 @@ interface Props {
   };
 }
 
+// TODO: Consider using flat list
+
 const DynamicRecordList = ({
   records,
   handleScroll = () => {},
@@ -73,7 +75,7 @@ const DynamicRecordList = ({
               <View style={{flex: 1}}>
                 <Text>{exp.description}</Text>
                 <Text style={{fontSize: 10, color: 'gray'}}>
-                  {(exp.category || exp.source) + ' : ' + exp.date}
+                  {`${exp.category || exp.source || 'Nieznana'} : ${exp.date}`}
                 </Text>
               </View>
 
