@@ -1,4 +1,5 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
+
 import {getURL} from '@/common';
 import {dropMain} from '../main/mainSlice';
 

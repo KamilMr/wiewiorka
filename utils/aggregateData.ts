@@ -1,4 +1,5 @@
 import _ from 'lodash';
+
 import {AggregatedData} from './types';
 import {convertDate} from '@/common';
 
