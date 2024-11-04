@@ -1,6 +1,8 @@
 import {
   GestureResponderEvent,
   Image,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
   ScrollView,
   StyleSheet,
   View,
@@ -27,7 +29,11 @@ interface Props {
     number: number,
     exp: boolean,
   ) => (event: GestureResponderEvent) => void;
-  handleScroll: () => void;
+  handleScroll: ({
+    nativeEvent,
+  }: {
+    nativeEvent: NativeSyntheticEvent<NativeScrollEvent>['nativeEvent'];
+  }) => void;
   records: {
     [key: string]: SelExpense[];
   };

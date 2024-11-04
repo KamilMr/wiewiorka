@@ -1,36 +1,20 @@
 import {useState} from 'react';
 import {
-  Image,
   NativeScrollEvent,
   NativeSyntheticEvent,
   ScrollView,
-  StyleSheet,
-  View,
 } from 'react-native';
 import {router} from 'expo-router';
 
-import {Text, Searchbar} from 'react-native-paper';
+import {Searchbar} from 'react-native-paper';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {FontAwesome} from '@expo/vector-icons'; // Assuming you're using FontAwesome for icons
+
 import _ from 'lodash';
 
 import {isCloseToBottom} from '@/common';
 import {selectRecords} from '@/redux/main/selectors';
 import {useAppSelector} from '@/hooks';
 import DynamicRecordList from '@/components/DynamicList';
-
-type Expense = {
-  id: string | number;
-  amount: number;
-  date: string;
-  description?: string;
-  source?: string;
-  owner?: string;
-  price: string;
-  category?: string;
-  exp?: boolean;
-  color?: string;
-};
 
 const Records = () => {
   const [number, setNumber] = useState(30);
