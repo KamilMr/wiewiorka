@@ -1,17 +1,46 @@
-import {Image, ScrollView, StyleSheet, View} from 'react-native';
+import {
+  GestureResponderEvent,
+  Image,
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native';
 import {Text} from 'react-native-paper';
 
 import {FontAwesome} from '@expo/vector-icons';
 import _ from 'lodash';
 
-const DynamicRecordList = ({records, handleScroll, handleNavigate}) => {
+interface SelExpense {
+  id: number;
+  description: string;
+  exp: boolean;
+  color: string;
+  category: string;
+  price: string;
+  owner: string;
+  source: string;
+  date: string;
+}
+
+interface Props {
+  handleNavigate: (
+    number: number,
+    exp: boolean,
+  ) => (event: GestureResponderEvent) => void;
+  handleScroll: () => void;
+  records: {
+    [key: string]: SelExpense[];
+  };
+}
+
+const DynamicRecordList = ({records, handleScroll, handleNavigate}: Props) => {
   return (
     <ScrollView onScroll={handleScroll}>
       {_.keys(records).map((dateKey) => (
         <View key={dateKey}>
           <Text>{dateKey}</Text>
 
-          {records[dateKey].map((exp: Expense) => (
+          {records[dateKey].map((exp: SelExpense) => (
             <View
               style={styles.row}
               key={exp.id}
