@@ -15,8 +15,10 @@ import {isCloseToBottom} from '@/common';
 import {selectRecords} from '@/redux/main/selectors';
 import {useAppSelector} from '@/hooks';
 import DynamicRecordList from '@/components/DynamicList';
+import {sizes, useAppTheme} from '@/constants/theme';
 
 const Records = () => {
+  const t = useAppTheme();
   const [number, setNumber] = useState(30);
   // const [openFilter, setOpenFilter] = useState(false);
   const [filter, setFilter] = useState([]); // [txt, categoryid]
@@ -44,12 +46,12 @@ const Records = () => {
   };
 
   return (
-    <SafeAreaView style={{padding: 16}}>
+    <SafeAreaView style={{padding: sizes.xl, backgroundColor: t.colors.background}}>
       <Searchbar
         placeholder="Szukaj"
         onChangeText={setSearchQuery}
         value={searchQuery}
-        style={{marginBottom: 12}}
+        style={{marginBottom: sizes.lg}}
       />
       <ScrollView onScroll={handleScroll}>
         <DynamicRecordList

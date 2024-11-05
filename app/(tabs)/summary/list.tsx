@@ -8,11 +8,9 @@ import {
   View,
 } from 'react-native';
 import _ from 'lodash';
-import {Text} from 'react-native-paper';
 
 import {useAppSelector} from '@/hooks';
 import {selectRecords} from '@/redux/main/selectors';
-import Expense from '../addnew';
 import DynamicRecordList from '@/components/DynamicList';
 import {isCloseToBottom} from '@/common';
 

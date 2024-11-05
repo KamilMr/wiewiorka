@@ -1,7 +1,8 @@
 import {View} from 'react-native';
 
-import {Text} from 'react-native-paper';
 import {PieChart, PieChartPropsType} from 'react-native-gifted-charts';
+
+import Text from './CustomText';
 
 interface Props {
   title?: string;
@@ -15,7 +16,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const CustomPieChart = ((props: Props & PieChartPropsType) => {
+const CustomPieChart = (props: Props & PieChartPropsType) => {
   const {data, title = '', ...rest} = props;
   return (
     <View style={styles.container}>
@@ -23,6 +24,6 @@ const CustomPieChart = ((props: Props & PieChartPropsType) => {
       <PieChart data={data} {...rest} />
     </View>
   );
-});
+};
 
 export default CustomPieChart;

@@ -2,10 +2,10 @@ import {useState} from 'react';
 import {ScrollView, View} from 'react-native';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {Button, RadioButton, Text} from 'react-native-paper';
+import {Button, RadioButton} from 'react-native-paper';
 
 import {selectComparison} from '@/redux/main/selectors';
-import {BarChart, SummaryCard} from '@/components';
+import {SummaryCard, Text} from '@/components';
 import {useAppSelector} from '@/hooks';
 
 const MONTH = 1;

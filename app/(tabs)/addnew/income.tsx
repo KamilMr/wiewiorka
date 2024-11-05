@@ -6,7 +6,7 @@ import {
   useNavigation,
 } from 'expo-router';
 import {View, StyleSheet, ScrollView} from 'react-native';
-import {Text, Button, IconButton} from 'react-native-paper';
+import {Button, IconButton} from 'react-native-paper';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 import _ from 'lodash';
@@ -15,7 +15,7 @@ import {format} from 'date-fns';
 import {selectIncome, selectSources} from '@/redux/main/selectors';
 import {deleteIncome, uploadIncome} from '@/redux/main/thunks';
 import {useAppDispatch, useAppSelector} from '@/hooks';
-import {Select, TextInput} from '@/components';
+import {Select, TextInput,Text} from '@/components';
 import CustomeDatePicker from '@/components/DatePicker';
 import {convertDate} from '@/common';
 
