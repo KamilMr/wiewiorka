@@ -15,6 +15,7 @@ import {isCloseToBottom} from '@/common';
 import {selectRecords} from '@/redux/main/selectors';
 import {useAppSelector} from '@/hooks';
 import DynamicRecordList from '@/components/DynamicList';
+import { sizes } from '@/constants/theme';
 
 const Records = () => {
   const [number, setNumber] = useState(30);
@@ -44,12 +45,12 @@ const Records = () => {
   };
 
   return (
-    <SafeAreaView style={{padding: 16}}>
+    <SafeAreaView style={{padding: sizes.xl}}>
       <Searchbar
         placeholder="Szukaj"
         onChangeText={setSearchQuery}
         value={searchQuery}
-        style={{marginBottom: 12}}
+        style={{marginBottom: sizes.lg}}
       />
       <ScrollView onScroll={handleScroll}>
         <DynamicRecordList

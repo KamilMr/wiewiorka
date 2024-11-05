@@ -1,4 +1,34 @@
-import {MD3DarkTheme, MD3LightTheme} from 'react-native-paper';
+import {MD3LightTheme} from 'react-native-paper';
+
+const colorNames = {};
+
+/**
+ * Base size multiplier
+ * @constant {number}
+ */
+export const SM: number = 2;
+
+/**
+ * Object containing size options with different scaling factors.
+ * Each key represents a size (sm, md, lg, xl, xxl, xxxl) with values based on powers of SM.
+ * - `sm`: 2
+ * - `md`: 4
+ * - `lg`: 8
+ * - `xl`: 16
+ * - `xxl`: 32
+ * - `xxxl`: 64
+ *
+ * @type {{ sm: 2, md: 4, lg: 8, xl: 16, xxl: 32, xxxl: 64 }}
+ */
+export const sizes: Record<'sm' | 'md' | 'lg' | 'xl' | 'xxl' | 'xxxl', number> =
+  {
+    sm: SM, // 2
+    md: SM ** 2, // 4
+    lg: SM ** 3, // 8
+    xl: SM ** 4, // 16
+    xxl: SM ** 5, // 32
+    xxxl: SM ** 6, // 64
+  };
 
 export const paperTheme = {
   ...MD3LightTheme,
@@ -23,4 +53,3 @@ export const paperTheme = {
     error: '#D32F2F', // Standard error color for clear visibility
   },
 };
-
