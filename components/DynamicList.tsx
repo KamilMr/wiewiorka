@@ -11,7 +11,7 @@ import {
 import {Text} from '@/components';
 import _ from 'lodash';
 import {format as formatDate} from 'date-fns';
-import {colorNames, sizes} from '@/constants/theme';
+import {colorNames, sizes, useAppTheme} from '@/constants/theme';
 import {CircleIcon} from './Icons';
 
 interface SelExpense {
@@ -49,6 +49,7 @@ export default function DynamicRecordList({
   handleScroll = () => {},
   handleNavigate = () => () => {},
 }: Props) {
+  const t = useAppTheme();
   return (
     <ScrollView onScroll={handleScroll}>
       {_.keys(records).map((dateKey) => (
@@ -64,27 +65,31 @@ export default function DynamicRecordList({
               style={styles.row}
               key={exp.id}
               onTouchEnd={handleNavigate(exp.id, exp.exp)}>
-              <CircleIcon stroke={exp.color} fill={exp.color?'none':colorNames.softLavender} />
+              <CircleIcon
+                stroke={exp.color}
+                fill={exp.color ? 'none' : t.colors.softLavender}
+              />
 
               {/* Description */}
               <View style={{flex: 1, marginLeft: sizes.lg}}>
-                <Text variant='bodyMedium'>{exp.description}</Text>
-                <Text variant='bodySmall' style={{color: 'gray'}}>
-                  {`${exp.category || exp.source || 'Nieznana'} : ${exp.date}`}
+                <Text variant="bodyMedium">{exp.description}</Text>
+                <Text variant="bodySmall" style={{color: t.colors.secondary}}>
+                  {`${exp.category || exp.source || 'Nieznana'}`}
                 </Text>
               </View>
 
               {/* Price */}
-              <View>
+              <View style={{alignItems: 'flex-end'}}>
                 <Text
-                  variant='bodyMedium'
+                  variant="bodyMedium"
                   style={{
-                    fontWeight: 'bold',
-                    color: exp.exp ? colorNames.deepMaroon : undefined,
+                    color: exp.exp ? t.colors.deepMaroon : t.colors.primary,
                   }}>
                   {exp.price + ' zł'}
                 </Text>
-                <Text variant='bodySmall' style={{ textAlign: 'right'}}>
+                <Text
+                  variant="bodySmall"
+                  style={{textAlign: 'right', color: t.colors.secondary}}>
                   {exp.owner}
                 </Text>
               </View>
@@ -101,14 +106,12 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    // borderBottomWidth: 0.2,
-    // borderBottomColor: 'lightgray',
+    paddingVertical: sizes.xl,
   },
   image: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    marginRight: 16,
+    marginRight: sizes.xl,
   },
 });

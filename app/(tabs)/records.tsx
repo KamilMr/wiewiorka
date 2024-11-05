@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 import {router} from 'expo-router';
 
-import {Searchbar, useTheme} from 'react-native-paper';
+import {Searchbar} from 'react-native-paper';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import _ from 'lodash';
@@ -15,10 +15,10 @@ import {isCloseToBottom} from '@/common';
 import {selectRecords} from '@/redux/main/selectors';
 import {useAppSelector} from '@/hooks';
 import DynamicRecordList from '@/components/DynamicList';
-import {sizes} from '@/constants/theme';
+import {sizes, useAppTheme} from '@/constants/theme';
 
 const Records = () => {
-  const t = useTheme();
+  const t = useAppTheme();
   const [number, setNumber] = useState(30);
   // const [openFilter, setOpenFilter] = useState(false);
   const [filter, setFilter] = useState([]); // [txt, categoryid]

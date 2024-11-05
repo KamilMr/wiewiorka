@@ -1,4 +1,4 @@
-import {MD3LightTheme as DefaultTheme} from 'react-native-paper';
+import {MD3LightTheme as DefaultTheme, useTheme} from 'react-native-paper';
 
 export const colorNames = {
   softLavender: '#E8DEF8',
@@ -57,3 +57,7 @@ export const paperTheme = {
     error: '#D32F2F', // Standard error color for clear visibility
   },
 };
+
+export type AppTheme = typeof paperTheme;
+
+export const useAppTheme = () => useTheme<AppTheme>();
