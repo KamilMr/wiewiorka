@@ -2,7 +2,7 @@ import {useState} from 'react';
 import {router} from 'expo-router';
 import {StyleSheet, View} from 'react-native';
 
-import {Button} from 'react-native-paper';
+import {Button, TextInput} from 'react-native-paper';
 
 import {signIn} from '@/redux/auth/thunks';
 import {useAppDispatch} from '@/hooks';

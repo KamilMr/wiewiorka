@@ -2,7 +2,7 @@ import {View} from 'react-native';
 
 import {PieChart, PieChartPropsType} from 'react-native-gifted-charts';
 
-import {Text} from '.';
+import Text from './CustomText';
 
 interface Props {
   title?: string;
