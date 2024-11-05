@@ -1,14 +1,16 @@
 import React, {useState} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 
 import {Dropdown} from 'react-native-element-dropdown';
 import AntDesign from '@expo/vector-icons/AntDesign';
+
+import {Text} from '.';
 
 interface Props {
   onChange: (data: any) => any;
   value: any;
   styles?: Object;
-  items: Array<{label: string, value: string}>;
+  items: Array<{label: string; value: string}>;
   title?: string;
   disable?: boolean;
 }

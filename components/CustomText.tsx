@@ -1,6 +1,7 @@
-import {Text, TextProps} from 'react-native-paper';
+import {Text} from 'react-native-paper';
+import {Props} from 'react-native-paper/lib/typescript/components/Typography/Text';
 
-type CustomTextProps = TextProps<{}> & {
+type CustomTextProps = Props<string> & {
   variant?: 'bodyLarge' | 'bodyMedium' | 'bodySmall';
 };
 

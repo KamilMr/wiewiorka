@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import {router, useLocalSearchParams} from 'expo-router';
 import {ScrollView, View} from 'react-native';
-import {Button, IconButton, Text} from 'react-native-paper';
+import {Button, IconButton} from 'react-native-paper';
 
 import {barDataItem, pieDataItem} from 'react-native-gifted-charts';
 import {format, lastDayOfMonth} from 'date-fns';
@@ -13,7 +13,7 @@ import {
   selectCategories,
 } from '@/redux/main/selectors';
 import {useAppSelector} from '@/hooks';
-import {BarChart, Chip, DatePicker, PieChartBar} from '@/components';
+import {BarChart, Chip, DatePicker, PieChartBar, Text} from '@/components';
 import {EXCLUDED_CAT, formatPrice, shortenText} from '@/common';
 import {Axis, PickFilter, decId, groupBy, sumById} from '@/utils/aggregateData';
 import {Category} from '@/redux/main/mainSlice';

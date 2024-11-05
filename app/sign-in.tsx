@@ -1,9 +1,12 @@
 import {useState} from 'react';
-import {StyleSheet, View} from 'react-native';
-import {Button, Text, TextInput} from 'react-native-paper';
-import {signIn} from '@/redux/auth/thunks';
 import {router} from 'expo-router';
+import {StyleSheet, View} from 'react-native';
+
+import {Button} from 'react-native-paper';
+
+import {signIn} from '@/redux/auth/thunks';
 import {useAppDispatch} from '@/hooks';
+import {Text} from '@/components';
 
 const Login = () => {
   const dispatch = useAppDispatch();
