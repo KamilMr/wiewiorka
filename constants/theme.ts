@@ -1,6 +1,9 @@
-import {MD3LightTheme} from 'react-native-paper';
+import {MD3LightTheme as DefaultTheme} from 'react-native-paper';
 
-const colorNames = {};
+export const colorNames = {
+  softLavender: '#E8DEF8',
+  deepMaroon: '#400303',
+};
 
 /**
  * Base size multiplier
@@ -31,14 +34,15 @@ export const sizes: Record<'sm' | 'md' | 'lg' | 'xl' | 'xxl' | 'xxxl', number> =
   };
 
 export const paperTheme = {
-  ...MD3LightTheme,
+  ...DefaultTheme,
   colors: {
-    ...MD3LightTheme.colors,
+    ...DefaultTheme.colors,
+    ...colorNames,
     // primary: '#5C4033', // A deep brown resembling the tree bark
     // onPrimary: '#FFFFFF', // White for contrast
     // secondaryContainer: '#A67B5B', // Light brown for subtle highlights
     // onSecondaryContainer: '#FFFFFF', // White for readability
-    // background: '#3E2C1F', // Dark brown almost black for background depth
+    background: '#FFFFFF', // Dark brown almost black for background depth
     // onBackground: '#FFFFFF', // White to pop against dark backgrounds
     // surface: '#8D6E63', // Muted earth tone for surfaces
     // surfaceVariant: '#5C4033', // Dark brown to complement primary

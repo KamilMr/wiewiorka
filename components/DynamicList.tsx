@@ -8,9 +8,11 @@ import {
   View,
 } from 'react-native';
 
-import {FontAwesome} from '@expo/vector-icons';
-import {Text} from 'react-native-paper';
+import {Text} from '@/components';
 import _ from 'lodash';
+import {format as formatDate} from 'date-fns';
+import {colorNames, sizes} from '@/constants/theme';
+import {CircleIcon} from './Icons';
 
 interface SelExpense {
   id: number;
@@ -22,6 +24,7 @@ interface SelExpense {
   owner: string;
   source: string;
   date: string;
+  image: string;
 }
 
 interface Props {
@@ -41,40 +44,32 @@ interface Props {
 
 // TODO: Consider using flat list
 
-const DynamicRecordList = ({
+export default function DynamicRecordList({
   records,
   handleScroll = () => {},
   handleNavigate = () => () => {},
-}: Props) => {
+}: Props) {
   return (
     <ScrollView onScroll={handleScroll}>
       {_.keys(records).map((dateKey) => (
-        <View key={dateKey}>
-          <Text>{dateKey}</Text>
+        <View key={dateKey} style={{marginBottom: sizes.xxl}}>
+          <Text variant="bodyLarge">
+            {dateKey === formatDate(new Date(), 'dd/MM/yyyy')
+              ? 'dziś'
+              : dateKey}
+          </Text>
 
           {records[dateKey].map((exp: SelExpense) => (
             <View
               style={styles.row}
               key={exp.id}
               onTouchEnd={handleNavigate(exp.id, exp.exp)}>
-              <FontAwesome
-                name="tag"
-                size={24}
-                color="black"
-                style={{marginRight: 16}}
-              />
-
-              {/* Image placeholder (small) */}
-              <Image
-                source={{uri: 'https://via.placeholder.com/40'}}
-                style={styles.image}
-                tintColor={`#${exp.color}`}
-              />
+              <CircleIcon stroke={exp.color} fill={exp.color?'none':colorNames.softLavender} />
 
               {/* Description */}
-              <View style={{flex: 1}}>
-                <Text>{exp.description}</Text>
-                <Text style={{fontSize: 10, color: 'gray'}}>
+              <View style={{flex: 1, marginLeft: sizes.lg}}>
+                <Text variant='bodyMedium'>{exp.description}</Text>
+                <Text variant='bodySmall' style={{color: 'gray'}}>
                   {`${exp.category || exp.source || 'Nieznana'} : ${exp.date}`}
                 </Text>
               </View>
@@ -82,14 +77,14 @@ const DynamicRecordList = ({
               {/* Price */}
               <View>
                 <Text
+                  variant='bodyMedium'
                   style={{
-                    fontSize: 16,
                     fontWeight: 'bold',
-                    color: exp.exp ? 'red' : undefined,
+                    color: exp.exp ? colorNames.deepMaroon : undefined,
                   }}>
                   {exp.price + ' zł'}
                 </Text>
-                <Text style={{fontSize: 10, textAlign: 'right'}}>
+                <Text variant='bodySmall' style={{ textAlign: 'right'}}>
                   {exp.owner}
                 </Text>
               </View>
@@ -100,15 +95,15 @@ const DynamicRecordList = ({
       <View style={{height: 80}}></View>
     </ScrollView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 12,
-    borderBottomWidth: 0.2,
-    borderBottomColor: 'lightgray',
+    // borderBottomWidth: 0.2,
+    // borderBottomColor: 'lightgray',
   },
   image: {
     width: 40,
@@ -117,5 +112,3 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
 });
-
-export default DynamicRecordList;

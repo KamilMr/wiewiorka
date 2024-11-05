@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 import {router} from 'expo-router';
 
-import {Searchbar} from 'react-native-paper';
+import {Searchbar, useTheme} from 'react-native-paper';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import _ from 'lodash';
@@ -15,9 +15,10 @@ import {isCloseToBottom} from '@/common';
 import {selectRecords} from '@/redux/main/selectors';
 import {useAppSelector} from '@/hooks';
 import DynamicRecordList from '@/components/DynamicList';
-import { sizes } from '@/constants/theme';
+import {sizes} from '@/constants/theme';
 
 const Records = () => {
+  const t = useTheme();
   const [number, setNumber] = useState(30);
   // const [openFilter, setOpenFilter] = useState(false);
   const [filter, setFilter] = useState([]); // [txt, categoryid]
@@ -45,7 +46,7 @@ const Records = () => {
   };
 
   return (
-    <SafeAreaView style={{padding: sizes.xl}}>
+    <SafeAreaView style={{padding: sizes.xl, backgroundColor: t.colors.background}}>
       <Searchbar
         placeholder="Szukaj"
         onChangeText={setSearchQuery}
