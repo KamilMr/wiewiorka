@@ -12,29 +12,22 @@ type IconProp = {
   color?: string;
 };
 
-// Define the type for the icons object
-type Icons = {
-  index: (props: IconProp) => JSX.Element;
-  records: (props: IconProp) => JSX.Element;
-  addnew: (props: IconProp) => JSX.Element;
-  summary: (props: IconProp) => JSX.Element;
-  profile: (props: IconProp) => JSX.Element;
-};
-
 type Items = {
   title: string;
   onPress: () => void;
 };
+
 type ContextMenuAction = {
   [key: string]: Items[];
 };
+
 const MyTabBar = ({
   state,
   descriptors,
   navigation,
   showLabel = false,
 }: BottomTabBarProps & {showLabel?: boolean}) => {
-  const icons: Icons = {
+  const icons: {[key: string]: (props: IconProp) => JSX.Element} = {
     index: (props: IconProp) => (
       <TabBarIcon name={props.isFocus ? 'home' : 'home-outline'} {...props} />
     ),
@@ -113,7 +106,7 @@ const MyTabBar = ({
         };
 
         return (
-          <Button style={styles.tabBarItem} key={route.name}>
+          <Button style={styles.tabBarItem} key={route.name} onPress={onPress}>
             <Menu
               visible={visible[index] || false}
               closeMenu={closeMenu}
