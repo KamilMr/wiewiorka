@@ -3,6 +3,7 @@ import {MD3LightTheme as DefaultTheme, useTheme} from 'react-native-paper';
 export const colorNames = {
   softLavender: '#E8DEF8',
   deepMaroon: '#400303',
+  white: '#FFFFFF',
 };
 
 /**
