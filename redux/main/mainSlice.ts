@@ -55,6 +55,7 @@ export interface Group {
 }
 
 export interface MainSlice {
+  status: 'idle' | 'fetching';
   expenses: Array<Expense>;
   incomes: Array<Income>;
   categories: {[key: number]: Group};
@@ -64,6 +65,7 @@ export interface MainSlice {
 }
 
 const emptyState: MainSlice = {
+  status: 'idle',
   expenses: [],
   incomes: [],
   categories: {},
@@ -80,6 +82,9 @@ const mainSlice = createSlice({
   name: 'main',
   initialState: emptyState,
   reducers: {
+    setStatus: (state, action) => {
+      state.status = action.payload;
+    },
     setSnackbar: (state, action) => {
       let {open = false, type = '', msg = ''} = action.payload || {};
       if (msg) open = true;
@@ -154,7 +159,11 @@ const mainSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(fetchIni.pending, (state, action) => {
+        state.status = 'fetching';
+      })
       .addCase(fetchIni.fulfilled, (state, action) => {
+        state.status = 'idle';
         let {expenses, income, categories} = action.payload;
         expenses = expenses.map((ex: Expense) => ({
           ...ex,
@@ -166,9 +175,6 @@ const mainSlice = createSlice({
           ...inc,
           date: format(inc.date, 'yyyy-MM-dd'),
         }));
-        state.snackbar.open = true;
-        state.snackbar.type = 'success';
-        state.snackbar.msg = 'Pobrano dane';
 
         state.sources = income.reduce(
           (pv: {[key: string]: string[]}, cv: Income) => {
@@ -185,6 +191,7 @@ const mainSlice = createSlice({
         state.snackbar.open = true;
         state.snackbar.type = 'error';
         state.snackbar.msg = action.error.message;
+        state.status = 'idle';
       })
       .addCase(handleCategory.rejected, (state, action) => {
         state.snackbar.open = true;
@@ -246,6 +253,7 @@ export const {
   initState,
   removeExpense,
   setSnackbar,
+  setStatus,
   updateExpense,
 } = mainSlice.actions;
 
