@@ -1,3 +1,4 @@
+import { sizes } from '@/constants/theme';
 import {StyleSheet} from 'react-native';
 import {TextInput, TextInputProps} from 'react-native-paper';
 
@@ -20,7 +21,7 @@ const CustomTextInput = ({
 };
 
 const styles = StyleSheet.create({
-  root: {marginVertical: 8},
+  root: {marginVertical: 8, marginHorizontal: sizes.md},
 });
 
 export default CustomTextInput;

@@ -18,6 +18,7 @@ import {useAppDispatch, useAppSelector} from '@/hooks';
 import {Select, TextInput,Text} from '@/components';
 import CustomeDatePicker from '@/components/DatePicker';
 import {convertDate} from '@/common';
+import { useAppTheme } from '@/constants/theme';
 
 interface Income {
   id?: string;
@@ -49,6 +50,8 @@ const Income = () => {
   const [editedIncome, setEditedIncome] = useState(initState(income));
 
   const [isNewSource, setIsNewSource] = useState(false);
+
+  const t = useAppTheme();
 
   // Toggle between edit and view modes
   const handleEdit = () => {
@@ -122,7 +125,7 @@ const Income = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, {backgroundColor: t.colors.white}]}>
       <ScrollView keyboardShouldPersistTaps="always">
         {Number.isInteger(param.id * 1) && (
           <IconButton

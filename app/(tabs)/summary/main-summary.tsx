@@ -17,6 +17,7 @@ import {BarChart, Chip, DatePicker, PieChartBar, Text} from '@/components';
 import {EXCLUDED_CAT, formatPrice, shortenText} from '@/common';
 import {Axis, PickFilter, decId, groupBy, sumById} from '@/utils/aggregateData';
 import {Category} from '@/redux/main/mainSlice';
+import {useAppTheme} from '@/constants/theme';
 
 type AggrExpense = {
   v: number;
@@ -70,6 +71,8 @@ const Summary = () => {
   ]);
   const [axis, setAxis] = useState<[Axis, PickFilter]>(['1-0', '0-0']);
   const [chartDisplay, setChartDisplay] = useState<string>('pie');
+
+  const t = useAppTheme();
 
   // selectors
   const stateCategories = useAppSelector(selectCategories);
@@ -246,7 +249,7 @@ const Summary = () => {
   };
 
   return (
-    <ScrollView>
+    <ScrollView style={{backgroundColor: t.colors.white}}>
       <DatePicker
         value={filterDates[0]}
         label="Start"
