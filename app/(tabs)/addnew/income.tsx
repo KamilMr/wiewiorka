@@ -124,7 +124,6 @@ const Income = () => {
       .then(() => router.navigate('/(tabs)/records'));
   };
 
-  console.log('nowt present')
   return (
     <SafeAreaView style={[styles.container, {backgroundColor: t.colors.white}]}>
       <ScrollView keyboardShouldPersistTaps="always">
@@ -269,14 +268,6 @@ const styles = StyleSheet.create({
   value: {
     fontSize: 16,
     marginBottom: 8,
-  },
-  input: {
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 8,
-    borderRadius: 4,
-    marginBottom: 12,
   },
   image: {
     width: '100%',

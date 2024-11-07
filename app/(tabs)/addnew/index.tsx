@@ -18,7 +18,7 @@ import {deleteExpense, uploadExpense} from '@/redux/main/thunks';
 import {useAppDispatch, useAppSelector} from '@/hooks';
 import {Select, TextInput, Image, Text} from '@/components';
 import CustomeDatePicker from '@/components/DatePicker';
-import {useAppTheme} from '@/constants/theme';
+import {sizes, useAppTheme} from '@/constants/theme';
 
 interface Expense {
   id: string;
@@ -60,6 +60,8 @@ const Expense = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const isValid = validateInput(editedExpense);
+  const isEmpty =
+    !editedExpense.date && !editedExpense.price && !editedExpense.categoryId;
 
   const t = useAppTheme();
 
@@ -175,7 +177,7 @@ const Expense = () => {
           />
         )}
         <TextInput
-          style={styles.input}
+          style={{marginBottom: sizes.xl}}
           value={editedExpense.description}
           label="Opis"
           readOnly={!isEditMode}
@@ -187,39 +189,26 @@ const Expense = () => {
           editable={!isEditMode}
           label="Wybierz datę"
           disabled={!isEditMode}
-          style={styles.input}
+          style={{marginBottom: sizes.lg}}
           value={new Date(editedExpense.date.split('/').reverse().join('-'))}
           onChange={handleDate}
         />
-        {isEditMode ? (
-          <TextInput
-            style={styles.input}
-            value={String(editedExpense.price)}
-            label="Cena"
-            readOnly={!isEditMode}
-            autoFocus={true}
-            keyboardType="numeric"
-            onChangeText={(text) =>
-              setEditedExpense({
-                ...editedExpense,
-                price: text.replace(',', '.'),
-              })
-            }
-          />
-        ) : (
-          <Text>{'fds'} zł</Text>
-        )}
-
         <TextInput
-          style={styles.input}
-          label="Kto dokonał zakupu"
-          readOnly={true}
-          disabled={true}
-          value={editedExpense.owner}
+          style={{marginBottom: sizes.xl}}
+          value={String(editedExpense.price)}
+          label="Cena"
+          readOnly={!isEditMode}
+          autoFocus={true}
+          keyboardType="numeric"
           onChangeText={(text) =>
-            setEditedExpense({...editedExpense, owner: text})
+            setEditedExpense({
+              ...editedExpense,
+              price: text.replace(',', '.'),
+            })
           }
         />
+
+        {editedExpense.owner ? <Text>{editedExpense.owner}</Text> : null}
 
         <Select
           value={
@@ -244,23 +233,23 @@ const Expense = () => {
         <View style={styles.buttonContainer}>
           <Button
             mode="contained"
-            onPress={handleSave}
+            onPress={isEditMode ? handleSave : handleEdit}
             loading={isLoading}
-            disabled={!isValid || !isEditMode}
+            disabled={!isValid && !isEmpty}
             style={styles.button}>
-            Save
+            {isEditMode ? 'Zapisz' : 'Edytuj'}
           </Button>
           <Button
             mode="outlined"
             onPress={
-              isEditMode
+              isEditMode && Number.isInteger(+id)
                 ? handleCancel
                 : () => {
                     router.navigate('/(tabs)/records');
                   }
             }
             style={styles.button}>
-            Cancel
+            {isEditMode ? 'Przerwij' : 'Zakończ'}
           </Button>
         </View>
         <View style={{height: 80}} />
@@ -273,23 +262,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'space-between', // Ensure buttons stay at the bottom
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginTop: 12,
-  },
-  value: {
-    fontSize: 16,
-    marginBottom: 8,
-  },
-  input: {
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 8,
-    borderRadius: 4,
-    marginBottom: 12,
   },
   image: {
     width: '100%',
@@ -309,3 +281,18 @@ const styles = StyleSheet.create({
 });
 
 export default Expense;
+/*
+ *
+ *<View
+            style={{
+              marginHorizontal: sizes.xl,
+              padding: sizes.lg,
+              borderRadius: 4,
+                height: 60,
+              marginBottom: sizes.xl,
+              backgroundColor: t.colors.softLavender,
+            }}>
+            <Text>{String(editedExpense.price)}</Text>
+          </View>
+ *
+ * */

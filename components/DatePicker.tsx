@@ -1,4 +1,4 @@
-import { sizes } from '@/constants/theme';
+import {sizes} from '@/constants/theme';
 import {View} from 'react-native';
 import {
   DatePickerInput,
@@ -35,7 +35,7 @@ const CustomeDatePicker = ({
   };
 
   return (
-    <View style={{maxWidth: 360, marginHorizontal: sizes.xl}}>
+    <View style={{maxWidth: 360, marginHorizontal: sizes.xl, ...style}}>
       <DatePickerInput
         inputMode="end"
         editable={editable}
@@ -47,7 +47,6 @@ const CustomeDatePicker = ({
         label={label}
         value={value || defaultValue}
         onChange={handleOnConfirm}
-        style={[{}, style]}
       />
     </View>
   );
