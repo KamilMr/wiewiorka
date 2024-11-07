@@ -13,6 +13,7 @@ import FullWidthImage from './FullImage';
 import MyTabBar from './CustomTab';
 import PieChartBar from './PieChartBar';
 import SummaryCard from './SummaryCard';
+import ViewWithText from './ViewWithText';
 
 export {
   CustomBar as BarChart,
@@ -30,4 +31,5 @@ export {
   MyTabBar as TabBar,
   PieChartBar,
   SummaryCard,
+  ViewWithText,
 };

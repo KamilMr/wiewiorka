@@ -1,14 +1,15 @@
 import {sizes} from '@/constants/theme';
+
 import {StyleSheet} from 'react-native';
 import {TextInput, TextInputProps} from 'react-native-paper';
 
-const CustomTextInput = ({
+export default function CustomTextInput({
   onChangeText,
   value,
   style,
   innerRef,
   ...props
-}: TextInputProps) => {
+}: TextInputProps & {innerRef?: string}) {
   return (
     <TextInput
       onChangeText={onChangeText}
@@ -18,10 +19,8 @@ const CustomTextInput = ({
       {...props}
     />
   );
-};
+}
 
 const styles = StyleSheet.create({
   root: {marginVertical: sizes.lg, marginHorizontal: sizes.xl},
 });
-
-export default CustomTextInput;

@@ -16,7 +16,7 @@ import {format} from 'date-fns';
 import {selectCategories, selectExpense} from '@/redux/main/selectors';
 import {deleteExpense, uploadExpense} from '@/redux/main/thunks';
 import {useAppDispatch, useAppSelector} from '@/hooks';
-import {Select, TextInput, Image, Text} from '@/components';
+import {Select, TextInput, Image, Text, ViewWithText} from '@/components';
 import CustomeDatePicker from '@/components/DatePicker';
 import {sizes, useAppTheme} from '@/constants/theme';
 
@@ -176,53 +176,80 @@ const Expense = () => {
             onPress={handleDeleteExpense}
           />
         )}
-        <TextInput
-          style={{marginBottom: sizes.xl}}
-          value={editedExpense.description}
-          label="Opis"
-          readOnly={!isEditMode}
-          onChangeText={(text: string) =>
-            setEditedExpense({...editedExpense, description: text})
-          }
-        />
-        <CustomeDatePicker
-          editable={!isEditMode}
-          label="Wybierz datę"
-          disabled={!isEditMode}
-          style={{marginBottom: sizes.lg}}
-          value={new Date(editedExpense.date.split('/').reverse().join('-'))}
-          onChange={handleDate}
-        />
-        <TextInput
-          style={{marginBottom: sizes.xl}}
-          value={String(editedExpense.price)}
-          label="Cena"
-          readOnly={!isEditMode}
-          autoFocus={true}
-          keyboardType="numeric"
-          onChangeText={(text) =>
-            setEditedExpense({
-              ...editedExpense,
-              price: text.replace(',', '.'),
-            })
-          }
-        />
+        {isEditMode ? (
+          <TextInput
+            style={{marginBottom: sizes.xl}}
+            value={editedExpense.description}
+            label="Opis"
+            readOnly={!isEditMode}
+            onChangeText={(text: string) =>
+              setEditedExpense({...editedExpense, description: text})
+            }
+          />
+        ) : (
+          <ViewWithText
+            label="Opis"
+            txt={editedExpense.description || 'brak'}
+          />
+        )}
+        {isEditMode ? (
+          <CustomeDatePicker
+            editable={!isEditMode}
+            label="Wybierz datę"
+            disabled={!isEditMode}
+            style={{marginBottom: sizes.lg}}
+            value={new Date(editedExpense.date.split('/').reverse().join('-'))}
+            onChange={handleDate}
+          />
+        ) : (
+          <ViewWithText label="Data" txt={editedExpense.date} />
+        )}
+        {isEditMode ? (
+          <TextInput
+            style={{marginBottom: sizes.xl}}
+            value={String(editedExpense.price)}
+            label="Cena"
+            autoFocus={isEditMode}
+            readOnly={!isEditMode}
+            keyboardType="numeric"
+            onChangeText={(text) =>
+              setEditedExpense({
+                ...editedExpense,
+                price: text.replace(',', '.'),
+              })
+            }
+          />
+        ) : (
+          <ViewWithText label="Cena" txt={editedExpense.price} />
+        )}
 
-        {editedExpense.owner ? <Text>{editedExpense.owner}</Text> : null}
+        {editedExpense.owner ? (
+          <ViewWithText label="Kto?" txt={editedExpense.owner} />
+        ) : null}
 
-        <Select
-          value={
-            categories.find(({catId}) => catId === editedExpense.categoryId)
-              ?.category || ''
-          }
-          title="Wybierz kategorię"
-          onChange={handleSelectCategory}
-          disable={!isEditMode}
-          items={categories.map((cat) => ({
-            label: cat.category,
-            value: cat.category,
-          }))}
-        />
+        {isEditMode ? (
+          <Select
+            value={
+              categories.find(({catId}) => catId === editedExpense.categoryId)
+                ?.category || ''
+            }
+            title="Wybierz kategorię"
+            onChange={handleSelectCategory}
+            disable={!isEditMode}
+            items={categories.map((cat) => ({
+              label: cat.category,
+              value: cat.category,
+            }))}
+          />
+        ) : (
+          <ViewWithText
+            label="Kategoria"
+            txt={
+              categories.find(({catId}) => catId === editedExpense.categoryId)
+                ?.category || ''
+            }
+          />
+        )}
         <Image
           imageSrc={editedExpense.image}
           editable={isEditMode}
