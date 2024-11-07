@@ -18,7 +18,7 @@ import {deleteExpense, uploadExpense} from '@/redux/main/thunks';
 import {useAppDispatch, useAppSelector} from '@/hooks';
 import {Select, TextInput, Image} from '@/components';
 import CustomeDatePicker from '@/components/DatePicker';
-import {selectMe} from '@/redux/auth/authSlice';
+import {useAppTheme} from '@/constants/theme';
 
 interface Expense {
   id: string;
@@ -60,6 +60,8 @@ const Expense = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const isValid = validateInput(editedExpense);
+
+  const t = useAppTheme();
 
   useFocusEffect(
     useCallback(() => {
@@ -161,7 +163,7 @@ const Expense = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, {backgroundColor: t.colors.white}]}>
       <ScrollView keyboardShouldPersistTaps="always">
         <View style={styles.detailsContainer}>
           {Number.isInteger(id * 1) && (

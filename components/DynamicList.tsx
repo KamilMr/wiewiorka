@@ -66,8 +66,8 @@ export default function DynamicRecordList({
               key={exp.id}
               onTouchEnd={handleNavigate(exp.id, exp.exp)}>
               <CircleIcon
-                stroke={exp.color}
-                fill={exp.color ? 'none' : t.colors.softLavender}
+                fillOuter={exp.exp ? exp.color : t.colors.softLavender}
+                fillInner={exp.exp ? t.colors.white: t.colors.softLavender}
               />
 
               {/* Description */}

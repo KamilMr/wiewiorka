@@ -13,6 +13,7 @@ import {useAppSelector} from '@/hooks';
 import {selectRecords} from '@/redux/main/selectors';
 import DynamicRecordList from '@/components/DynamicList';
 import {isCloseToBottom} from '@/common';
+import {useAppTheme} from '@/constants/theme';
 
 const TransactionList = () => {
   const [number, setNumber] = useState(30);
@@ -25,6 +26,7 @@ const TransactionList = () => {
       dates: [dates[0], dates[1]],
     }),
   );
+  const t = useAppTheme();
 
   // Load more items when the scroll reaches the bottom
   const handleScroll = ({
@@ -38,11 +40,8 @@ const TransactionList = () => {
   };
 
   return (
-    <View style={{padding: 16}}>
-      <DynamicRecordList
-        records={records}
-        handleScroll={handleScroll}
-      />
+    <View style={{padding: 16, backgroundColor: t.colors.white, flex: 1}}>
+      <DynamicRecordList records={records} handleScroll={handleScroll} />
     </View>
   );
 };

@@ -213,3 +213,6 @@ export const selectByTimeRange = (dates: [Date, Date]) => {
     else return data;
   });
 };
+
+export const selectStatus = (state: RootState) =>
+  state.main.status;

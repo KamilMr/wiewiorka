@@ -7,6 +7,7 @@ import {Button, RadioButton} from 'react-native-paper';
 import {selectComparison} from '@/redux/main/selectors';
 import {SummaryCard, Text} from '@/components';
 import {useAppSelector} from '@/hooks';
+import {useAppTheme} from '@/constants/theme';
 
 const MONTH = 1;
 const YEAR = 12;
@@ -52,9 +53,11 @@ const Summary = () => {
   const summary = useAppSelector(selectComparison(filter));
   const handleChange = (f) => setFilter(f);
 
+  const t = useAppTheme();
+
   return (
-    <SafeAreaView>
-      <ScrollView>
+    <SafeAreaView style={{backgroundColor: t.colors.white}}>
+      <ScrollView style={{backgroundColor: t.colors.white}}>
         <Config
           selection={[
             [MONTH, MONTH_LABEL],
