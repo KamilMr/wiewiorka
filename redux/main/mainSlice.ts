@@ -190,7 +190,7 @@ const mainSlice = createSlice({
       .addCase(fetchIni.rejected, (state, action) => {
         state.snackbar.open = true;
         state.snackbar.type = 'error';
-        state.snackbar.msg = action.error.message;
+        state.snackbar.msg = action.error.message || 'Coś poszło nie tak';
         state.status = 'idle';
       })
       .addCase(handleCategory.rejected, (state, action) => {

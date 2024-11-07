@@ -18,8 +18,7 @@ import {deleteExpense, uploadExpense} from '@/redux/main/thunks';
 import {useAppDispatch, useAppSelector} from '@/hooks';
 import {Select, TextInput, Image} from '@/components';
 import CustomeDatePicker from '@/components/DatePicker';
-import {selectMe} from '@/redux/auth/authSlice';
-import { useAppTheme } from '@/constants/theme';
+import {useAppTheme} from '@/constants/theme';
 
 interface Expense {
   id: string;
