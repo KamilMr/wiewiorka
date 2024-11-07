@@ -13,6 +13,7 @@ interface Props {
   items: Array<{label: string; value: string}>;
   title?: string;
   disable?: boolean;
+  placeholderTxt?: string;
 }
 
 const DropdownComponent = ({
@@ -21,6 +22,7 @@ const DropdownComponent = ({
   items,
   title = '',
   disable = false,
+  placeholderTxt = 'Wybierz kategorię',
 }: Props) => {
   const [isFocus, setIsFocus] = useState(false);
 
@@ -53,8 +55,8 @@ const DropdownComponent = ({
         maxHeight={300}
         labelField="label"
         valueField="value"
-        dropdownPosition='top'
-        placeholder={!isFocus ? 'Wybierz kategorię' : '...'}
+        dropdownPosition="top"
+        placeholder={!isFocus ? placeholderTxt : '...'}
         keyboardAvoiding
         searchPlaceholder="Szuka..."
         value={value}

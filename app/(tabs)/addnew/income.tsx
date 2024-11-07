@@ -1,4 +1,4 @@
-import {useCallback, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {
   router,
   useFocusEffect,
@@ -50,6 +50,7 @@ const Income = () => {
   const [editedIncome, setEditedIncome] = useState(initState(income));
 
   const [isNewSource, setIsNewSource] = useState(false);
+  const newSource = useRef(null);
 
   const t = useAppTheme();
 
@@ -124,6 +125,13 @@ const Income = () => {
       .then(() => router.navigate('/(tabs)/records'));
   };
 
+  useEffect(() => {
+    if (newSource.current) {
+      console.log('ds', newSource);
+      newSource.current.focus();
+    }
+  }, [isNewSource]);
+
   return (
     <SafeAreaView style={[styles.container, {backgroundColor: t.colors.white}]}>
       <ScrollView keyboardShouldPersistTaps="always">
@@ -183,18 +191,22 @@ const Income = () => {
 
           {isEditMode && !isNewSource ? (
             <Select
+              placeholderTxt="Wybierz źródło"
               value={editedIncome.source}
               onChange={({value}) => {
-                if (value === 'nowe źródło') return setIsNewSource(true);
+                if (value === 'Nowe') return setIsNewSource(true);
                 setEditedIncome({...editedIncome, source: value});
               }}
-              items={sources
-                .concat(['nowe źródło'])
-                .map((s: string) => ({label: s, value: s}))}
+              items={['Nowe', ...sources].map((s: string) => ({
+                label: s,
+                value: s,
+              }))}
             />
           ) : (
             <TextInput
               value={editedIncome.source}
+              label={'Nowe źródło dochodu'}
+              innerRef={newSource}
               onChangeText={(txt) => {
                 setEditedIncome({...editedIncome, source: txt});
               }}
