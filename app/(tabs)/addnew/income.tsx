@@ -15,10 +15,10 @@ import {format} from 'date-fns';
 import {selectIncome, selectSources} from '@/redux/main/selectors';
 import {deleteIncome, uploadIncome} from '@/redux/main/thunks';
 import {useAppDispatch, useAppSelector} from '@/hooks';
-import {Select, TextInput,Text} from '@/components';
+import {Select, TextInput, Text, ViewWithText} from '@/components';
 import CustomeDatePicker from '@/components/DatePicker';
 import {convertDate} from '@/common';
-import { useAppTheme } from '@/constants/theme';
+import {useAppTheme} from '@/constants/theme';
 
 interface Income {
   id?: string;
@@ -139,15 +139,15 @@ const Income = () => {
         <View style={styles.detailsContainer}>
           {isEditMode ? (
             <TextInput
-              style={styles.input}
-              label="Opis"
+              label="Opis - już wkrótce"
+              disabled
               value={editedIncome.description}
               onChangeText={(text) =>
                 setEditedIncome({...editedIncome, description: text})
               }
             />
           ) : (
-            <Text style={styles.value}>{income.description}</Text>
+            <ViewWithText label="Opis" txt={income.description} />
           )}
 
           {isEditMode ? (
@@ -159,19 +159,13 @@ const Income = () => {
               onChange={handleDate}
             />
           ) : (
-            <Text style={styles.value}>{income.date}</Text>
+            <ViewWithText label="Data" txt={income.date} />
           )}
 
-          {isEditMode ? null : (
-            <>
-              <Text style={styles.label}>Zarobił</Text>
-              <Text style={styles.value}>{income.owner}</Text>
-            </>
-          )}
+          {isEditMode ? null : <ViewWithText label="Kto?" txt={income.owner} />}
 
           {isEditMode ? (
             <TextInput
-              style={styles.input}
               label={'Kwota'}
               value={String(editedIncome.price)}
               autoFocus={true}
@@ -184,7 +178,7 @@ const Income = () => {
               }
             />
           ) : (
-            <Text style={styles.value}>{income.price} zł</Text>
+            <ViewWithText label="Cena" txt={income.price} />
           )}
 
           {isEditMode && !isNewSource ? (
@@ -200,7 +194,6 @@ const Income = () => {
             />
           ) : (
             <TextInput
-              style={styles.input}
               value={editedIncome.source}
               onChangeText={(txt) => {
                 setEditedIncome({...editedIncome, source: txt});
