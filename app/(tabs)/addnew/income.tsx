@@ -127,7 +127,6 @@ const Income = () => {
 
   useEffect(() => {
     if (newSource.current) {
-      console.log('ds', newSource);
       newSource.current.focus();
     }
   }, [isNewSource]);
@@ -216,39 +215,24 @@ const Income = () => {
 
         {/* Buttons for Edit, Save, Cancel */}
         <View style={styles.buttonContainer}>
-          {isEditMode ? (
-            <>
-              <Button
-                mode="contained"
-                onPress={handleSave}
-                style={styles.button}>
-                Zapisz
-              </Button>
-              <Button
-                mode="outlined"
-                onPress={handleCancel}
-                style={styles.button}>
-                Stop
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button
-                mode="contained"
-                onPress={handleEdit}
-                style={styles.button}>
-                Edytuj
-              </Button>
-              <Button
-                mode="outlined"
-                onPress={() => {
-                  router.navigate('/(tabs)/records');
-                }}
-                style={styles.button}>
-                Zamknij
-              </Button>
-            </>
-          )}
+          <Button
+            mode="contained"
+            onPress={isEditMode ? handleSave : handleEdit}
+            style={styles.button}>
+            {isEditMode ? 'Zapisz' : 'Edytuj'}
+          </Button>
+          <Button
+            mode="outlined"
+            onPress={
+              isEditMode
+                ? handleCancel
+                : () => {
+                    router.navigate('/(tabs)/records');
+                  }
+            }
+            style={styles.button}>
+            {isEditMode ? 'Przerwij' : 'Zakończ'}
+          </Button>
         </View>
         <View style={{height: 60}} />
       </ScrollView>
