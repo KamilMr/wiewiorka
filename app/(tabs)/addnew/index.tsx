@@ -16,7 +16,7 @@ import {format} from 'date-fns';
 import {selectCategories, selectExpense} from '@/redux/main/selectors';
 import {deleteExpense, uploadExpense} from '@/redux/main/thunks';
 import {useAppDispatch, useAppSelector} from '@/hooks';
-import {Select, TextInput, Image} from '@/components';
+import {Select, TextInput, Image, Text} from '@/components';
 import CustomeDatePicker from '@/components/DatePicker';
 import {useAppTheme} from '@/constants/theme';
 
@@ -162,7 +162,6 @@ const Expense = () => {
       .then(() => router.navigate('/(tabs)/records'));
   };
 
-  console.log('expense add')
   return (
     <SafeAreaView style={[styles.container, {backgroundColor: t.colors.white}]}>
       <ScrollView keyboardShouldPersistTaps="always">
@@ -192,20 +191,24 @@ const Expense = () => {
           value={new Date(editedExpense.date.split('/').reverse().join('-'))}
           onChange={handleDate}
         />
-        <TextInput
-          style={styles.input}
-          value={String(editedExpense.price)}
-          label="Cena"
-          readOnly={!isEditMode}
-          autoFocus={true}
-          keyboardType="numeric"
-          onChangeText={(text) =>
-            setEditedExpense({
-              ...editedExpense,
-              price: text.replace(',', '.'),
-            })
-          }
-        />
+        {isEditMode ? (
+          <TextInput
+            style={styles.input}
+            value={String(editedExpense.price)}
+            label="Cena"
+            readOnly={!isEditMode}
+            autoFocus={true}
+            keyboardType="numeric"
+            onChangeText={(text) =>
+              setEditedExpense({
+                ...editedExpense,
+                price: text.replace(',', '.'),
+              })
+            }
+          />
+        ) : (
+          <Text>{'fds'} zł</Text>
+        )}
 
         <TextInput
           style={styles.input}
@@ -239,41 +242,26 @@ const Expense = () => {
 
         {/* Buttons for Edit, Save, Cancel */}
         <View style={styles.buttonContainer}>
-          {isEditMode ? (
-            <>
-              <Button
-                mode="contained"
-                onPress={handleSave}
-                loading={isLoading}
-                disabled={!isValid}
-                style={styles.button}>
-                Save
-              </Button>
-              <Button
-                mode="outlined"
-                onPress={handleCancel}
-                style={styles.button}>
-                Cancel
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button
-                mode="contained"
-                onPress={handleEdit}
-                style={styles.button}>
-                Edytuj
-              </Button>
-              <Button
-                mode="outlined"
-                onPress={() => {
-                  router.navigate('/(tabs)/records');
-                }}
-                style={styles.button}>
-                Zamknij
-              </Button>
-            </>
-          )}
+          <Button
+            mode="contained"
+            onPress={handleSave}
+            loading={isLoading}
+            disabled={!isValid || !isEditMode}
+            style={styles.button}>
+            Save
+          </Button>
+          <Button
+            mode="outlined"
+            onPress={
+              isEditMode
+                ? handleCancel
+                : () => {
+                    router.navigate('/(tabs)/records');
+                  }
+            }
+            style={styles.button}>
+            Cancel
+          </Button>
         </View>
         <View style={{height: 80}} />
       </ScrollView>

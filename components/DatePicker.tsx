@@ -1,3 +1,5 @@
+import { sizes } from '@/constants/theme';
+import {View} from 'react-native';
 import {
   DatePickerInput,
   pl,
@@ -33,18 +35,21 @@ const CustomeDatePicker = ({
   };
 
   return (
-    <DatePickerInput
-      inputMode="end"
-      editable={editable}
-      disabled={disabled}
-      readOnly={readOnly}
-      keyboardType="numeric"
-      locale="pl"
-      label={label}
-      value={value || defaultValue}
-      onChange={handleOnConfirm}
-      style={[style]}
-    />
+    <View style={{maxWidth: 360, marginHorizontal: sizes.xl}}>
+      <DatePickerInput
+        inputMode="end"
+        editable={editable}
+        disabled={disabled}
+        readOnly={readOnly}
+        presentationStyle="pageSheet"
+        keyboardType="numeric"
+        locale="pl"
+        label={label}
+        value={value || defaultValue}
+        onChange={handleOnConfirm}
+        style={[{}, style]}
+      />
+    </View>
   );
 };
 
