@@ -248,7 +248,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'space-between', // Ensure buttons stay at the bottom
-    padding: 16,
   },
   detailsContainer: {
     flex: 1,
