@@ -25,6 +25,7 @@ const TabLayout = () => {
   if (!token) return <Redirect href="/sign-in" />;
 
   const handleFetch = async () => {
+    if (fetching === 'fetching') return;
     dispatch(fetchIni());
   };
 
