@@ -12,7 +12,11 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import _ from 'lodash';
 import {format} from 'date-fns';
 
-import {selectIncome, selectSources} from '@/redux/main/selectors';
+import {
+  selectIncome,
+  selectSources,
+  selectStatus,
+} from '@/redux/main/selectors';
 import {deleteIncome, uploadIncome} from '@/redux/main/thunks';
 import {useAppDispatch, useAppSelector} from '@/hooks';
 import {Select, TextInput, Text, ViewWithText} from '@/components';
@@ -44,6 +48,7 @@ const Income = () => {
   const param = useLocalSearchParams();
   const income = useAppSelector(selectIncome(param.id)) || {};
   const sources = useAppSelector(selectSources);
+  const fetching = useAppSelector(selectStatus);
 
   // State for edit mode and editing fields
   const [isEditMode, setIsEditMode] = useState(false);
@@ -82,6 +87,7 @@ const Income = () => {
   );
 
   const handleSave = () => {
+    if (fetching === 'fetching') return;
     const newD = _.chain(editedIncome)
       .pick(['date', 'source', 'vat', 'price'])
       .omitBy((d) => !d || d === 'undefined')
@@ -218,6 +224,7 @@ const Income = () => {
           <Button
             mode="contained"
             onPress={isEditMode ? handleSave : handleEdit}
+            loading={fetching === 'fetching'}
             style={styles.button}>
             {isEditMode ? 'Zapisz' : 'Edytuj'}
           </Button>
