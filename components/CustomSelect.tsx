@@ -53,6 +53,7 @@ const DropdownComponent = ({
         maxHeight={300}
         labelField="label"
         valueField="value"
+        dropdownPosition='top'
         placeholder={!isFocus ? 'Wybierz kategorię' : '...'}
         keyboardAvoiding
         searchPlaceholder="Szuka..."
