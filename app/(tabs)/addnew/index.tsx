@@ -162,83 +162,80 @@ const Expense = () => {
       .then(() => router.navigate('/(tabs)/records'));
   };
 
+  console.log('expense add')
   return (
     <SafeAreaView style={[styles.container, {backgroundColor: t.colors.white}]}>
       <ScrollView keyboardShouldPersistTaps="always">
-        <View style={styles.detailsContainer}>
-          {Number.isInteger(id * 1) && (
-            <IconButton
-              icon={'trash-can'}
-              style={{
-                alignSelf: 'flex-end',
-              }}
-              onPress={handleDeleteExpense}
-            />
-          )}
-          <TextInput
-            style={styles.input}
-            value={editedExpense.description}
-            label="Opis"
-            readOnly={!isEditMode}
-            onChangeText={(text: string) =>
-              setEditedExpense({...editedExpense, description: text})
-            }
+        {Number.isInteger(id * 1) && (
+          <IconButton
+            icon={'trash-can'}
+            style={{
+              alignSelf: 'flex-end',
+            }}
+            onPress={handleDeleteExpense}
           />
-          <CustomeDatePicker
-            editable={!isEditMode}
-            label="Wybierz datę"
-            disabled={!isEditMode}
-            style={styles.input}
-            value={new Date(editedExpense.date.split('/').reverse().join('-'))}
-            onChange={handleDate}
-          />
-          <TextInput
-            style={styles.input}
-            value={String(editedExpense.price)}
-            label="Cena"
-            readOnly={!isEditMode}
-            autoFocus={true}
-            keyboardType="numeric"
-            onChangeText={(text) =>
-              setEditedExpense({
-                ...editedExpense,
-                price: text.replace(',', '.'),
-              })
-            }
-          />
+        )}
+        <TextInput
+          style={styles.input}
+          value={editedExpense.description}
+          label="Opis"
+          readOnly={!isEditMode}
+          onChangeText={(text: string) =>
+            setEditedExpense({...editedExpense, description: text})
+          }
+        />
+        <CustomeDatePicker
+          editable={!isEditMode}
+          label="Wybierz datę"
+          disabled={!isEditMode}
+          style={styles.input}
+          value={new Date(editedExpense.date.split('/').reverse().join('-'))}
+          onChange={handleDate}
+        />
+        <TextInput
+          style={styles.input}
+          value={String(editedExpense.price)}
+          label="Cena"
+          readOnly={!isEditMode}
+          autoFocus={true}
+          keyboardType="numeric"
+          onChangeText={(text) =>
+            setEditedExpense({
+              ...editedExpense,
+              price: text.replace(',', '.'),
+            })
+          }
+        />
 
-          {isEditMode ? null : (
-            <TextInput
-              style={styles.input}
-              label="Kto dokonał zakupu"
-              readOnly={true}
-              disabled={true}
-              value={editedExpense.owner}
-              onChangeText={(text) =>
-                setEditedExpense({...editedExpense, owner: text})
-              }
-            />
-          )}
+        <TextInput
+          style={styles.input}
+          label="Kto dokonał zakupu"
+          readOnly={true}
+          disabled={true}
+          value={editedExpense.owner}
+          onChangeText={(text) =>
+            setEditedExpense({...editedExpense, owner: text})
+          }
+        />
 
-          <Select
-            value={
-              categories.find(({catId}) => catId === editedExpense.categoryId)
-                ?.category || ''
-            }
-            title="Wybierz kategorię"
-            onChange={handleSelectCategory}
-            disable={!isEditMode}
-            items={categories.map((cat) => ({
-              label: cat.category,
-              value: cat.category,
-            }))}
-          />
-          <Image
-            imageSrc={editedExpense.image}
-            editable={isEditMode}
-            onChange={handleImageSave}
-          />
-        </View>
+        <Select
+          value={
+            categories.find(({catId}) => catId === editedExpense.categoryId)
+              ?.category || ''
+          }
+          title="Wybierz kategorię"
+          onChange={handleSelectCategory}
+          disable={!isEditMode}
+          items={categories.map((cat) => ({
+            label: cat.category,
+            value: cat.category,
+          }))}
+        />
+        <Image
+          imageSrc={editedExpense.image}
+          editable={isEditMode}
+          onChange={handleImageSave}
+        />
 
         {/* Buttons for Edit, Save, Cancel */}
         <View style={styles.buttonContainer}>
@@ -289,7 +286,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-between', // Ensure buttons stay at the bottom
   },
-  detailsContainer: {},
   label: {
     fontSize: 16,
     fontWeight: 'bold',

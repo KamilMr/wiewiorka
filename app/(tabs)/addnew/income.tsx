@@ -124,6 +124,7 @@ const Income = () => {
       .then(() => router.navigate('/(tabs)/records'));
   };
 
+  console.log('nowt present')
   return (
     <SafeAreaView style={[styles.container, {backgroundColor: t.colors.white}]}>
       <ScrollView keyboardShouldPersistTaps="always">
