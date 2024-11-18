@@ -56,7 +56,7 @@ const Summary = () => {
   const t = useAppTheme();
 
   return (
-    <SafeAreaView style={{backgroundColor: t.colors.white}}>
+    <SafeAreaView style={{height:'100%',backgroundColor: t.colors.white}}>
       <ScrollView style={{backgroundColor: t.colors.white}}>
         <Config
           selection={[

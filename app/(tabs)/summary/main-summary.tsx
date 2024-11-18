@@ -249,7 +249,11 @@ const Summary = () => {
   };
 
   return (
-    <ScrollView style={{backgroundColor: t.colors.white}}>
+    <ScrollView
+      style={{
+        height: '100%',
+        backgroundColor: t.colors.white,
+      }}>
       <DatePicker
         value={filterDates[0]}
         label="Start"
