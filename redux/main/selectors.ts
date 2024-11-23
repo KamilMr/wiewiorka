@@ -106,7 +106,7 @@ export const selectCategories = createSelector(
   (cat) => {
     const arr = Object.entries(cat);
     return arr.reduce((pv, [key, cv]) => {
-      const categories = [...cv.categories].map((obj) => ({
+      const categories = [...cv.subcategories].map((obj) => ({
         ...obj,
         groupId: +key,
         groupName: cv.groupName,
@@ -214,5 +214,4 @@ export const selectByTimeRange = (dates: [Date, Date]) => {
   });
 };
 
-export const selectStatus = (state: RootState) =>
-  state.main.status;
+export const selectStatus = (state: RootState) => state.main.status;

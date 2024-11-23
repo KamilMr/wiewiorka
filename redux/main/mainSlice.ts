@@ -21,44 +21,57 @@ type Snackbar = {
   msg: string;
 };
 
-export type Income = {
-  date: string;
+export interface Income {
   id: number;
-  owner: string;
+  date: string;
   price: number;
   source: string;
-  valt: number;
-};
-
-export type Expense = {
-  category: string;
-  categoryId: number;
-  date: string;
+  ownerId: number;
+  vat: number;
+  houseId: string;
   description: string;
-  id: number;
-  image: string;
   owner: string;
-  price: number;
-  receipt: string;
-  exp: boolean;
-};
-
-export interface Category {
-  catId: number;
-  category: string;
-  color: string;
 }
 
-export interface Group {
-  categories: Category[];
-  groupName: string;
+export interface Expense {
+  id: number;
+  description: string;
+  date: string;
+  price: number;
+  categoryId: number;
+  image: string;
+  houseId: string;
+  owner: string;
+}
+
+export interface ExpenseMore {
+  categoryName: string;
+  isExp: boolean;
+}
+
+type Owner = 'house' | 'user';
+type OwnerId = string | number;
+
+export interface Subcategory {
+  id: number;
+  name: string;
+  groupId: number;
+  color: string;
+  owner: Owner;
+  ownerId: OwnerId;
+}
+
+export interface Category {
+  subcategories: Subcategory[];
+  name: string;
+  color: string;
 }
 
 export interface MainSlice {
   status: 'idle' | 'fetching';
   expenses: Array<Expense>;
   incomes: Array<Income>;
-  categories: {[key: number]: Group};
+  categories: {[key: number]: Category};
   _aggregated: AggregatedData;
   sources: {[key: string]: string[]};
   snackbar: Snackbar;
@@ -171,23 +184,24 @@ const mainSlice = createSlice({
         }));
         state.expenses = expenses;
         state.categories = categories;
-        state.incomes = income.map((inc: Income) => ({
-          ...inc,
-          date: format(inc.date, 'yyyy-MM-dd'),
-        }));
-
-        state.sources = income.reduce(
-          (pv: {[key: string]: string[]}, cv: Income) => {
-            pv[cv.owner] ??= [];
-            if (!pv[cv.owner].includes(cv.source)) pv[cv.owner].push(cv.source);
-            return pv;
-          },
-          {},
-        );
-
-        state._aggregated = aggregateDataByDay(expenses, categories);
+        // state.incomes = income.map((inc: Income) => ({
+        //   ...inc,
+        //   date: format(inc.date, 'yyyy-MM-dd'),
+        // }));
+        //
+        // state.sources = income.reduce(
+        //   (pv: {[key: string]: string[]}, cv: Income) => {
+        //     pv[cv.owner] ??= [];
+        //     if (!pv[cv.owner].includes(cv.source)) pv[cv.owner].push(cv.source);
+        //     return pv;
+        //   },
+        //   {},
+        // );
+        //
+        // state._aggregated = aggregateDataByDay(expenses, categories);
       })
       .addCase(fetchIni.rejected, (state, action) => {
+        console.log('rejected');
         state.snackbar.open = true;
         state.snackbar.type = 'error';
         state.snackbar.msg = action.error.message || 'Coś poszło nie tak';
