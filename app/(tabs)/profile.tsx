@@ -4,6 +4,7 @@ import {StyleSheet, View} from 'react-native';
 import {useAppDispatch} from '@/hooks';
 import {logout} from '@/redux/auth/thunks';
 import {useAppTheme} from '@/constants/theme';
+import { router } from 'expo-router';
 
 const Profile = () => {
   const dispatch = useAppDispatch();
@@ -14,11 +15,17 @@ const Profile = () => {
   return (
     <View style={[styles.root, {backgroundColor: t.colors.white}]}>
       <Button
+        mode="contained"
+        onPress={() => {router.navigate('/(categories)')}}
+        style={{marginBottom: 40}}>
+        Kategorie
+      </Button>
+      <Button
         icon="logout"
         mode="contained"
         onPress={handleLogout}
         style={{marginBottom: 40}}>
-        logout
+        Wyloguj się
       </Button>
       <View style={{height: 80}} />
     </View>
