@@ -16,7 +16,7 @@ const Profile = () => {
     <View style={[styles.root, {backgroundColor: t.colors.white}]}>
       <Button
         mode="contained"
-        onPress={() => {router.navigate('/(categories)')}}
+        onPress={() => {router.navigate('/(categories)/main')}}
         style={{marginBottom: 40}}>
         Kategorie
       </Button>

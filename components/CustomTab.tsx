@@ -43,9 +43,9 @@ const MyTabBar = ({
         {...props}
       />
     ),
-    profile: (props: IconProp) => (
+    settings: (props: IconProp) => (
       <TabBarIcon
-        name={props.isFocus ? 'person' : 'person-outline'}
+        name={props.isFocus ? 'settings' : 'settings-outline'}
         {...props}
       />
     ),
