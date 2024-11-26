@@ -52,14 +52,14 @@ export const selectRecords = (number: number, search: Search) =>
         .map((obj: Expense) => {
           const catObj = obj?.exp
             ? categories.find(
-                ({catId}: {catId: number}) => catId === obj.categoryId,
+                ({id}: {catId: number}) => id === obj.categoryId,
               )
             : null;
 
           return {
             ...obj,
             description: obj.description || '',
-            category: catObj?.category ?? '',
+            category: catObj?.name?? '',
             color: catObj?.color ?? '',
           };
         });
@@ -85,10 +85,10 @@ export const selectExpense = (id: number) =>
   createSelector([selectCategories, selectExpensesAll], (cat, exp) => {
     const expense = exp.find((ex) => ex.id === +id);
     if (!expense) return;
-    const categoryObj = cat.find((obj) => obj.catId === expense.categoryId);
+    const categoryObj = cat.find((obj) => obj.id=== expense.categoryId);
     return {
       ...expense,
-      category: categoryObj.category,
+      category: categoryObj.name,
       catColor: categoryObj.color,
       date: format(new Date(expense.date), 'dd/MM/yyyy'),
     };
@@ -109,7 +109,7 @@ export const selectCategories = createSelector(
       const categories = [...cv.subcategories].map((obj) => ({
         ...obj,
         groupId: +key,
-        groupName: cv.groupName,
+        groupName: cv.name,
         color: `#${obj.color || 'FFFFFF'}`,
       }));
       if (Array.isArray(pv)) pv.push(...categories);

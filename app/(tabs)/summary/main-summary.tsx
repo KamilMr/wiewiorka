@@ -80,6 +80,7 @@ const Summary = () => {
 
   // grouping
   const grouped = groupBy(selected, 'month', ...axis);
+  console.log(grouped)
 
   useEffect(() => {
     setFilters(
@@ -113,7 +114,7 @@ const Summary = () => {
   // );
 
   const getCategoryName = (n: number, id: string) => {
-    if (!id) id = axis[0] === '1-1' ? 'catId' : 'groupId';
+    if (!id) id = axis[0] === '1-1' ? 'id' : 'groupId';
     const cat = stateCategories.find((o) => +o[id] === n);
 
     return cat;
@@ -125,12 +126,12 @@ const Summary = () => {
     type: 'category' | 'group';
     color: string;
   }[] = idsGroupOrCategory.map((n: string) => {
-    const holder = axis[0] === '1-1' ? 'catId' : 'groupId';
+    const holder = axis[0] === '1-1' ? 'id' : 'groupId';
     const cat = getCategoryName(+n, holder);
     return {
-      name: cat?.[holder === 'catId' ? 'category' : 'groupName'] || 'not found',
+      name: cat?.[holder === 'id' ? 'category' : 'groupName'] || 'not found',
       id: +n,
-      type: holder === 'catId' ? 'category' : 'group',
+      type: holder === 'id' ? 'category' : 'group',
       color: cat ? cat?.color || '' : '',
     };
   });
@@ -157,11 +158,11 @@ const Summary = () => {
         const isCat = +catId > 0;
 
         const foundCategory = stateCategories.find((o) =>
-          isCat ? o.catId === +catId : o.groupId === +grId,
+          isCat ? o.id === +catId : o.groupId === +grId,
         );
         if (
           f.size &&
-          !f.has(isCat ? foundCategory.category : foundCategory?.groupName)
+          !f.has(isCat ? foundCategory.name : foundCategory?.groupName)
         )
           return undefined;
 
@@ -171,9 +172,7 @@ const Summary = () => {
           value: value,
           id: itemId,
           frontColor: foundCategory.color,
-          label: isCat
-            ? foundCategory.category
-            : foundCategory?.groupName || '',
+          label: isCat ? foundCategory.name : foundCategory?.groupName || '',
           spacing: 10,
           barWidth: 50,
           topLabelComponent: () => (
@@ -201,11 +200,11 @@ const Summary = () => {
         // console.log(grId, valueArr);
 
         const foundCategory = stateCategories.find((o) =>
-          isCat ? o.catId === +catId : o.groupId === +grId,
+          isCat ? o.id === +catId : o.groupId === +grId,
         );
         if (
           f.size &&
-          !f.has(isCat ? foundCategory.category : foundCategory?.groupName)
+          !f.has(isCat ? foundCategory.name : foundCategory?.groupName)
         )
           return undefined;
         // console.log(name,isCat,grId)
@@ -214,9 +213,7 @@ const Summary = () => {
         const tR: {label: string; id: string} & pieDataItem = {
           id: itemId,
           value,
-          label: isCat
-            ? foundCategory.category
-            : foundCategory?.groupName || '',
+          label: isCat ? foundCategory.name : foundCategory?.groupName || '',
           text: +percentage < 4 ? '' : `${percentage}%`,
           color: foundCategory.color,
         };

@@ -147,7 +147,7 @@ const Expense = () => {
     if (!cat) return;
     setEditedExpense({
       ...editedExpense,
-      categoryId: categories.find((c) => c.category === cat.value).catId,
+      categoryId: categories.find((c) => c.name === cat.value).id,
     });
   };
 
@@ -222,15 +222,15 @@ const Expense = () => {
 
           <Select
             value={
-              categories.find(({catId}) => catId === editedExpense.categoryId)
-                ?.category || ''
+              categories.find(({id}) => id === editedExpense.categoryId)
+                ?.name || ''
             }
             title="Wybierz kategorię"
             onChange={handleSelectCategory}
             disable={!isEditMode}
             items={categories.map((cat) => ({
-              label: cat.category,
-              value: cat.category,
+              label: cat.name,
+              value: cat.name,
             }))}
           />
           <Image
