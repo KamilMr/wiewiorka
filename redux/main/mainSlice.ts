@@ -184,21 +184,20 @@ const mainSlice = createSlice({
         }));
         state.expenses = expenses;
         state.categories = categories;
-        // state.incomes = income.map((inc: Income) => ({
-        //   ...inc,
-        //   date: format(inc.date, 'yyyy-MM-dd'),
-        // }));
+        state.incomes = income.map((inc: Income) => ({
+          ...inc,
+          date: format(inc.date, 'yyyy-MM-dd'),
+        }));
+        state.sources = income.reduce(
+          (pv: {[key: string]: string[]}, cv: Income) => {
+            pv[cv.owner] ??= [];
+            if (!pv[cv.owner].includes(cv.source)) pv[cv.owner].push(cv.source);
+            return pv;
+          },
+          {},
+        );
         //
-        // state.sources = income.reduce(
-        //   (pv: {[key: string]: string[]}, cv: Income) => {
-        //     pv[cv.owner] ??= [];
-        //     if (!pv[cv.owner].includes(cv.source)) pv[cv.owner].push(cv.source);
-        //     return pv;
-        //   },
-        //   {},
-        // );
-        //
-        // state._aggregated = aggregateDataByDay(expenses, categories);
+        state._aggregated = aggregateDataByDay(expenses, categories);
       })
       .addCase(fetchIni.rejected, (state, action) => {
         console.log('rejected');
