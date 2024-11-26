@@ -36,6 +36,7 @@ export const signIn = createAsyncThunk(
 
 export const logout = createAsyncThunk('/user/logout', async (_, thunkAPI) => {
   let data: DataResponse;
+  thunkAPI.dispatch(dropMain());
   try {
     const resp = await fetch(getURL('users/logout'), {
       method: 'POST',
@@ -47,8 +48,6 @@ export const logout = createAsyncThunk('/user/logout', async (_, thunkAPI) => {
     if (data.err) throw data.err;
   } catch (err) {
     throw err;
-  } finally {
-    thunkAPI.dispatch(dropMain());
   }
   return data.d;
 });
