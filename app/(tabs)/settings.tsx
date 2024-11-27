@@ -6,7 +6,7 @@ import {logout} from '@/redux/auth/thunks';
 import {useAppTheme} from '@/constants/theme';
 import { router } from 'expo-router';
 
-const Profile = () => {
+const Settings = () => {
   const dispatch = useAppDispatch();
   const t = useAppTheme();
   const handleLogout = () => {
@@ -16,7 +16,7 @@ const Profile = () => {
     <View style={[styles.root, {backgroundColor: t.colors.white}]}>
       <Button
         mode="contained"
-        onPress={() => {router.navigate('/(categories)/main')}}
+        onPress={() => {router.replace('/categories')}}
         style={{marginBottom: 40}}>
         Kategorie
       </Button>
@@ -41,4 +41,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Profile;
+export default Settings;

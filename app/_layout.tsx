@@ -37,7 +37,7 @@ const RootLayout = () => {
           <Stack initialRouteName='(tabs)' >
             <Stack.Screen name="sign-in" options={{headerShown: false}} />
             <Stack.Screen name="(tabs)" options={{headerShown: false}} />
-            <Stack.Screen name="(categories)" options={{headerShown: false}} />
+            <Stack.Screen name="categories" options={{headerShown: false}} />
             <Stack.Screen name="+not-found" />
           </Stack>
           <SnackBar />

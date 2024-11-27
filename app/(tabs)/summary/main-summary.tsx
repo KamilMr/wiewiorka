@@ -13,7 +13,7 @@ import {EXCLUDED_CAT, formatPrice, shortenText} from '@/common';
 import {Axis, PickFilter, decId, groupBy} from '@/utils/aggregateData';
 import {Category, Subcategory} from '@/redux/main/mainSlice';
 import {useAppTheme} from '@/constants/theme';
-import {buildBarChart, buildPieChart} from './chartBuilder';
+import {buildBarChart, buildPieChart} from '@/utils/chartBuilder';
 
 type GroupedValue = number[];
 interface GroupedType {
