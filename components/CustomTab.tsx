@@ -26,6 +26,7 @@ const MyTabBar = ({
   state,
   descriptors,
   showLabel = false,
+  navigation
 }: BottomTabBarProps & {showLabel?: boolean}) => {
   const icons: {[key: string]: (props: IconProp) => JSX.Element} = {
     index: (props: IconProp) => (
@@ -60,7 +61,7 @@ const MyTabBar = ({
       {
         title: 'Dodaj Wpływ',
         onPress: () => {
-          router.push'/(tabs)/addnew/income')
+          router.push('/(tabs)/addnew/income');
           closeMenu();
         },
       },

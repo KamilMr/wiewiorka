@@ -20,7 +20,6 @@ const CustomPieChart = (props: Props & PieChartPropsType) => {
   let {data, title = '', ...rest} = props;
   if (!Array.isArray(data) || data.length < 1) {
     data = [{value: 10, color: '#FFFFFF'}];
-    console.warn('Data not array');
   }
   return (
     <View style={styles.container}>

@@ -5,52 +5,60 @@ import {Text} from '@/components';
 import {Subcategory} from '@/redux/main/mainSlice';
 import {decId, sumById} from '@/utils/aggregateData';
 import _ from 'lodash';
-import { formatPrice } from '@/common';
+import {formatPrice} from '@/common';
+
 type GroupedValue = number[];
+
 interface GroupedType {
   [key: string]: {[key: string]: GroupedValue};
 }
 
 export const buildBarChart = (
-  obj,
+  obj: GroupedType,
   f: Set<string>,
   categories: Subcategory[],
 ) => {
   const values = _.entries(sumById(obj));
-  return values
-    .map(([itemId, valueArr]) => {
-      const [grId, catId] = decId(itemId);
-      const isCat = +catId > 0;
+  const tR = values.map(([itemId, valueArr]) => {
+      const [decGrId, decCatId] = decId(itemId).map(o =>+o);
+      const isCat = decCatId > 0;
 
-      const foundCategory = categories.find((o) =>
-        isCat ? o.id === +catId : o.groupId === +grId,
+      const foundedCat: Subcategory | undefined = categories.find((iterCat) =>
+        isCat ? iterCat.id === decCatId : iterCat.groupId === decGrId,
       );
+      if (!foundedCat) {
+        console.warn('Category not found in buildBarChart',valueArr)
+        return undefined
+      }
+
       if (
         f.size &&
-        !f.has(isCat ? foundCategory.name : foundCategory?.groupName)
+        !f.has(isCat ? foundedCat.name : foundedCat.groupName || '')
       )
         return undefined;
 
       const value = valueArr[0];
 
-      const tR: {id: string} & barDataItem = {
+      const tR: {id: string} & barDataItem= {
         value: value,
         id: itemId,
-        frontColor: foundCategory.color,
-        label: isCat ? foundCategory.name : foundCategory?.groupName || '',
+        frontColor: foundedCat?.color,
+        label: (isCat ? foundedCat?.name : foundedCat?.groupName) || '',
         spacing: 10,
         barWidth: 50,
-        topLabelComponent: () => (
-          <Text style={{fontSize: 8}}>
-            {formatPrice(_.parseInt(value.toString()))}
-          </Text>
-        ),
+        // topLabelComponent: () => (
+        //   <Text style={{fontSize: 8}}>
+        //     {formatPrice(_.parseInt(value.toString()))}
+        //   </Text>
+        // ),
       };
 
       return tR;
-    })
-    .filter(Boolean)
-    .sort((a, b) => b.value - a.value);
+    });
+
+  const filteredSorted = tR.filter(Boolean).sort((a:any, b: any) => b.value - a.value);
+
+  return filteredSorted;
 };
 
 export const buildPieChart = (
@@ -67,12 +75,17 @@ export const buildPieChart = (
       const [grId, catId] = decId(itemId);
       const isCat = +catId > 0;
 
-      const foundCategory = categories.find((categoryObj: Subcategory) =>
+      const foundedCat = categories.find((categoryObj: Subcategory) =>
         isCat ? categoryObj.id === +catId : categoryObj.groupId === +grId,
       );
+
+      if (!foundedCat) {
+        console.warn('Category not found in buildBarChart',valueArr)
+        return undefined
+      }
       if (
         f.size &&
-        !f.has(isCat ? foundCategory?.name : foundCategory?.groupName)
+        !f.has(isCat ? foundedCat.name : foundedCat?.groupName || '')
       )
         return undefined;
       const value = valueArr[0];
@@ -80,13 +93,13 @@ export const buildPieChart = (
       const tR: {label: string; id: string} & pieDataItem = {
         id: itemId,
         value,
-        label: isCat ? foundCategory.name : foundCategory?.groupName || '',
+        label: isCat ? foundedCat.name : foundedCat?.groupName || '',
         text: +percentage < 4 ? '' : `${percentage}%`,
-        color: foundCategory.color,
+        color: foundedCat.color,
       };
       return tR;
     })
     .filter(Boolean)
-    .sort((a, b) => b.value - a.value);
+    .sort((a:any, b:any) => b.value - a.value);
   return tR;
 };
