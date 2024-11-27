@@ -6,10 +6,7 @@ import {Button, IconButton} from 'react-native-paper';
 import {format, lastDayOfMonth} from 'date-fns';
 import _ from 'lodash';
 
-import {
-  selectByTimeRange,
-  selectCategories,
-} from '@/redux/main/selectors';
+import {selectByTimeRange, selectCategories} from '@/redux/main/selectors';
 import {useAppSelector} from '@/hooks';
 import {BarChart, Chip, DatePicker, PieChartBar, Text} from '@/components';
 import {EXCLUDED_CAT, formatPrice, shortenText} from '@/common';
@@ -253,9 +250,9 @@ const Summary = () => {
               let category: string | undefined;
               const cat: Category | undefined = getCategoryName(
                 +decId(item.id)[1],
-                'catId',
+                'id',
               );
-              if (cat) category = cat.category;
+              if (cat) category = cat.name;
 
               router.navigate({
                 pathname: '/summary/list',
