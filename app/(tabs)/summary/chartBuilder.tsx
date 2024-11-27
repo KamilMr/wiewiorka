@@ -75,7 +75,6 @@ export const buildPieChart = (
         !f.has(isCat ? foundCategory?.name : foundCategory?.groupName)
       )
         return undefined;
-      // console.log(name,isCat,grId)
       const value = valueArr[0];
       const percentage: string = perc(value);
       const tR: {label: string; id: string} & pieDataItem = {

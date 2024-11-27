@@ -1,4 +1,5 @@
 import {useState} from 'react';
+import {router} from 'expo-router';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 
 import {BottomTabBarProps} from '@react-navigation/bottom-tabs';
@@ -24,7 +25,6 @@ type ContextMenuAction = {
 const MyTabBar = ({
   state,
   descriptors,
-  navigation,
   showLabel = false,
 }: BottomTabBarProps & {showLabel?: boolean}) => {
   const icons: {[key: string]: (props: IconProp) => JSX.Element} = {
@@ -60,7 +60,7 @@ const MyTabBar = ({
       {
         title: 'Dodaj Wpływ',
         onPress: () => {
-          navigation.navigate('income');
+          router.push'/(tabs)/addnew/income')
           closeMenu();
         },
       },
