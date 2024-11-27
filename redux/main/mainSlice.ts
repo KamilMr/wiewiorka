@@ -55,8 +55,9 @@ type OwnerId = string | number;
 export interface Subcategory {
   id: number;
   name: string;
-  groupId: number;
   color: string;
+  groupId: number;
+  groupName?: string;
   owner: Owner;
   ownerId: OwnerId;
 }

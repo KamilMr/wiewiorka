@@ -17,7 +17,11 @@ const styles = StyleSheet.create({
 });
 
 const CustomPieChart = (props: Props & PieChartPropsType) => {
-  const {data, title = '', ...rest} = props;
+  let {data, title = '', ...rest} = props;
+  if (!Array.isArray(data) || data.length < 1) {
+    data = [{value: 10, color: '#FFFFFF'}];
+    console.warn('Data not array');
+  }
   return (
     <View style={styles.container}>
       <Text>{title}</Text>

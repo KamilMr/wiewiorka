@@ -3,28 +3,25 @@ import {router, useLocalSearchParams} from 'expo-router';
 import {ScrollView, View} from 'react-native';
 import {Button, IconButton} from 'react-native-paper';
 
-import {barDataItem, pieDataItem} from 'react-native-gifted-charts';
 import {format, lastDayOfMonth} from 'date-fns';
 import _ from 'lodash';
 
 import {
-  aggregateExpenses,
   selectByTimeRange,
   selectCategories,
 } from '@/redux/main/selectors';
 import {useAppSelector} from '@/hooks';
 import {BarChart, Chip, DatePicker, PieChartBar, Text} from '@/components';
 import {EXCLUDED_CAT, formatPrice, shortenText} from '@/common';
-import {Axis, PickFilter, decId, groupBy, sumById} from '@/utils/aggregateData';
-import {Category} from '@/redux/main/mainSlice';
+import {Axis, PickFilter, decId, groupBy} from '@/utils/aggregateData';
+import {Category, Subcategory} from '@/redux/main/mainSlice';
 import {useAppTheme} from '@/constants/theme';
+import {buildBarChart, buildPieChart} from './chartBuilder';
 
-type AggrExpense = {
-  v: number;
-  color: string;
-  name: string;
-  id: string;
-};
+type GroupedValue = number[];
+interface GroupedType {
+  [key: string]: {[key: string]: GroupedValue};
+}
 
 const GroupCategory = ({
   axis,
@@ -75,12 +72,11 @@ const Summary = () => {
   const t = useAppTheme();
 
   // selectors
-  const stateCategories = useAppSelector(selectCategories);
+  const stateCategories: Subcategory[] = useAppSelector(selectCategories);
   const selected = useAppSelector(selectByTimeRange(filterDates));
 
   // grouping
-  const grouped = groupBy(selected, 'month', ...axis);
-  console.log(grouped)
+  const grouped: GroupedType = groupBy(selected, 'month', ...axis);
 
   useEffect(() => {
     setFilters(
@@ -103,15 +99,6 @@ const Summary = () => {
   const idsGroupOrCategory: string[] = idsOfCategories.map(
     (str: string) => str.split('-')[+axis[0].split('-')[1]],
   );
-  // console.log(
-  //   new Set(
-  //     _.values(grouped)
-  //       .map((o) => _.entries(o))
-  //       .flat()
-  //       .sort(([, va], [, vb]) => vb[0] - va[0])
-  //       .map(([id, val]) => id),
-  //   ),
-  // );
 
   const getCategoryName = (n: number, id: string) => {
     if (!id) id = axis[0] === '1-1' ? 'id' : 'groupId';
@@ -128,8 +115,9 @@ const Summary = () => {
   }[] = idsGroupOrCategory.map((n: string) => {
     const holder = axis[0] === '1-1' ? 'id' : 'groupId';
     const cat = getCategoryName(+n, holder);
+
     return {
-      name: cat?.[holder === 'id' ? 'category' : 'groupName'] || 'not found',
+      name: cat?.[holder === 'id' ? 'name' : 'groupName'] || 'not found',
       id: +n,
       type: holder === 'id' ? 'category' : 'group',
       color: cat ? cat?.color || '' : '',
@@ -144,89 +132,15 @@ const Summary = () => {
     ),
   );
 
-  // console.log(filters.map((name) => name))
   const setCat = new Set(filters.map((o: {name: string}) => o.name));
 
   const handleRemoveFilters = () => setFilters([]);
   const handleResetFilters = () => setFilters(currentGroupOrCategory);
 
-  const buildBarChart = (obj, f: Set<string>) => {
-    const values = _.entries(sumById(obj));
-    return values
-      .map(([itemId, valueArr]) => {
-        const [grId, catId] = decId(itemId);
-        const isCat = +catId > 0;
-
-        const foundCategory = stateCategories.find((o) =>
-          isCat ? o.id === +catId : o.groupId === +grId,
-        );
-        if (
-          f.size &&
-          !f.has(isCat ? foundCategory.name : foundCategory?.groupName)
-        )
-          return undefined;
-
-        const value = valueArr[0];
-
-        const tR: {id: string} & barDataItem = {
-          value: value,
-          id: itemId,
-          frontColor: foundCategory.color,
-          label: isCat ? foundCategory.name : foundCategory?.groupName || '',
-          spacing: 10,
-          barWidth: 50,
-          topLabelComponent: () => (
-            <Text style={{fontSize: 8}}>
-              {formatPrice(_.parseInt(value.toString()))}
-            </Text>
-          ),
-        };
-
-        return tR;
-      })
-      .filter(Boolean)
-      .sort((a, b) => b.value - a.value);
-  };
-  const buildPieChart = (obj, f: Set<string>) => {
-    const values = _.entries(sumById(obj));
-    const max = _.sum(values.map((arr: [number, number]) => arr[1]).flat(2));
-    const perc = (n: number) => ((n * 100) / max).toFixed(2);
-
-    // console.log(stateCategories);
-    return values
-      .map(([itemId, valueArr]) => {
-        const [grId, catId] = decId(itemId);
-        const isCat = +catId > 0;
-        // console.log(grId, valueArr);
-
-        const foundCategory = stateCategories.find((o) =>
-          isCat ? o.id === +catId : o.groupId === +grId,
-        );
-        if (
-          f.size &&
-          !f.has(isCat ? foundCategory.name : foundCategory?.groupName)
-        )
-          return undefined;
-        // console.log(name,isCat,grId)
-        const value = valueArr[0];
-        const percentage: string = perc(value);
-        const tR: {label: string; id: string} & pieDataItem = {
-          id: itemId,
-          value,
-          label: isCat ? foundCategory.name : foundCategory?.groupName || '',
-          text: +percentage < 4 ? '' : `${percentage}%`,
-          color: foundCategory.color,
-        };
-        return tR;
-      })
-      .filter(Boolean)
-      .sort((a, b) => b.value - a.value);
-  };
-
   const data =
     chartDisplay === 'pie'
-      ? buildPieChart(grouped, setCat)
-      : buildBarChart(grouped, setCat);
+      ? buildPieChart(grouped, setCat, stateCategories)
+      : buildBarChart(grouped, setCat, stateCategories);
 
   const handleFilters = (catId: number) => () => {
     const categoryToAdd = currentGroupOrCategory.find((f) => f.id === catId);
@@ -293,9 +207,9 @@ const Summary = () => {
               let category: string | undefined;
               const cat: Category | undefined = getCategoryName(
                 +decId(item.id)[1],
-                'catId',
+                'id',
               );
-              if (cat) category = cat.category;
+              if (cat) category = cat.name;
 
               router.navigate({
                 pathname: '/summary/list',

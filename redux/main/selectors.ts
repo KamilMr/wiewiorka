@@ -1,10 +1,10 @@
 import {createSelector} from '@reduxjs/toolkit';
-import {format, isAfter, isBefore} from 'date-fns';
+import {format, isAfter, isBefore, isSameDay} from 'date-fns';
 import _ from 'lodash';
 
 import {EXCLUDED_CAT, dh, makeNewIdArr} from '@/common';
 import {RootState} from '../store';
-import {Expense, Income} from './mainSlice';
+import {Category, Expense, Income, Subcategory} from './mainSlice';
 
 export type Search = {
   txt: string;
@@ -49,17 +49,15 @@ export const selectRecords = (number: number, search: Search) =>
 
           return dh.isBetweenDates(d, ds, de);
         })
-        .map((obj: Expense) => {
+        .map((obj: Expense & {exp: true}) => {
           const catObj = obj?.exp
-            ? categories.find(
-                ({id}: {catId: number}) => id === obj.categoryId,
-              )
+            ? categories.find(({id}: {catId: number}) => id === obj.categoryId)
             : null;
 
           return {
             ...obj,
             description: obj.description || '',
-            category: catObj?.name?? '',
+            category: catObj?.name ?? '',
             color: catObj?.color ?? '',
           };
         });
@@ -85,7 +83,7 @@ export const selectExpense = (id: number) =>
   createSelector([selectCategories, selectExpensesAll], (cat, exp) => {
     const expense = exp.find((ex) => ex.id === +id);
     if (!expense) return;
-    const categoryObj = cat.find((obj) => obj.id=== expense.categoryId);
+    const categoryObj = cat.find((obj) => obj.id === expense.categoryId);
     return {
       ...expense,
       category: categoryObj.name,
@@ -105,14 +103,15 @@ export const selectCategories = createSelector(
   [(state) => state.main.categories],
   (cat) => {
     const arr = Object.entries(cat);
-    return arr.reduce((pv, [key, cv]) => {
-      const categories = [...cv.subcategories].map((obj) => ({
-        ...obj,
-        groupId: +key,
-        groupName: cv.name,
-        color: `#${obj.color || 'FFFFFF'}`,
-      }));
-      if (Array.isArray(pv)) pv.push(...categories);
+    return arr.reduce((pv: Array<Subcategory>, [key, cv]: [string, any]) => {
+      const subcategories: Array<Subcategory> = [...cv.subcategories].map(
+        (obj) => ({
+          ...obj,
+          groupName: cv.name,
+          color: `#${obj.color || '#FFFFFF'}`,
+        }),
+      );
+      if (Array.isArray(pv)) pv.push(...subcategories);
       return pv;
     }, []);
   },
@@ -120,13 +119,16 @@ export const selectCategories = createSelector(
 
 export const selectMainCategories = createSelector(
   [(state) => state.categories],
-  (cat) => {
+  (cat: Record<string, Category>) => {
     const arr = Object.entries(cat);
-    return arr.reduce((pv, [key, cv]) => {
-      const categories = [cv.groupName, key];
-      if (Array.isArray(pv)) pv.push(categories);
-      return pv;
-    }, []);
+    return arr.reduce(
+      (pv: Array<Array<string>>, [key, cv]: [string, Category]) => {
+        const categories: [string, string] = [cv.name, key];
+        if (Array.isArray(pv)) pv.push(categories);
+        return pv;
+      },
+      [],
+    );
   },
 );
 
@@ -201,8 +203,8 @@ export const selectSources = (state: RootState) => {
 const withinRange = (date: Date, dates: [Date, Date]) => {
   return (
     (isAfter(date, dates[0]) && isBefore(new Date(date), dates[1])) ||
-    _.isEqual(date, dates[0]) ||
-    _.isEqual(date, dates[1])
+    isSameDay(date, dates[0]) ||
+    isSameDay(date, dates[1])
   );
 };
 

@@ -51,6 +51,7 @@ const MyTabBar = ({
     ),
   };
 
+
   const [visible, setVisible] = useState<boolean[]>([]);
 
   const closeMenu = () => setVisible([]);
