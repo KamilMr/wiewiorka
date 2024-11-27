@@ -20,43 +20,44 @@ export const buildBarChart = (
 ) => {
   const values = _.entries(sumById(obj));
   const tR = values.map(([itemId, valueArr]) => {
-      const [decGrId, decCatId] = decId(itemId).map(o =>+o);
-      const isCat = decCatId > 0;
+    const [decGrId, decCatId] = decId(itemId).map((o) => +o);
+    const isCat = decCatId > 0;
 
-      const foundedCat: Subcategory | undefined = categories.find((iterCat) =>
-        isCat ? iterCat.id === decCatId : iterCat.groupId === decGrId,
-      );
-      if (!foundedCat) {
-        console.warn('Category not found in buildBarChart',valueArr)
-        return undefined
-      }
+    const foundedCat: Subcategory | undefined = categories.find((iterCat) =>
+      isCat ? iterCat.id === decCatId : iterCat.groupId === decGrId,
+    );
+    if (!foundedCat) {
+      console.warn('Category not found in buildBarChart', valueArr);
+      return undefined;
+    }
 
-      if (
-        f.size &&
-        !f.has(isCat ? foundedCat.name : foundedCat.groupName || '')
-      )
-        return undefined;
+    if (f.size && !f.has(isCat ? foundedCat.name : foundedCat.groupName || ''))
+      return undefined;
 
-      const value = valueArr[0];
+    const value = valueArr[0];
 
-      const tR: {id: string} & barDataItem= {
-        value: value,
-        id: itemId,
-        frontColor: foundedCat?.color,
-        label: (isCat ? foundedCat?.name : foundedCat?.groupName) || '',
-        spacing: 10,
-        barWidth: 50,
-        // topLabelComponent: () => (
-        //   <Text style={{fontSize: 8}}>
-        //     {formatPrice(_.parseInt(value.toString()))}
-        //   </Text>
-        // ),
-      };
+    const tR: {id: string} & barDataItem = {
+      value: value,
+      id: itemId,
+      frontColor: foundedCat?.color,
+      label: (isCat ? foundedCat?.name : foundedCat?.groupName) || '',
+      spacing: 10,
+      barWidth: 50,
+      topLabelComponent: () => {
+        return (
+          <Text style={{fontSize: 8}}>
+            {formatPrice(_.parseInt(value.toString()))}
+          </Text>
+        );
+      },
+    };
 
-      return tR;
-    });
+    return tR;
+  });
 
-  const filteredSorted = tR.filter(Boolean).sort((a:any, b: any) => b.value - a.value);
+  const filteredSorted = tR
+    .filter(Boolean)
+    .sort((a: any, b: any) => b.value - a.value);
 
   return filteredSorted;
 };
@@ -80,8 +81,8 @@ export const buildPieChart = (
       );
 
       if (!foundedCat) {
-        console.warn('Category not found in buildBarChart',valueArr)
-        return undefined
+        console.warn('Category not found in buildBarChart', valueArr);
+        return undefined;
       }
       if (
         f.size &&
@@ -100,6 +101,6 @@ export const buildPieChart = (
       return tR;
     })
     .filter(Boolean)
-    .sort((a:any, b:any) => b.value - a.value);
+    .sort((a: any, b: any) => b.value - a.value);
   return tR;
 };
