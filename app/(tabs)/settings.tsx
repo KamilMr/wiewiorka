@@ -4,7 +4,7 @@ import {StyleSheet, View} from 'react-native';
 import {useAppDispatch} from '@/hooks';
 import {logout} from '@/redux/auth/thunks';
 import {useAppTheme} from '@/constants/theme';
-import { router } from 'expo-router';
+import {router} from 'expo-router';
 
 const Settings = () => {
   const dispatch = useAppDispatch();
@@ -16,7 +16,9 @@ const Settings = () => {
     <View style={[styles.root, {backgroundColor: t.colors.white}]}>
       <Button
         mode="contained"
-        onPress={() => {router.replace('/categories')}}
+        onPress={() => {
+          router.navigate('/categories');
+        }}
         style={{marginBottom: 40}}>
         Kategorie
       </Button>
