@@ -117,6 +117,11 @@ export const selectCategories = createSelector(
   },
 );
 
+export const selectCategory = (id: number) =>
+  createSelector([selectCategories], (categories) => {
+    return categories.find((c) => c.id === id);
+  });
+
 export const selectMainCategories = createSelector(
   [(state) => state.categories],
   (cat: Record<string, Category>) => {

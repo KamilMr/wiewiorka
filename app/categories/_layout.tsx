@@ -26,6 +26,14 @@ export default function Layout() {
           headerRight: () => <IconButton icon={'pencil'} />,
         })}
       />
+      <Stack.Screen
+        name="[id]"
+        options={() => ({
+          headerShown: true,
+          title: 'Edycja',
+          headerRight: () => <IconButton icon={'pencil'} />,
+        })}
+      />
     </Stack>
   );
 }

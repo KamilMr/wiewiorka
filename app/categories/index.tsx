@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {useLocalSearchParams, useNavigation} from 'expo-router';
+import {router, useLocalSearchParams, useNavigation} from 'expo-router';
 import {ScrollView, StyleSheet, View} from 'react-native';
 
 import _ from 'lodash';
@@ -60,9 +60,7 @@ const GroupedItem = ({
         <View style={styles.iconGroup}>
           <IconButton
             icon="pencil"
-            onPress={() => {
-              /* Handle edit */
-            }}
+            onPress={() => router.navigate(`/categories/${item.id}`)}
           />
           <IconButton
             icon="trash-can"
@@ -149,7 +147,6 @@ const modalState: () => CustomModal = () => ({
 export default function MainView() {
   const navigation = useNavigation();
   const categories = useAppSelector(selectCategories);
-  const params = useLocalSearchParams();
   const [edit, setEdit] = useState(false);
   const [modalContent, setModalContent] = useState<CustomModal>(modalState());
 
