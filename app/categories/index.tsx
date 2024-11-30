@@ -122,9 +122,9 @@ const GroupedItemsList = ({
       </View>
       {expanded && (
         <View style={styles.expandedContent}>
-          {items.map((item, index) => (
+          {items.map((item) => (
             <GroupedItem
-              key={index}
+              key={item.id}
               item={item}
               edit={edit}
               addModal={addModal}
