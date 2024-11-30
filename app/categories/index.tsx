@@ -1,3 +1,10 @@
+import {useEffect, useState} from 'react';
+import {useLocalSearchParams, useNavigation} from 'expo-router';
+import {ScrollView, StyleSheet, View} from 'react-native';
+
+import _ from 'lodash';
+import {IconButton} from 'react-native-paper';
+
 import {Modal, Text} from '@/components';
 import {CustomModal} from '@/components/CustomModal';
 import {CircleIcon} from '@/components/Icons';
@@ -5,11 +12,6 @@ import {useAppTheme} from '@/constants/theme';
 import {useAppSelector} from '@/hooks';
 import {Subcategory} from '@/redux/main/mainSlice';
 import {selectCategories} from '@/redux/main/selectors';
-import {useLocalSearchParams, useNavigation} from 'expo-router';
-import _ from 'lodash';
-import {useEffect, useState} from 'react';
-import {ScrollView, StyleSheet, TextBase, View} from 'react-native';
-import {IconButton} from 'react-native-paper';
 
 interface GroupedItemsProps {
   nameOfGroup: string;
@@ -171,10 +173,8 @@ export default function MainView() {
   };
 
   const t = useAppTheme();
-  console.log(t);
 
   const grouped = _.groupBy(categories, 'groupName');
-  console.log(grouped);
 
   useEffect(() => {
     navigation.setOptions({
