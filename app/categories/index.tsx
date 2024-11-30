@@ -27,9 +27,24 @@ interface AddEmptyModal {
   emptyModal: () => void;
 }
 
+interface DeleteCategory {
+  id: number;
+  kind: 'group' | 'category';
+}
+
+type HandleDelete = {
+  handleDelete: (arg: DeleteCategory) => void;
+};
+
 const WIDTH_ICON_VIEW = 45;
 
-const GroupedItem = ({item, edit}: ItemsProps) => {
+const GroupedItem = ({
+  item,
+  edit,
+  addModal,
+  emptyModal,
+  handleDelete,
+}: ItemsProps & AddEmptyModal & HandleDelete) => {
   return (
     <View style={styles.itemContainer}>
       {/* Placeholder on the left */}
@@ -49,9 +64,15 @@ const GroupedItem = ({item, edit}: ItemsProps) => {
           />
           <IconButton
             icon="trash-can"
-            onPress={() => {
-              /* Handle delete */
-            }}
+            onPress={() =>
+              addModal({
+                visible: true,
+                title: `Usunąć podkategorię ${item.name}?`,
+                content: `Kiedy usuniesz, przypisane transakcje zostaną bez kategorii.`,
+                onApprove: () => handleDelete({id: item.id, kind: 'category'}),
+                onDismiss: emptyModal,
+              })
+            }
           />
         </View>
       )}
@@ -65,7 +86,8 @@ const GroupedItemsList = ({
   edit,
   addModal,
   emptyModal,
-}: GroupedItemsProps & AddEmptyModal) => {
+  handleDelete,
+}: GroupedItemsProps & AddEmptyModal & HandleDelete) => {
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -81,6 +103,8 @@ const GroupedItemsList = ({
                   title: `Usunąć kategorię ${nameOfGroup}?`,
                   content: `Kategoria zostanie usunięta a przypisanie traksakcje zostaną bez kategorii`,
                   onDismiss: emptyModal,
+                  onApprove: () =>
+                    handleDelete({id: items[0].groupId, kind: 'group'}),
                 })
               }
             />
@@ -97,7 +121,14 @@ const GroupedItemsList = ({
       {expanded && (
         <View style={styles.expandedContent}>
           {items.map((item, index) => (
-            <GroupedItem key={index} item={item} edit={edit} />
+            <GroupedItem
+              key={index}
+              item={item}
+              edit={edit}
+              addModal={addModal}
+              emptyModal={emptyModal}
+              handleDelete={handleDelete}
+            />
           ))}
         </View>
       )}
@@ -156,6 +187,10 @@ export default function MainView() {
     });
   }, [navigation, edit]);
 
+  const handleDelete = async ({id, kind}: DeleteCategory) => {
+    console.log(id, kind);
+  };
+
   return (
     <View style={{height: '100%', backgroundColor: t.colors.white}}>
       <ScrollView>
@@ -167,6 +202,7 @@ export default function MainView() {
             edit={edit}
             addModal={addModal}
             emptyModal={emptyModal}
+            handleDelete={handleDelete}
           />
         ))}
       </ScrollView>
