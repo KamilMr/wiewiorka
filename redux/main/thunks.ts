@@ -79,15 +79,17 @@ export const uploadIncome = createAsyncThunk(
 );
 
 export const handleCategory = createAsyncThunk(
-  'handleCategory',
+  'category/upsert',
   async (payload = {}, thunkAPI) => {
-    const {token} = thunkAPI.getState().me;
+    const {token} = thunkAPI.getState().auth;
 
     if (!Object.keys(payload).length) return;
 
     const {method, id, ...rest} = payload;
     let q = 'category' + (method === 'PUT' ? `/${id}` : '');
     let data;
+
+    const {name, color, groupId} = rest;
     try {
       let resp = await fetch(getURL(q), {
         method,
@@ -95,7 +97,7 @@ export const handleCategory = createAsyncThunk(
           'content-type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(rest),
+        body: JSON.stringify({name, color: color.split('#')[1],groupId}),
       });
       data = await resp.json();
       if (data.err) throw data.err;

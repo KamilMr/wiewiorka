@@ -7,10 +7,15 @@ import _ from 'lodash';
 
 import {Select, Text, TextInput} from '@/components';
 import {useAppDispatch, useAppSelector} from '@/hooks';
-import {selectCategories, selectCategory} from '@/redux/main/selectors';
+import {
+  selectCategories,
+  selectCategory,
+  selectStatus,
+} from '@/redux/main/selectors';
 import {Subcategory} from '@/redux/main/mainSlice';
 import {sizes, useAppTheme} from '@/constants/theme';
 import {Props} from '@/components/CustomSelect';
+import {handleCategory} from '@/redux/main/thunks';
 
 interface State {
   id?: number;
@@ -35,6 +40,7 @@ interface TwoButtonsProps {
   okTxt?: string;
   visible?: boolean;
   disableOk?: boolean;
+  loading: boolean;
 }
 const TwoButtons: React.FC<TwoButtonsProps> = ({
   handleOk,
@@ -43,6 +49,7 @@ const TwoButtons: React.FC<TwoButtonsProps> = ({
   okTxt = 'Tak',
   visible = true,
   disableOk = false,
+  loading = false,
 }) => {
   if (!visible) return null;
   console.log(disableOk);
@@ -51,7 +58,11 @@ const TwoButtons: React.FC<TwoButtonsProps> = ({
       <Button mode="outlined" onPress={handleCancel} disabled={disableOk}>
         {cancelTxt}
       </Button>
-      <Button mode="contained" onPress={handleOk} disabled={disableOk}>
+      <Button
+        loading={loading}
+        mode="contained"
+        onPress={handleOk}
+        disabled={disableOk}>
         {okTxt}
       </Button>
     </View>
@@ -62,6 +73,8 @@ export default function OneCategory() {
   const dispatch = useAppDispatch();
   const {id} = useLocalSearchParams();
   const navigation = useNavigation();
+  const fetching = useAppSelector(selectStatus);
+  const isFetching = fetching === 'fetching';
 
   const category: Subcategory | undefined = useAppSelector(selectCategory(+id));
   const categories = useAppSelector(selectCategories);
@@ -96,16 +109,22 @@ export default function OneCategory() {
     setEdit(false);
     setState(emptyState({id: catId, name, groupName, groupId, color}));
   };
+
   const handleSave = async () => {
     // validate
-    // dispatch(cate)
+    dispatch(handleCategory({method: 'PUT', ...state})).then((res) => {
+      router.navigate('/categories');
+    });
   };
+
   const handleColorChange = (color: string) => {
     setState({...state, color});
   };
-  const handleCatChange = (cat) => {
+
+  const handleCatChange = (cat: any) => {
     setState({...state, groupName: cat.label, groupId: cat.value});
   };
+
   const handleSubCatChange = (name: string) => {
     setState({...state, name});
   };
@@ -173,7 +192,9 @@ export default function OneCategory() {
         visible={edit}
         handleOk={handleSave}
         handleCancel={handleCancel}
+        okTxt="Zapisz"
         disableOk={!isDirty}
+        loading={isFetching}
       />
     </ScrollView>
   );
