@@ -1,11 +1,11 @@
 import {useEffect, useState} from 'react';
-import {SafeAreaView, ScrollView, View} from 'react-native';
+import {ScrollView, View} from 'react-native';
 import {useLocalSearchParams, router, useNavigation} from 'expo-router';
-import {Button, IconButton} from 'react-native-paper';
+import {Button, IconButton, TouchableRipple} from 'react-native-paper';
 
 import _ from 'lodash';
 
-import {Select, Text, TextInput} from '@/components';
+import {ColorPicker, Select, Text, TextInput} from '@/components';
 import {useAppDispatch, useAppSelector} from '@/hooks';
 import {
   selectCategories,
@@ -85,6 +85,8 @@ export default function OneCategory() {
     emptyState({id: catId, name, groupName, groupId, color}),
   );
   const [edit, setEdit] = useState(false);
+  const [openPicker, setOpenPicker] = useState(false);
+
   const t = useAppTheme();
 
   useEffect(() => {
@@ -113,13 +115,15 @@ export default function OneCategory() {
   const handleSave = async () => {
     // validate
     dispatch(handleCategory({method: 'PUT', ...state})).then((res) => {
-      router.navigate('/categories');
+      router.replace('/categories');
     });
   };
 
   const handleColorChange = (color: string) => {
     setState({...state, color});
   };
+
+  const handleTogglePicker = () => setOpenPicker(!openPicker);
 
   const handleCatChange = (cat: any) => {
     setState({...state, groupName: cat.label, groupId: cat.value});
@@ -161,13 +165,15 @@ export default function OneCategory() {
             alignItems: 'center',
             justifyContent: 'space-between',
           }}>
-          <View
-            style={{
-              backgroundColor: state?.color,
-              width: 50,
-              height: 50,
-            }}
-          />
+          <TouchableRipple onPress={handleTogglePicker}>
+            <View
+              style={{
+                backgroundColor: state?.color,
+                width: 50,
+                height: 50,
+              }}
+            />
+          </TouchableRipple>
           <TextInput
             style={{width: '80%'}}
             value={state?.name}
@@ -195,6 +201,13 @@ export default function OneCategory() {
         okTxt="Zapisz"
         disableOk={!isDirty}
         loading={isFetching}
+      />
+      <ColorPicker
+        value={state.color}
+        visible={openPicker}
+        onChange={handleColorChange}
+        openModal={handleTogglePicker}
+        closeModal={handleTogglePicker}
       />
     </ScrollView>
   );

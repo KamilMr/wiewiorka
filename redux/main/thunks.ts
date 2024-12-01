@@ -90,6 +90,7 @@ export const handleCategory = createAsyncThunk(
     let data;
 
     const {name, color, groupId} = rest;
+    console.log(color)
     try {
       let resp = await fetch(getURL(q), {
         method,
