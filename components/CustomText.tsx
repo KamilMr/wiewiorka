@@ -2,7 +2,7 @@ import {Text} from 'react-native-paper';
 import {Props} from 'react-native-paper/lib/typescript/components/Typography/Text';
 
 type CustomTextProps = Props<string> & {
-  variant?: 'bodyLarge' | 'bodyMedium' | 'bodySmall' |'titleLarge';
+  variant?: 'bodyLarge' | 'bodyMedium' | 'bodySmall' |'titleLarge'|'titleMedium';
 };
 
 export default function CustomText({

@@ -1,34 +1,88 @@
 import {useEffect, useState} from 'react';
-import {SafeAreaView, View} from 'react-native';
+import {SafeAreaView, ScrollView, View} from 'react-native';
 import {useLocalSearchParams, router, useNavigation} from 'expo-router';
-import {IconButton} from 'react-native-paper';
+import {Button, IconButton} from 'react-native-paper';
 
 import _ from 'lodash';
 
 import {Select, Text, TextInput} from '@/components';
-import {useAppSelector} from '@/hooks';
+import {useAppDispatch, useAppSelector} from '@/hooks';
 import {selectCategories, selectCategory} from '@/redux/main/selectors';
 import {Subcategory} from '@/redux/main/mainSlice';
-import {useAppTheme} from '@/constants/theme';
+import {sizes, useAppTheme} from '@/constants/theme';
 import {Props} from '@/components/CustomSelect';
 
+interface State {
+  id?: number;
+  color?: string;
+  name?: string;
+  groupName?: string;
+  groupId?: number;
+}
+
+const emptyState = ({id, color, name, groupName, groupId}: State): State => ({
+  id,
+  color,
+  name,
+  groupId,
+  groupName,
+});
+
+interface TwoButtonsProps {
+  handleOk: () => void;
+  handleCancel: () => void;
+  cancelTxt?: string;
+  okTxt?: string;
+  visible?: boolean;
+  disableOk?: boolean;
+}
+const TwoButtons: React.FC<TwoButtonsProps> = ({
+  handleOk,
+  handleCancel,
+  cancelTxt = 'Anuluj',
+  okTxt = 'Tak',
+  visible = true,
+  disableOk = false,
+}) => {
+  if (!visible) return null;
+  console.log(disableOk);
+  return (
+    <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
+      <Button mode="outlined" onPress={handleCancel} disabled={disableOk}>
+        {cancelTxt}
+      </Button>
+      <Button mode="contained" onPress={handleOk} disabled={disableOk}>
+        {okTxt}
+      </Button>
+    </View>
+  );
+};
+
 export default function OneCategory() {
+  const dispatch = useAppDispatch();
   const {id} = useLocalSearchParams();
   const navigation = useNavigation();
 
   const category: Subcategory | undefined = useAppSelector(selectCategory(+id));
   const categories = useAppSelector(selectCategories);
+
+  const {id: catId, name, groupId, groupName, color} = category || {};
+
+  const [state, setState] = useState<State>(
+    emptyState({id: catId, name, groupName, groupId, color}),
+  );
   const [edit, setEdit] = useState(false);
   const t = useAppTheme();
 
-  const grouped = _.groupBy(categories, 'groupName');
-  console.log(grouped);
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <IconButton
           icon={edit ? 'check' : 'pencil'}
-          onPressIn={() => setEdit(!edit)}
+          onPressIn={() => {
+            setEdit(!edit);
+            handleSave();
+          }}
         />
       ),
     });
@@ -37,46 +91,90 @@ export default function OneCategory() {
   // temp fix
   if (!category) router.navigate('..');
 
-  const selectData: Pick<Props, 'items'> = _.keys(grouped).map((k) => ({
+  // handlers
+  const handleCancel = () => {
+    setEdit(false);
+    setState(emptyState({id: catId, name, groupName, groupId, color}));
+  };
+  const handleSave = async () => {
+    // validate
+    // dispatch(cate)
+  };
+  const handleColorChange = (color: string) => {
+    setState({...state, color});
+  };
+  const handleCatChange = (cat) => {
+    setState({...state, groupName: cat.label, groupId: cat.value});
+  };
+  const handleSubCatChange = (name: string) => {
+    setState({...state, name});
+  };
+
+  const isDirty = !_.isEqual(
+    emptyState({id: catId, name, groupName, groupId, color}),
+    state,
+  );
+
+  const grouped = _.groupBy(categories, 'groupName');
+  const itemsToSelect: Pick<Props, 'items'> = _.keys(grouped).map((k) => ({
     label: k,
     value: grouped[k][0].groupId,
   }));
 
+  useEffect(() => {
+    if (isDirty !== edit) {
+      setEdit(isDirty);
+    }
+  }, [isDirty]);
+
   return (
-    <View style={{padding: 8, height: '100%', backgroundColor: t.colors.white}}>
+    <ScrollView style={{height: '100%', backgroundColor: t.colors.white}}>
       <View
         style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
+          padding: sizes.lg,
+          marginTop: sizes.xxl,
+          height: '100%',
+          backgroundColor: t.colors.white,
         }}>
-        <Text style={{width: '50%'}} variant="titleLarge">
-          {category?.name}
-        </Text>
-        <IconButton icon="trash-can" onPress={() => {}} />
-      </View>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          marginVertical: 12,
-        }}>
-        <Text>Kolor: </Text>
         <View
           style={{
-            backgroundColor: category?.color,
-            width: 60,
-            height: 30,
-          }}
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
+          <View
+            style={{
+              backgroundColor: state?.color,
+              width: 50,
+              height: 50,
+            }}
+          />
+          <TextInput
+            style={{width: '80%'}}
+            value={state?.name}
+            onChangeText={handleSubCatChange}
+            label={'Podkategoria'}></TextInput>
+        </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginVertical: sizes.xl,
+          }}></View>
+
+        <Select
+          title="Główna Kategoria"
+          value={state?.groupId || ''}
+          onChange={handleCatChange}
+          items={itemsToSelect}
         />
       </View>
-
-      <Select
-        value={category?.groupId || ''}
-        onChange={() => {}}
-        items={selectData}
+      <TwoButtons
+        visible={edit}
+        handleOk={handleSave}
+        handleCancel={handleCancel}
+        disableOk={!isDirty}
       />
-      <TextInput value={category?.name} label={'Podkategoria'}></TextInput>
-    </View>
+    </ScrollView>
   );
 }
