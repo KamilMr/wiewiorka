@@ -3,15 +3,16 @@ import {router, useLocalSearchParams, useNavigation} from 'expo-router';
 import {ScrollView, StyleSheet, View} from 'react-native';
 
 import _ from 'lodash';
-import {IconButton} from 'react-native-paper';
+import {Icon, IconButton} from 'react-native-paper';
 
-import {Modal, Text} from '@/components';
+import {Modal, Text, TextInput} from '@/components';
 import {CustomModal} from '@/components/CustomModal';
 import {CircleIcon} from '@/components/Icons';
 import {useAppTheme} from '@/constants/theme';
-import {useAppSelector} from '@/hooks';
+import {useAppDispatch, useAppSelector} from '@/hooks';
 import {Subcategory} from '@/redux/main/mainSlice';
 import {selectCategories} from '@/redux/main/selectors';
+import {handleGroupCategory} from '@/redux/main/thunks';
 
 interface GroupedItemsProps {
   nameOfGroup: string;
@@ -146,9 +147,12 @@ const modalState: () => CustomModal = () => ({
 
 export default function MainView() {
   const navigation = useNavigation();
+  const dispatch = useAppDispatch();
   const categories = useAppSelector(selectCategories);
   const [edit, setEdit] = useState(false);
   const [modalContent, setModalContent] = useState<CustomModal>(modalState());
+
+  const [newGroup, setNewGroup] = useState({name: ''});
 
   const emptyModal = () => {
     setModalContent(modalState());
@@ -188,6 +192,12 @@ export default function MainView() {
     console.log(id, kind);
   };
 
+  const handleSave = () => {
+    dispatch(handleGroupCategory({method: 'POST', name: newGroup.name})).then(res => {
+      setNewGroup({name: ''})
+    });
+  };
+
   return (
     <View style={{height: '100%', backgroundColor: t.colors.white}}>
       <ScrollView>
@@ -202,6 +212,20 @@ export default function MainView() {
             handleDelete={handleDelete}
           />
         ))}
+        {edit && (
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <TextInput
+              label={'Nowa kategoria'}
+              style={{width: '80%'}}
+              value={newGroup.name}
+              onChangeText={(text) => {
+                setNewGroup({name: text});
+              }}
+            />
+
+            <IconButton icon="check" onPress={handleSave} />
+          </View>
+        )}
       </ScrollView>
       <Modal
         visible={modalContent.visible}

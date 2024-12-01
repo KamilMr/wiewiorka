@@ -90,7 +90,6 @@ export const handleCategory = createAsyncThunk(
     let data;
 
     const {name, color, groupId} = rest;
-    console.log(color)
     try {
       let resp = await fetch(getURL(q), {
         method,
@@ -99,6 +98,37 @@ export const handleCategory = createAsyncThunk(
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({name, color: color.split('#')[1],groupId}),
+      });
+      data = await resp.json();
+      if (data.err) throw data.err;
+      thunkAPI.dispatch(fetchIni());
+    } catch (err) {
+      throw err;
+    }
+    return data.d;
+  },
+);
+
+export const handleGroupCategory = createAsyncThunk(
+  'categoryGroup/upsert',
+  async (payload = {}, thunkAPI) => {
+    const {token} = thunkAPI.getState().auth;
+
+    if (!Object.keys(payload).length) return;
+
+    const {method = '', id, ...rest} = payload;
+    let q = 'category/group' + (method === 'PUT' ? `/${id}` : '');
+    let data;
+
+    const {name, color = '#FFFFFF'} = rest;
+    try {
+      let resp = await fetch(getURL(q), {
+        method,
+        headers: {
+          'content-type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({name, color: color.split('#')[1]}),
       });
       data = await resp.json();
       if (data.err) throw data.err;

@@ -52,7 +52,6 @@ const TwoButtons: React.FC<TwoButtonsProps> = ({
   loading = false,
 }) => {
   if (!visible) return null;
-  console.log(disableOk);
   return (
     <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
       <Button mode="outlined" onPress={handleCancel} disabled={disableOk}>

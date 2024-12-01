@@ -33,6 +33,7 @@ export default function CustomColorPicker({
         <ColorPicker
           style={{width: '70%', margin: 'auto'}}
           value={value}
+          
           onComplete={onSelectColor}>
           <Preview />
           <Panel1 />
