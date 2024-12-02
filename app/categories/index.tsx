@@ -11,13 +11,14 @@ import {CircleIcon} from '@/components/Icons';
 import {useAppTheme} from '@/constants/theme';
 import {useAppDispatch, useAppSelector} from '@/hooks';
 import {Subcategory} from '@/redux/main/mainSlice';
-import {selectCategories} from '@/redux/main/selectors';
-import {handleGroupCategory} from '@/redux/main/thunks';
+import {selectCategories, selectMainCategories} from '@/redux/main/selectors';
+import {handleCategory, handleGroupCategory} from '@/redux/main/thunks';
 
 interface GroupedItemsProps {
   nameOfGroup: string;
   items: Subcategory[];
   edit: boolean;
+  groupId: string;
 }
 
 interface ItemsProps {
@@ -83,13 +84,27 @@ const GroupedItem = ({
 
 const GroupedItemsList = ({
   nameOfGroup,
-  items,
+  items = [],
   edit,
   addModal,
   emptyModal,
   handleDelete,
+  groupId,
 }: GroupedItemsProps & AddEmptyModal & HandleDelete) => {
   const [expanded, setExpanded] = useState(false);
+  const [newCategory, setNewCategory] = useState('');
+  const dispatch = useAppDispatch();
+
+  const handleSave = () => {
+    dispatch(
+      handleCategory({
+        method: 'POST',
+        name: newCategory,
+        groupId: +groupId,
+        color: '#FFFFFF',
+      }),
+    ).then((res) => console.log('ok'));
+  };
 
   return (
     <View>
@@ -104,8 +119,7 @@ const GroupedItemsList = ({
                   title: `Usunąć kategorię ${nameOfGroup}?`,
                   content: `Kategoria zostanie usunięta a przypisanie traksakcje zostaną bez kategorii`,
                   onDismiss: emptyModal,
-                  onApprove: () =>
-                    handleDelete({id: items[0].groupId, kind: 'group'}),
+                  onApprove: () => handleDelete({id: groupId, kind: 'group'}),
                 })
               }
             />
@@ -131,6 +145,20 @@ const GroupedItemsList = ({
               handleDelete={handleDelete}
             />
           ))}
+          {edit && (
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <TextInput
+                label={'Nowa Podkategoria'}
+                mode="outlined"
+                style={{width: '80%'}}
+                value={newCategory}
+                onChangeText={(text) => {
+                  setNewCategory(text);
+                }}
+              />
+              <IconButton icon="check" onPress={handleSave} />
+            </View>
+          )}
         </View>
       )}
     </View>
@@ -151,6 +179,7 @@ export default function MainView() {
   const categories = useAppSelector(selectCategories);
   const [edit, setEdit] = useState(false);
   const [modalContent, setModalContent] = useState<CustomModal>(modalState());
+  const mainCategories = useAppSelector(selectMainCategories);
 
   const [newGroup, setNewGroup] = useState({name: ''});
 
@@ -193,15 +222,17 @@ export default function MainView() {
   };
 
   const handleSave = () => {
-    dispatch(handleGroupCategory({method: 'POST', name: newGroup.name})).then(res => {
-      setNewGroup({name: ''})
-    });
+    dispatch(handleGroupCategory({method: 'POST', name: newGroup.name})).then(
+      (res) => {
+        setNewGroup({name: ''});
+      },
+    );
   };
 
   return (
     <View style={{height: '100%', backgroundColor: t.colors.white}}>
       <ScrollView>
-        {_.keys(grouped).map((groupName) => (
+        {mainCategories.map(([groupName, groupId]) => (
           <GroupedItemsList
             key={groupName}
             nameOfGroup={groupName}
@@ -210,6 +241,7 @@ export default function MainView() {
             addModal={addModal}
             emptyModal={emptyModal}
             handleDelete={handleDelete}
+            groupId={groupId}
           />
         ))}
         {edit && (

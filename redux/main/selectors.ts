@@ -123,7 +123,7 @@ export const selectCategory = (id: number) =>
   });
 
 export const selectMainCategories = createSelector(
-  [(state) => state.categories],
+  [(state) => state.main.categories],
   (cat: Record<string, Category>) => {
     const arr = Object.entries(cat);
     return arr.reduce(
