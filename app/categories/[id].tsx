@@ -70,7 +70,7 @@ const TwoButtons: React.FC<TwoButtonsProps> = ({
 
 export default function OneCategory() {
   const dispatch = useAppDispatch();
-  const {id} = useLocalSearchParams();
+  const {id, groupId: incomingGrId} = useLocalSearchParams();
   const navigation = useNavigation();
   const fetching = useAppSelector(selectStatus);
   const isFetching = fetching === 'fetching';
@@ -86,26 +86,32 @@ export default function OneCategory() {
     color = '#FFFFFF',
   } = category || {};
 
-  const initialState = emptyState({id: catId, name, groupName, groupId, color});
+  const initialState = emptyState({
+    id: catId,
+    name,
+    groupName,
+    groupId: groupId || +incomingGrId,
+    color,
+  });
   const [state, setState] = useState<State>(initialState);
   const [edit, setEdit] = useState(false);
   const [openPicker, setOpenPicker] = useState(false);
 
   const t = useAppTheme();
 
-  useEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <IconButton
-          icon={edit ? 'check' : 'pencil'}
-          onPressIn={() => {
-            setEdit(!edit);
-            handleSave();
-          }}
-        />
-      ),
-    });
-  }, [navigation, edit]);
+  // useEffect(() => {
+  //   navigation.setOptions({
+  //     headerRight: () => (
+  //       <IconButton
+  //         icon={edit ? 'check' : 'pencil'}
+  //         onPressIn={() => {
+  //           setEdit(!edit);
+  //           handleSave();
+  //         }}
+  //       />
+  //     ),
+  //   });
+  // }, [navigation, edit]);
 
   // handlers
   const handleCancel = () => {
@@ -120,9 +126,11 @@ export default function OneCategory() {
         method: id && Number.isInteger(+id) ? 'PUT' : 'POST',
         ...state,
       }),
-    ).then((res) => {
-      router.replace('/categories');
-    });
+    )
+      .unwrap()
+      .then(() => {
+        router.navigate('..');
+      });
   };
 
   const handleColorChange = (color: string) => {

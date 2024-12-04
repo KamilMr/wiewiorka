@@ -85,7 +85,6 @@ export const handleCategory = createAsyncThunk(
 
     if (!Object.keys(payload).length) return;
 
-    console.log(payload);
     const {method, id, ...rest} = payload;
     let q = 'category' + (method === 'PUT' ? `/${id}` : '');
     let data;

@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react';
 import {router, useLocalSearchParams, useNavigation} from 'expo-router';
-import {ScrollView, StyleSheet, View} from 'react-native';
+import {ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
 
 import _ from 'lodash';
 import {Icon, IconButton} from 'react-native-paper';
@@ -46,6 +46,14 @@ type HandleDelete = {
 };
 
 const WIDTH_ICON_VIEW = 45;
+
+const modalState: () => CustomModal = () => ({
+  visible: false,
+  title: '',
+  content: '',
+  onDismiss: () => {},
+  onApprove: () => {},
+});
 
 const GroupedItem = ({
   item,
@@ -113,31 +121,31 @@ const GroupedItemsList = ({
 
   return (
     <View>
-      <View key={nameOfGroup} style={styles.groupContainer}>
-        {edit ? (
-          <View style={{width: WIDTH_ICON_VIEW}}>
-            <IconButton
-              icon="trash-can"
-              onPress={() =>
-                addModal({
-                  visible: true,
-                  title: `Usunąć kategorię ${nameOfGroup}?`,
-                  content: `Kategoria zostanie usunięta a przypisanie traksakcje zostaną bez kategorii`,
-                  onDismiss: emptyModal,
-                  onApprove: () => handleDelete({id: groupId, kind: 'group'}),
-                })
-              }
-            />
-          </View>
-        ) : (
-          <View style={{width: WIDTH_ICON_VIEW}} />
-        )}
-        <Text style={{width: '70%'}}>{`${nameOfGroup} (${items.length})`}</Text>
-        <IconButton
-          icon={expanded ? 'chevron-down' : 'chevron-right'}
-          onPress={() => setExpanded(!expanded)}
-        />
-      </View>
+      <TouchableOpacity onPress={() => setExpanded(!expanded)}>
+        <View key={nameOfGroup} style={styles.groupContainer}>
+          {edit ? (
+            <View style={{width: WIDTH_ICON_VIEW}}>
+              <IconButton
+                icon="trash-can"
+                onPress={() =>
+                  addModal({
+                    visible: true,
+                    title: `Usunąć kategorię ${nameOfGroup}?`,
+                    content: `Kategoria zostanie usunięta a przypisanie traksakcje zostaną bez kategorii`,
+                    onDismiss: emptyModal,
+                    onApprove: () => handleDelete({id: groupId, kind: 'group'}),
+                  })
+                }
+              />
+            </View>
+          ) : (
+            <View style={{width: WIDTH_ICON_VIEW}} />
+          )}
+          <Text
+            style={{width: '70%'}}>{`${nameOfGroup} (${items.length})`}</Text>
+          <IconButton icon={expanded ? 'chevron-down' : 'chevron-right'} />
+        </View>
+      </TouchableOpacity>
       {expanded && (
         <View style={styles.expandedContent}>
           {items.map((item) => (
@@ -159,7 +167,9 @@ const GroupedItemsList = ({
               }}>
               <IconButton
                 icon="plus"
-                onPress={() => router.navigate('/categories/new')}
+                onPress={() =>
+                  router.navigate(`/categories/new?groupId=${groupId}`)
+                }
               />
             </View>
           )}
@@ -168,14 +178,6 @@ const GroupedItemsList = ({
     </View>
   );
 };
-
-const modalState: () => CustomModal = () => ({
-  visible: false,
-  title: '',
-  content: '',
-  onDismiss: () => {},
-  onApprove: () => {},
-});
 
 export default function MainView() {
   const navigation = useNavigation();
@@ -233,11 +235,11 @@ export default function MainView() {
   };
 
   const handleSave = () => {
-    dispatch(handleGroupCategory({method: 'POST', name: newGroup.name})).then(
-      (res) => {
+    dispatch(handleGroupCategory({method: 'POST', name: newGroup.name}))
+      .unwrap()
+      .then(() => {
         setNewGroup({name: ''});
-      },
-    );
+      });
   };
 
   return (
@@ -258,7 +260,8 @@ export default function MainView() {
         {edit && (
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <TextInput
-              label={'Nowa kategoria'}
+              label={'Wpisz nową kategorię'}
+              mode="outlined"
               style={{width: '80%'}}
               value={newGroup.name}
               onChangeText={(text) => {

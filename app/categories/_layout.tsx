@@ -31,7 +31,6 @@ export default function Layout() {
         options={() => ({
           headerShown: true,
           title: 'Edycja',
-          headerRight: () => <IconButton icon={'pencil'} />,
         })}
       />
     </Stack>
