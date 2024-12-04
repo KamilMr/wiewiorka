@@ -97,7 +97,65 @@ export const handleCategory = createAsyncThunk(
           'content-type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({name, color: color.split('#')[1],groupId}),
+        body: JSON.stringify({name, color: color.split('#')[1], groupId}),
+      });
+      data = await resp.json();
+      if (data.err) throw data.err;
+      thunkAPI.dispatch(fetchIni());
+    } catch (err) {
+      throw err;
+    }
+    return data.d;
+  },
+);
+
+export const handleDeleteCategory = createAsyncThunk(
+  'category/delete',
+  async (payload = {}, thunkAPI) => {
+    const {token} = thunkAPI.getState().auth;
+
+    if (!Object.keys(payload).length) return;
+
+    const {id} = payload;
+    let q = `category/${id}`;
+    let data;
+
+    try {
+      let resp = await fetch(getURL(q), {
+        method: 'DELETE',
+        headers: {
+          'content-type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      data = await resp.json();
+      if (data.err) throw data.err;
+      thunkAPI.dispatch(fetchIni());
+    } catch (err) {
+      throw err;
+    }
+    return data.d;
+  },
+);
+
+export const handleDeleteGroupCategory = createAsyncThunk(
+  'categoryGroup/delete',
+  async (payload = {}, thunkAPI) => {
+    const {token} = thunkAPI.getState().auth;
+
+    if (!Object.keys(payload).length) return;
+
+    const {id} = payload;
+    let q = `category/group/${id}`;
+    let data;
+
+    try {
+      let resp = await fetch(getURL(q), {
+        method: 'DELETE',
+        headers: {
+          'content-type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
       });
       data = await resp.json();
       if (data.err) throw data.err;

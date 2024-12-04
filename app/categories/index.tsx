@@ -12,7 +12,12 @@ import {useAppTheme} from '@/constants/theme';
 import {useAppDispatch, useAppSelector} from '@/hooks';
 import {Subcategory} from '@/redux/main/mainSlice';
 import {selectCategories, selectMainCategories} from '@/redux/main/selectors';
-import {handleCategory, handleGroupCategory} from '@/redux/main/thunks';
+import {
+  handleCategory,
+  handleDeleteCategory,
+  handleDeleteGroupCategory,
+  handleGroupCategory,
+} from '@/redux/main/thunks';
 
 interface GroupedItemsProps {
   nameOfGroup: string;
@@ -218,7 +223,14 @@ export default function MainView() {
   }, [navigation, edit]);
 
   const handleDelete = async ({id, kind}: DeleteCategory) => {
-    console.log(id, kind);
+    if (kind === 'category') {
+      dispatch(handleDeleteCategory({id}));
+    }
+    if (kind === 'group') {
+      dispatch(handleDeleteGroupCategory({id}));
+    }
+
+    emptyModal();
   };
 
   const handleSave = () => {

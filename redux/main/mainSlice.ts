@@ -8,6 +8,8 @@ import {
   deleteIncome,
   fetchIni,
   handleCategory,
+  handleDeleteCategory,
+  handleDeleteGroupCategory,
   handleGroupCategory,
   uploadExpense,
   uploadFile,
@@ -101,7 +103,8 @@ const mainSlice = createSlice({
       state.status = action.payload;
     },
     setSnackbar: (state, action) => {
-      let {open = false, type = '', msg = ''} = action.payload || {}; if (msg) open = true;
+      let {open = false, type = '', msg = ''} = action.payload || {};
+      if (msg) open = true;
       // state.snackbar.open = open;
       // state.snackbar.msg = msg;
       // state.snackbar.type = type;
@@ -257,12 +260,17 @@ const mainSlice = createSlice({
         state.snackbar.type = 'info';
         state.snackbar.msg = action.error.message || 'Coś poszło nie tak';
       })
-      .addCase(handleGroupCategory.fulfilled, (state, action) => {
-        state.snackbar.open = true;
-        state.snackbar.type = 'info';
-        state.snackbar.msg = 'Ok'
-      })
       .addCase(handleGroupCategory.rejected, (state, action) => {
+        state.snackbar.open = true;
+        state.snackbar.type = 'error';
+        state.snackbar.msg = action.error.message || 'Coś poszło nie tak';
+      })
+      .addCase(handleDeleteCategory.rejected, (state, action) => {
+        state.snackbar.open = true;
+        state.snackbar.type = 'error';
+        state.snackbar.msg = action.error.message || 'Coś poszło nie tak';
+      })
+      .addCase(handleDeleteGroupCategory.rejected, (state, action) => {
         state.snackbar.open = true;
         state.snackbar.type = 'error';
         state.snackbar.msg = action.error.message || 'Coś poszło nie tak';
