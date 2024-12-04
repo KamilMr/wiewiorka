@@ -78,11 +78,16 @@ export default function OneCategory() {
   const category: Subcategory | undefined = useAppSelector(selectCategory(+id));
   const categories = useAppSelector(selectCategories);
 
-  const {id: catId, name, groupId, groupName, color} = category || {};
+  const {
+    id: catId,
+    name = '',
+    groupId,
+    groupName = '',
+    color = '#FFFFFF',
+  } = category || {};
 
-  const [state, setState] = useState<State>(
-    emptyState({id: catId, name, groupName, groupId, color}),
-  );
+  const initialState = emptyState({id: catId, name, groupName, groupId, color});
+  const [state, setState] = useState<State>(initialState);
   const [edit, setEdit] = useState(false);
   const [openPicker, setOpenPicker] = useState(false);
 
@@ -102,9 +107,6 @@ export default function OneCategory() {
     });
   }, [navigation, edit]);
 
-  // temp fix
-  if (!category) router.navigate('..');
-
   // handlers
   const handleCancel = () => {
     setEdit(false);
@@ -113,7 +115,12 @@ export default function OneCategory() {
 
   const handleSave = async () => {
     // validate
-    dispatch(handleCategory({method: 'PUT', ...state})).then((res) => {
+    dispatch(
+      handleCategory({
+        method: id && Number.isInteger(+id) ? 'PUT' : 'POST',
+        ...state,
+      }),
+    ).then((res) => {
       router.replace('/categories');
     });
   };

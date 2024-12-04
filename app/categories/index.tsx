@@ -151,17 +151,16 @@ const GroupedItemsList = ({
             />
           ))}
           {edit && (
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <TextInput
-                label={'Nowa Podkategoria'}
-                mode="outlined"
-                style={{width: '80%'}}
-                value={newCategory}
-                onChangeText={(text) => {
-                  setNewCategory(text);
-                }}
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              <IconButton
+                icon="plus"
+                onPress={() => router.navigate('/categories/new')}
               />
-              <IconButton icon="check" onPress={handleSave} />
             </View>
           )}
         </View>
