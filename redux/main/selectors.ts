@@ -172,35 +172,6 @@ export const selectComparison = (num: number | string) =>
     return _.orderBy(arr, ['year', 'month'], ['desc', 'desc']);
   });
 
-/** @param {string} date=MM/yyyy*/
-export const aggregateExpenses = (agrDates = [new Date(), new Date()]) =>
-  createSelector(
-    [selectCategories, selectExpensesAll],
-    (categories, expenses) => {
-      const [startDate, endDate] = agrDates;
-
-      const tR = {};
-      expenses.forEach(({date, price, categoryId}) => {
-        if (!dh.isBetweenDates(date, startDate, endDate)) return;
-        const cat = categories.find((c) => c.catId === categoryId);
-        tR[categoryId] ??= {
-          v: 0,
-          name: cat.category,
-          color: '#' + (typeof cat.color !== 'string' ? '000000' : cat.color),
-          id: cat.catId,
-        };
-
-        tR[categoryId].v += price;
-      });
-
-      return _.orderBy(
-        _.omitBy(tR, (c) => c.v === 0),
-        ['v'],
-        ['desc'],
-      );
-    },
-  );
-
 export const selectSources = (state: RootState) => {
   return state.main.sources[state.auth.name];
 };

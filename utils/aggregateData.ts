@@ -2,19 +2,10 @@ import _ from 'lodash';
 
 import {AggregatedData} from './types';
 import {convertDate} from '@/common';
+import {Category, Expense} from '../redux/main/mainSlice';
 
 type Axis = '1-1' | '1-0';
 type PickFilter = `${string}-${string}`;
-
-interface Expense {
-  date: string;
-  categoryId: number;
-  price: number;
-}
-
-interface Category {
-  categories: Array<{catId: number}>;
-}
 
 const decId = (str: string) => str.split('-');
 const encId = (arr: [number, number]) => arr.join('-');

@@ -19,7 +19,6 @@ type GroupedValue = number[];
 interface GroupedType {
   [key: string]: {[key: string]: GroupedValue};
 }
-
 const GroupCategory = ({
   axis,
   onPress,
@@ -75,6 +74,11 @@ const Summary = () => {
   // grouping
   const grouped: GroupedType = groupBy(selected, 'month', ...axis);
 
+  const getCategoryById = (id: number, isSubcategory: boolean = false) => {
+    const idField = isSubcategory ? 'id' : 'groupId';
+    return stateCategories.find((cat) => +cat[idField] === id);
+  };
+
   useEffect(() => {
     setFilters(
       currentGroupOrCategory.filter(
@@ -97,11 +101,8 @@ const Summary = () => {
     (str: string) => str.split('-')[+axis[0].split('-')[1]],
   );
 
-  const getCategoryName = (n: number, id: string) => {
-    if (!id) id = axis[0] === '1-1' ? 'id' : 'groupId';
-    const cat = stateCategories.find((o) => +o[id] === n);
-
-    return cat;
+  const getCategoryName = (n: number, idOrIdGroup: string) => {
+    return getCategoryById(n, idOrIdGroup || axis[0] === '1-1');
   };
 
   const currentGroupOrCategory: {
@@ -110,13 +111,13 @@ const Summary = () => {
     type: 'category' | 'group';
     color: string;
   }[] = idsGroupOrCategory.map((n: string) => {
-    const holder = axis[0] === '1-1' ? 'id' : 'groupId';
-    const cat = getCategoryName(+n, holder);
+    const idOrIdGroup = axis[0] === '1-1' ? 'id' : 'groupId';
+    const cat = getCategoryName(+n);
 
     return {
-      name: cat?.[holder === 'id' ? 'name' : 'groupName'] || 'not found',
+      name: cat?.[idOrIdGroup === 'id' ? 'name' : 'groupName'] || 'not found',
       id: +n,
-      type: holder === 'id' ? 'category' : 'group',
+      type: idOrIdGroup === 'id' ? 'category' : 'group',
       color: cat ? cat?.color || '' : '',
     };
   });

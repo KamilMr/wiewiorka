@@ -25,7 +25,7 @@ interface Expense {
   description: string;
   date: string;
   price: string;
-  categoryId: string;
+  categoryId: number;
   category: string;
   image: string;
   owner: string;
@@ -147,7 +147,7 @@ const Expense = () => {
     if (!cat) return;
     setEditedExpense({
       ...editedExpense,
-      categoryId: categories.find((c) => c.name === cat.value).id,
+      categoryId: categories.find((c) => c.name === cat.value)?.id,
     });
   };
 
