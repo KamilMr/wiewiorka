@@ -15,7 +15,7 @@ export const LOGIN_PATH = 'login';
 export const SUMMARY_PATH = 'summary';
 export const SUMMARY_CHART = 'summary/chart/:param';
 
-export const EXCLUDED_CAT = [72, 83];
+export const EXCLUDED_CAT = [];
 
 export const getURL = (p = '') => {
   return `${URL}/${p}`;

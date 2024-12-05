@@ -17,7 +17,7 @@ const CustomSnackBar = () => {
   useEffect(() => {
     const id = setTimeout(() => {
       dispatch(setSnackbar({}));
-    }, 3000);
+    }, 1500);
 
     return () => {
       clearTimeout(id);

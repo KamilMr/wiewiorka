@@ -1,9 +1,10 @@
-import 'react-native-reanimated';
 import {useEffect} from 'react';
 import {Stack} from 'expo-router';
+import {Provider} from 'react-redux';
+
+import 'react-native-reanimated';
 import {useFonts} from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
-import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 import {Provider as PaperProvider} from 'react-native-paper';
 
@@ -33,9 +34,10 @@ const RootLayout = () => {
     <Provider store={store}>
       <PersistGate persistor={persistor}>
         <PaperProvider theme={paperTheme}>
-          <Stack>
+          <Stack initialRouteName='(tabs)' >
             <Stack.Screen name="sign-in" options={{headerShown: false}} />
             <Stack.Screen name="(tabs)" options={{headerShown: false}} />
+            <Stack.Screen name="categories" options={{headerShown: false}} />
             <Stack.Screen name="+not-found" />
           </Stack>
           <SnackBar />

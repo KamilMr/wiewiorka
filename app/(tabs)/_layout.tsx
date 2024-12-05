@@ -12,7 +12,7 @@ import {TabBarIcon} from '@/components/navigation/TabBarIcon';
 import {sizes} from '@/constants/theme';
 import {selectStatus} from '@/redux/main/selectors';
 
-const TabLayout = () => {
+export default function TabLayout() {
   const token = useAppSelector(selectToken);
   const fetching = useAppSelector(selectStatus);
   const dispatch = useAppDispatch();
@@ -56,8 +56,7 @@ const TabLayout = () => {
         name="summary"
         options={{title: 'Podsumowanie', headerShown: true}}
       />
-      <Tabs.Screen name="profile" options={{title: 'Profil'}} />
+      <Tabs.Screen name="settings" options={{title: 'Ustawienia'}} />
     </Tabs>
   );
-};
-export default TabLayout;
+}

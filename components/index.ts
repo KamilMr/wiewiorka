@@ -13,8 +13,10 @@ import FullWidthImage from './FullImage';
 import MyTabBar from './CustomTab';
 import PieChartBar from './PieChartBar';
 import SummaryCard from './SummaryCard';
+import ColorPicker from './ColorPicker';
 
 export {
+  ColorPicker,
   CustomBar as BarChart,
   CustomChip as Chip,
   CustomImage as Image,

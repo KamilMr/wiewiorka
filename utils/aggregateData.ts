@@ -2,19 +2,10 @@ import _ from 'lodash';
 
 import {AggregatedData} from './types';
 import {convertDate} from '@/common';
+import {Category, Expense} from '../redux/main/mainSlice';
 
 type Axis = '1-1' | '1-0';
 type PickFilter = `${string}-${string}`;
-
-interface Expense {
-  date: string;
-  categoryId: number;
-  price: number;
-}
-
-interface Category {
-  categories: Array<{catId: number}>;
-}
 
 const decId = (str: string) => str.split('-');
 const encId = (arr: [number, number]) => arr.join('-');
@@ -60,8 +51,8 @@ const searchGroup = (
 ): string | undefined => {
   return _.entries(categories).find(([, obj]: [string, any]) => {
     return (
-      obj.categories.findIndex(
-        (catObj: {catId: number}) => catObj.catId === catId,
+      obj.subcategories.findIndex(
+        (catObj: {id: number}) => catObj.id === catId,
       ) > -1
     );
   })?.[0];
@@ -73,20 +64,20 @@ const aggregateData = (
 ) => {
   const d = _.groupBy(expenses, 'date');
 
-  const tR: AggregatedData = _.fromPairs(
-    _.entries(d).map(([dateId, arr]) => {
-      const groupedByCat = _.groupBy(arr, 'categoryId');
-      const summed = _.entries(groupedByCat).map(([catId, arr]) => {
-        return [
-          `${searchGroup(Number(catId), categories)}-${catId}`,
-          [_.sumBy(arr, 'price')],
-        ];
-      });
-      return [dateId, _.fromPairs(summed)];
-    }),
-  );
+  const data = _.entries(d).map(([date, arrValues]) => {
+    const groupedByCat = _.groupBy(arrValues, 'categoryId');
+    const pairCatIdVal = _.entries(groupedByCat);
 
-  return tR;
+    const summed = pairCatIdVal.map(([catId, arr]) => {
+      return [
+        `${searchGroup(Number(catId), categories)}-${catId}`,
+        [_.sumBy(arr, 'price')],
+      ];
+    });
+    return [date, _.fromPairs(summed)];
+  });
+
+  return _.fromPairs(data);
 };
 
 const sumById = (data: AggregatedData) => {

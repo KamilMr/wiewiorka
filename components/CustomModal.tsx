@@ -1,25 +1,47 @@
 import React from 'react';
 
-import {View, StyleSheet} from 'react-native';
-import {IconButton, Modal} from 'react-native-paper';
+import {StyleSheet} from 'react-native';
+import {Button, Dialog, Portal, Text} from 'react-native-paper';
 
-interface CustomModal {
+export interface CustomModal {
   visible: boolean;
-  children: React.ReactNode;
-  onDismiss: () => void;
+  onDismiss?: () => void;
+  onApprove?: () => void;
+  title?: string;
+  content: string | React.ReactNode;
 }
 
 const CustomModal = (props: CustomModal) => {
-  const {visible, onDismiss, children} = props;
+  const {visible, onDismiss, onApprove, content, title} = props;
+
+  // If 'visible' is false or 'content' is not provided, don't render the modal
+  if (!visible || !content) {
+    return null;
+  }
+
   return (
-    <Modal visible={visible} onDismiss={onDismiss}>
-      <View style={styles.modalBg}>
-        <View style={styles.header}>
-          <IconButton icon="close" onPress={onDismiss} style={{margin: 0}} />
-        </View>
-        <View style={styles.view}>{children}</View>
-      </View>
-    </Modal>
+    <Portal>
+      <Dialog visible={visible} onDismiss={onDismiss}>
+        {/* Render title only if it's provided */}
+        {title && <Dialog.Title>{title}</Dialog.Title>}
+
+        <Dialog.Content>
+          {typeof content === 'string' ? (
+            <Text variant="bodyMedium">{content}</Text>
+          ) : (
+            content
+          )}
+        </Dialog.Content>
+
+        {/* Render actions only if 'onApprove' or 'onDismiss' is provided */}
+        {(onApprove || onDismiss) && (
+          <Dialog.Actions>
+            {onApprove && <Button onPress={onApprove}>Tak</Button>}
+            {onDismiss && <Button onPress={onDismiss}>Nie</Button>}
+          </Dialog.Actions>
+        )}
+      </Dialog>
+    </Portal>
   );
 };
 

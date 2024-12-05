@@ -32,13 +32,11 @@ export const authSlice = createSlice({
         state.email = email;
         state.token = token;
       })
-      .addCase(signIn.rejected, (_, action) => {
-        console.log('rejected', action.payload);
-      })
-      .addCase(logout.fulfilled, () => {
+      .addCase(logout.pending, () => {
         return emptyState;
       })
-      .addCase(logout.rejected, () => {
+      .addCase(signIn.rejected, (_, action) => {
+        console.log('logout rejected', action.payload);
         return emptyState;
       });
   },

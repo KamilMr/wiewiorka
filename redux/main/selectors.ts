@@ -1,10 +1,10 @@
 import {createSelector} from '@reduxjs/toolkit';
-import {format, isAfter, isBefore} from 'date-fns';
+import {format, isAfter, isBefore, isSameDay} from 'date-fns';
 import _ from 'lodash';
 
 import {EXCLUDED_CAT, dh, makeNewIdArr} from '@/common';
 import {RootState} from '../store';
-import {Expense, Income} from './mainSlice';
+import {Category, Expense, Income, Subcategory} from './mainSlice';
 
 export type Search = {
   txt: string;
@@ -49,17 +49,15 @@ export const selectRecords = (number: number, search: Search) =>
 
           return dh.isBetweenDates(d, ds, de);
         })
-        .map((obj: Expense) => {
+        .map((obj: Expense & {exp: true}) => {
           const catObj = obj?.exp
-            ? categories.find(
-                ({catId}: {catId: number}) => catId === obj.categoryId,
-              )
+            ? categories.find(({id}: {catId: number}) => id === obj.categoryId)
             : null;
 
           return {
             ...obj,
             description: obj.description || '',
-            category: catObj?.category ?? '',
+            category: catObj?.name ?? '',
             color: catObj?.color ?? '',
           };
         });
@@ -85,10 +83,10 @@ export const selectExpense = (id: number) =>
   createSelector([selectCategories, selectExpensesAll], (cat, exp) => {
     const expense = exp.find((ex) => ex.id === +id);
     if (!expense) return;
-    const categoryObj = cat.find((obj) => obj.catId === expense.categoryId);
+    const categoryObj = cat.find((obj) => obj.id === expense.categoryId);
     return {
       ...expense,
-      category: categoryObj.category,
+      category: categoryObj.name,
       catColor: categoryObj.color,
       date: format(new Date(expense.date), 'dd/MM/yyyy'),
     };
@@ -105,28 +103,37 @@ export const selectCategories = createSelector(
   [(state) => state.main.categories],
   (cat) => {
     const arr = Object.entries(cat);
-    return arr.reduce((pv, [key, cv]) => {
-      const categories = [...cv.categories].map((obj) => ({
-        ...obj,
-        groupId: +key,
-        groupName: cv.groupName,
-        color: `#${obj.color || 'FFFFFF'}`,
-      }));
-      if (Array.isArray(pv)) pv.push(...categories);
+    return arr.reduce((pv: Array<Subcategory>, [key, cv]: [string, any]) => {
+      const subcategories: Array<Subcategory> = [...cv.subcategories].map(
+        (obj) => ({
+          ...obj,
+          groupName: cv.name,
+          color: `#${obj.color || '#FFFFFF'}`,
+        }),
+      );
+      if (Array.isArray(pv)) pv.push(...subcategories);
       return pv;
     }, []);
   },
 );
 
+export const selectCategory = (id: number) =>
+  createSelector([selectCategories], (categories) => {
+    return categories.find((c) => c.id === id);
+  });
+
 export const selectMainCategories = createSelector(
-  [(state) => state.categories],
-  (cat) => {
+  [(state) => state.main.categories],
+  (cat: Record<string, Category>) => {
     const arr = Object.entries(cat);
-    return arr.reduce((pv, [key, cv]) => {
-      const categories = [cv.groupName, key];
-      if (Array.isArray(pv)) pv.push(categories);
-      return pv;
-    }, []);
+    return arr.reduce(
+      (pv: Array<Array<string>>, [key, cv]: [string, Category]) => {
+        const categories: [string, string] = [cv.name, key];
+        if (Array.isArray(pv)) pv.push(categories);
+        return pv;
+      },
+      [],
+    );
   },
 );
 
@@ -165,35 +172,6 @@ export const selectComparison = (num: number | string) =>
     return _.orderBy(arr, ['year', 'month'], ['desc', 'desc']);
   });
 
-/** @param {string} date=MM/yyyy*/
-export const aggregateExpenses = (agrDates = [new Date(), new Date()]) =>
-  createSelector(
-    [selectCategories, selectExpensesAll],
-    (categories, expenses) => {
-      const [startDate, endDate] = agrDates;
-
-      const tR = {};
-      expenses.forEach(({date, price, categoryId}) => {
-        if (!dh.isBetweenDates(date, startDate, endDate)) return;
-        const cat = categories.find((c) => c.catId === categoryId);
-        tR[categoryId] ??= {
-          v: 0,
-          name: cat.category,
-          color: '#' + (typeof cat.color !== 'string' ? '000000' : cat.color),
-          id: cat.catId,
-        };
-
-        tR[categoryId].v += price;
-      });
-
-      return _.orderBy(
-        _.omitBy(tR, (c) => c.v === 0),
-        ['v'],
-        ['desc'],
-      );
-    },
-  );
-
 export const selectSources = (state: RootState) => {
   return state.main.sources[state.auth.name];
 };
@@ -201,8 +179,8 @@ export const selectSources = (state: RootState) => {
 const withinRange = (date: Date, dates: [Date, Date]) => {
   return (
     (isAfter(date, dates[0]) && isBefore(new Date(date), dates[1])) ||
-    _.isEqual(date, dates[0]) ||
-    _.isEqual(date, dates[1])
+    isSameDay(date, dates[0]) ||
+    isSameDay(date, dates[1])
   );
 };
 
@@ -214,5 +192,4 @@ export const selectByTimeRange = (dates: [Date, Date]) => {
   });
 };
 
-export const selectStatus = (state: RootState) =>
-  state.main.status;
+export const selectStatus = (state: RootState) => state.main.status;
