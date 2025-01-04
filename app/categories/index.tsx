@@ -1,16 +1,15 @@
 import {useEffect, useState} from 'react';
-import {router, useLocalSearchParams, useNavigation} from 'expo-router';
+import {router, useNavigation} from 'expo-router';
 import {ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
 
 import _ from 'lodash';
-import {Icon, IconButton} from 'react-native-paper';
+import {IconButton} from 'react-native-paper';
 
 import {Modal, Text, TextInput} from '@/components';
 import {CustomModal} from '@/components/CustomModal';
 import {CircleIcon} from '@/components/Icons';
 import {useAppTheme} from '@/constants/theme';
 import {useAppDispatch, useAppSelector} from '@/hooks';
-import {Subcategory} from '@/redux/main/mainSlice';
 import {selectCategories, selectMainCategories} from '@/redux/main/selectors';
 import {
   handleCategory,
@@ -18,32 +17,12 @@ import {
   handleDeleteGroupCategory,
   handleGroupCategory,
 } from '@/redux/main/thunks';
-
-interface GroupedItemsProps {
-  nameOfGroup: string;
-  items: Subcategory[];
-  edit: boolean;
-  groupId: string;
-}
-
-interface ItemsProps {
-  item: Subcategory;
-  edit: boolean;
-}
-
-interface AddEmptyModal {
-  addModal: (arg: CustomModal) => void;
-  emptyModal: () => void;
-}
-
-interface DeleteCategory {
-  id: number;
-  kind: 'group' | 'category';
-}
-
-type HandleDelete = {
-  handleDelete: (arg: DeleteCategory) => void;
-};
+import {
+  AddEmptyModal,
+  GroupedItemsProps,
+  HandleDelete,
+  ItemsProps,
+} from '@/components/categories/types';
 
 const WIDTH_ICON_VIEW = 45;
 
