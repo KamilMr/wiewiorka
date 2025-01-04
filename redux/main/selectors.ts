@@ -141,9 +141,9 @@ export const selectMainCategories = createSelector(
   },
 );
 
-export const selectComparison = (num: number | string) =>
+export const selectComparison = (number1or12: number | string) =>
   createSelector([selectIncomes, selectExpensesAll], (income, expenses) => {
-    const pattern: string = +num === 1 ? 'MM/yyyy' : 'yyyy';
+    const pattern: string = +number1or12 === 1 ? 'MM/yyyy' : 'yyyy';
     const calPrice = (price: number, vat: number = 0): number =>
       price - price * (vat / 100);
 
@@ -180,18 +180,10 @@ export const selectSources = (state: RootState) => {
   return state.main.sources[state.auth.name];
 };
 
-const withinRange = (date: Date, dates: [Date, Date]) => {
-  return (
-    (isAfter(date, dates[0]) && isBefore(new Date(date), dates[1])) ||
-    isSameDay(date, dates[0]) ||
-    isSameDay(date, dates[1])
-  );
-};
-
 export const selectByTimeRange = (dates: [Date, Date]) => {
   return createSelector([(state) => state.main._aggregated], (data) => {
     if (dates?.length === 2)
-      return _.pickBy(data, (_, date) => withinRange(new Date(date), dates));
+      return _.pickBy(data, (_, date) => dh.isBetweenDates(new Date(date), dates[0], dates[1]));
     else return data;
   });
 };
