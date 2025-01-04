@@ -16,6 +16,7 @@ import {Subcategory} from '@/redux/main/mainSlice';
 import {sizes, useAppTheme} from '@/constants/theme';
 import {Props} from '@/components/CustomSelect';
 import {handleCategory} from '@/redux/main/thunks';
+import {TwoButtons} from '@/components/categories/TwoButtons';
 
 interface State {
   id?: number;
@@ -32,41 +33,6 @@ const emptyState = ({id, color, name, groupName, groupId}: State): State => ({
   groupId,
   groupName,
 });
-
-interface TwoButtonsProps {
-  handleOk: () => void;
-  handleCancel: () => void;
-  cancelTxt?: string;
-  okTxt?: string;
-  visible?: boolean;
-  disableOk?: boolean;
-  loading: boolean;
-}
-const TwoButtons: React.FC<TwoButtonsProps> = ({
-  handleOk,
-  handleCancel,
-  cancelTxt = 'Anuluj',
-  okTxt = 'Tak',
-  visible = true,
-  disableOk = false,
-  loading = false,
-}) => {
-  if (!visible) return null;
-  return (
-    <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
-      <Button mode="outlined" onPress={handleCancel} disabled={disableOk}>
-        {cancelTxt}
-      </Button>
-      <Button
-        loading={loading}
-        mode="contained"
-        onPress={handleOk}
-        disabled={disableOk}>
-        {okTxt}
-      </Button>
-    </View>
-  );
-};
 
 export default function OneCategory() {
   const dispatch = useAppDispatch();
@@ -158,6 +124,8 @@ export default function OneCategory() {
     value: grouped[k][0].groupId,
   }));
 
+  console.log(grouped)
+
   useEffect(() => {
     if (isDirty !== edit) {
       setEdit(isDirty);
@@ -192,7 +160,7 @@ export default function OneCategory() {
             style={{width: '80%'}}
             value={state?.name}
             onChangeText={handleSubCatChange}
-            label={'Podkategoria'}></TextInput>
+            label={'Wpisz podkategorię'}></TextInput>
         </View>
         <View
           style={{
