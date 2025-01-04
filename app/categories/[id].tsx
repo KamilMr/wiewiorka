@@ -59,7 +59,7 @@ export default function OneCategory() {
     color,
   });
   const [state, setState] = useState<State>(initialState);
-  const [edit, setEdit] = useState(false);
+  // const [edit, setEdit] = useState(false);
   const [openPicker, setOpenPicker] = useState(false);
 
   const t = useAppTheme();
@@ -80,7 +80,7 @@ export default function OneCategory() {
 
   // handlers
   const handleCancel = () => {
-    setEdit(false);
+    // setEdit(false);
     setState(emptyState({id: catId, name, groupName, groupId, color}));
   };
 
@@ -112,21 +112,24 @@ export default function OneCategory() {
     setState({...state, name});
   };
 
-  const isDirty = !_.isEqual(
-    emptyState({id: catId, name, groupName, groupId, color}),
-    state,
-  );
+  const isDirty =
+    !_.isEqual(
+      emptyState({id: catId, name, groupName, groupId, color}),
+      state,
+    ) &&
+    state.name &&
+    state.groupName;
 
   const itemsToSelect = categories.map(([k, groupId]) => ({
     label: k,
     value: +groupId,
   }));
 
-  useEffect(() => {
-    if (isDirty !== edit) {
-      setEdit(isDirty);
-    }
-  }, [isDirty]);
+  // useEffect(() => {
+  //   if (isDirty !== edit) {
+  //     setEdit(isDirty);
+  //   }
+  // }, [isDirty]);
 
   return (
     <ScrollView style={{height: '100%', backgroundColor: t.colors.white}}>
@@ -149,6 +152,9 @@ export default function OneCategory() {
                 backgroundColor: state?.color,
                 width: 50,
                 height: 50,
+                borderWidth: 1,
+                borderColor: t.colors.primary,
+                opacity: 0.4,
               }}
             />
           </TouchableRipple>
@@ -173,7 +179,7 @@ export default function OneCategory() {
         />
       </View>
       <TwoButtons
-        visible={edit}
+        visible
         handleOk={handleSave}
         handleCancel={handleCancel}
         okTxt="Zapisz"
