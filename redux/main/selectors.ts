@@ -2,7 +2,7 @@ import {createSelector} from '@reduxjs/toolkit';
 import {format, isAfter, isBefore, isSameDay} from 'date-fns';
 import _ from 'lodash';
 
-import {EXCLUDED_CAT, dh, makeNewIdArr} from '@/common';
+import {EXCLUDED_CAT, dh, makeNewIdArr, normalize} from '@/common';
 import {RootState} from '../store';
 import {Category, Expense, Income, Subcategory} from './mainSlice';
 
@@ -20,20 +20,23 @@ const filterCat = (exp: Expense, f: Array<string>) => {
   return f.includes(exp.category);
 };
 
-const filterTxt = (
-  exp: Pick<Expense, 'description' | 'category'>,
-  f: string,
-) => {
+const filterTxt = (exp: any, f: string) => {
   if (!f) return true;
-  const string = exp.description + exp.category;
-  return string.toLowerCase().includes(f.toLowerCase());
+  const string = ['description', 'category', 'source', 'date'].reduce(
+    (pv, cv) => {
+      if (cv === 'date') return pv + format(new Date(exp.date), 'dd/MM/yyyy');
+      return pv + exp[cv] + '';
+    },
+    '',
+  );
+  return normalize(string.toLowerCase()).includes(normalize(f.toLowerCase()));
 };
 
 export const selectRecords = (number: number, search: Search) =>
   createSelector(
     [selectExpensesAll, selectCategories, selectIncomes],
     (expenses, categories, incomes) => {
-      const {txt, categories: fc, dates} = search;
+      const {txt: searchedTxt, categories: fc, dates} = search;
       const isValidArr =
         Array.isArray(dates) &&
         dates.length === 2 &&
@@ -62,8 +65,8 @@ export const selectRecords = (number: number, search: Search) =>
           };
         });
 
-      tR = tR.filter((exp: Expense & Income) => {
-        return filterTxt(exp, txt) && filterCat(exp, fc);
+      tR = tR.filter((record: Expense & Income) => {
+        return filterTxt(record, searchedTxt) && filterCat(record, fc);
       });
       return _.chain(tR)
         .sortBy(['date'])
@@ -104,6 +107,7 @@ export const selectCategories = createSelector(
   (cat) => {
     const arr = Object.entries(cat);
     return arr.reduce((pv: Array<Subcategory>, [key, cv]: [string, any]) => {
+      if (!cv.subcategories) cv.subcategories = [];
       const subcategories: Array<Subcategory> = [...cv.subcategories].map(
         (obj) => ({
           ...obj,
