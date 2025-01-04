@@ -1,20 +1,19 @@
 import {useEffect, useState} from 'react';
 import {ScrollView, View} from 'react-native';
 import {useLocalSearchParams, router, useNavigation} from 'expo-router';
-import {Button, IconButton, TouchableRipple} from 'react-native-paper';
+import {TouchableRipple} from 'react-native-paper';
 
 import _ from 'lodash';
 
-import {ColorPicker, Select, Text, TextInput} from '@/components';
+import {ColorPicker, Select, TextInput} from '@/components';
 import {useAppDispatch, useAppSelector} from '@/hooks';
 import {
-  selectCategories,
   selectCategory,
+  selectMainCategories,
   selectStatus,
 } from '@/redux/main/selectors';
 import {Subcategory} from '@/redux/main/mainSlice';
 import {sizes, useAppTheme} from '@/constants/theme';
-import {Props} from '@/components/CustomSelect';
 import {handleCategory} from '@/redux/main/thunks';
 import {TwoButtons} from '@/components/categories/TwoButtons';
 
@@ -42,7 +41,7 @@ export default function OneCategory() {
   const isFetching = fetching === 'fetching';
 
   const category: Subcategory | undefined = useAppSelector(selectCategory(+id));
-  const categories = useAppSelector(selectCategories);
+  const categories = useAppSelector(selectMainCategories);
 
   const {
     id: catId,
@@ -118,13 +117,10 @@ export default function OneCategory() {
     state,
   );
 
-  const grouped = _.groupBy(categories, 'groupName');
-  const itemsToSelect: Pick<Props, 'items'> = _.keys(grouped).map((k) => ({
+  const itemsToSelect = categories.map(([k, groupId]) => ({
     label: k,
-    value: grouped[k][0].groupId,
+    value: +groupId,
   }));
-
-  console.log(grouped)
 
   useEffect(() => {
     if (isDirty !== edit) {
