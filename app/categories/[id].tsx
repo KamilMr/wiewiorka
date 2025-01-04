@@ -1,21 +1,21 @@
 import {useEffect, useState} from 'react';
 import {ScrollView, View} from 'react-native';
 import {useLocalSearchParams, router, useNavigation} from 'expo-router';
-import {Button, IconButton, TouchableRipple} from 'react-native-paper';
+import {TouchableRipple} from 'react-native-paper';
 
 import _ from 'lodash';
 
-import {ColorPicker, Select, Text, TextInput} from '@/components';
+import {ColorPicker, Select, TextInput} from '@/components';
 import {useAppDispatch, useAppSelector} from '@/hooks';
 import {
-  selectCategories,
   selectCategory,
+  selectMainCategories,
   selectStatus,
 } from '@/redux/main/selectors';
 import {Subcategory} from '@/redux/main/mainSlice';
 import {sizes, useAppTheme} from '@/constants/theme';
-import {Props} from '@/components/CustomSelect';
 import {handleCategory} from '@/redux/main/thunks';
+import {TwoButtons} from '@/components/categories/TwoButtons';
 
 interface State {
   id?: number;
@@ -33,41 +33,6 @@ const emptyState = ({id, color, name, groupName, groupId}: State): State => ({
   groupName,
 });
 
-interface TwoButtonsProps {
-  handleOk: () => void;
-  handleCancel: () => void;
-  cancelTxt?: string;
-  okTxt?: string;
-  visible?: boolean;
-  disableOk?: boolean;
-  loading: boolean;
-}
-const TwoButtons: React.FC<TwoButtonsProps> = ({
-  handleOk,
-  handleCancel,
-  cancelTxt = 'Anuluj',
-  okTxt = 'Tak',
-  visible = true,
-  disableOk = false,
-  loading = false,
-}) => {
-  if (!visible) return null;
-  return (
-    <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
-      <Button mode="outlined" onPress={handleCancel} disabled={disableOk}>
-        {cancelTxt}
-      </Button>
-      <Button
-        loading={loading}
-        mode="contained"
-        onPress={handleOk}
-        disabled={disableOk}>
-        {okTxt}
-      </Button>
-    </View>
-  );
-};
-
 export default function OneCategory() {
   const dispatch = useAppDispatch();
   const {id, groupId: incomingGrId} = useLocalSearchParams();
@@ -76,7 +41,7 @@ export default function OneCategory() {
   const isFetching = fetching === 'fetching';
 
   const category: Subcategory | undefined = useAppSelector(selectCategory(+id));
-  const categories = useAppSelector(selectCategories);
+  const categories = useAppSelector(selectMainCategories);
 
   const {
     id: catId,
@@ -94,7 +59,7 @@ export default function OneCategory() {
     color,
   });
   const [state, setState] = useState<State>(initialState);
-  const [edit, setEdit] = useState(false);
+  // const [edit, setEdit] = useState(false);
   const [openPicker, setOpenPicker] = useState(false);
 
   const t = useAppTheme();
@@ -115,7 +80,7 @@ export default function OneCategory() {
 
   // handlers
   const handleCancel = () => {
-    setEdit(false);
+    // setEdit(false);
     setState(emptyState({id: catId, name, groupName, groupId, color}));
   };
 
@@ -147,22 +112,24 @@ export default function OneCategory() {
     setState({...state, name});
   };
 
-  const isDirty = !_.isEqual(
-    emptyState({id: catId, name, groupName, groupId, color}),
-    state,
-  );
+  const isDirty =
+    !_.isEqual(
+      emptyState({id: catId, name, groupName, groupId, color}),
+      state,
+    ) &&
+    state.name &&
+    state.groupName;
 
-  const grouped = _.groupBy(categories, 'groupName');
-  const itemsToSelect: Pick<Props, 'items'> = _.keys(grouped).map((k) => ({
+  const itemsToSelect = categories.map(([k, groupId]) => ({
     label: k,
-    value: grouped[k][0].groupId,
+    value: +groupId,
   }));
 
-  useEffect(() => {
-    if (isDirty !== edit) {
-      setEdit(isDirty);
-    }
-  }, [isDirty]);
+  // useEffect(() => {
+  //   if (isDirty !== edit) {
+  //     setEdit(isDirty);
+  //   }
+  // }, [isDirty]);
 
   return (
     <ScrollView style={{height: '100%', backgroundColor: t.colors.white}}>
@@ -185,6 +152,9 @@ export default function OneCategory() {
                 backgroundColor: state?.color,
                 width: 50,
                 height: 50,
+                borderWidth: 1,
+                borderColor: t.colors.primary,
+                opacity: 0.4,
               }}
             />
           </TouchableRipple>
@@ -192,7 +162,7 @@ export default function OneCategory() {
             style={{width: '80%'}}
             value={state?.name}
             onChangeText={handleSubCatChange}
-            label={'Podkategoria'}></TextInput>
+            label={'Wpisz podkategorię'}></TextInput>
         </View>
         <View
           style={{
@@ -209,7 +179,7 @@ export default function OneCategory() {
         />
       </View>
       <TwoButtons
-        visible={edit}
+        visible
         handleOk={handleSave}
         handleCancel={handleCancel}
         okTxt="Zapisz"
