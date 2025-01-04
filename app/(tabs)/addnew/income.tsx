@@ -43,7 +43,7 @@ const Income = () => {
   const navigation = useNavigation();
   const param = useLocalSearchParams();
   const income = useAppSelector(selectIncome(param.id)) || {};
-  const sources = useAppSelector(selectSources);
+  const sources = useAppSelector(selectSources) || [];
 
   // State for edit mode and editing fields
   const [isEditMode, setIsEditMode] = useState(false);
@@ -191,11 +191,11 @@ const Income = () => {
             <Select
               value={editedIncome.source}
               onChange={({value}) => {
-                if (value === 'nowe źródło') return setIsNewSource(true);
+                if (value === 'Dodaj nowe źródło') return setIsNewSource(true);
                 setEditedIncome({...editedIncome, source: value});
               }}
               items={sources
-                .concat(['nowe źródło'])
+                .concat(['Dodaj nowe źródło'])
                 .map((s: string) => ({label: s, value: s}))}
             />
           ) : (
