@@ -48,6 +48,21 @@ const Config: React.FC<{
   );
 };
 
+const NoData = () => {
+  const t = useAppTheme();
+  return (
+    <View
+      style={{
+        height: 200,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: t.colors.white,
+      }}>
+      <Text variant="titleLarge">Brak danych</Text>
+    </View>
+  );
+};
+
 const Summary = () => {
   const [filter, setFilter] = useState(MONTH);
   const summary = useAppSelector(selectComparison(filter));
@@ -57,7 +72,12 @@ const Summary = () => {
 
   return (
     <SafeAreaView style={{backgroundColor: t.colors.white}}>
-      <ScrollView style={{backgroundColor: t.colors.white}}>
+      <ScrollView
+        style={{
+          backgroundColor: t.colors.white,
+          height: '100%',
+          marginTop: 4 * 4,
+        }}>
         <Config
           selection={[
             [MONTH, MONTH_LABEL],
@@ -65,15 +85,19 @@ const Summary = () => {
           ]}
           onChange={handleChange}
         />
-        {summary.map((sumObj) => (
-          <SummaryCard
-            key={sumObj.id}
-            income={sumObj.income}
-            outcome={sumObj.outcome}
-            date={sumObj.date}
-            costs={sumObj.costs}
-          />
-        ))}
+        {!summary.length ? (
+          <NoData />
+        ) : (
+          summary.map((sumObj) => (
+            <SummaryCard
+              key={sumObj.id}
+              income={sumObj.income}
+              outcome={sumObj.outcome}
+              date={sumObj.date}
+              costs={sumObj.costs}
+            />
+          ))
+        )}
         <View style={{height: 80}} />
       </ScrollView>
     </SafeAreaView>

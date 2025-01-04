@@ -14,6 +14,7 @@ import MyTabBar from './CustomTab';
 import PieChartBar from './PieChartBar';
 import SummaryCard from './SummaryCard';
 import ColorPicker from './ColorPicker';
+import NoData from './NoData';
 
 export {
   ColorPicker,
@@ -30,6 +31,7 @@ export {
   DropdownComponent as Select,
   FullWidthImage,
   MyTabBar as TabBar,
+  NoData,
   PieChartBar,
   SummaryCard,
 };
