@@ -8,6 +8,7 @@ import {selectComparison} from '@/redux/main/selectors';
 import {SummaryCard, Text} from '@/components';
 import {useAppSelector} from '@/hooks';
 import {useAppTheme} from '@/constants/theme';
+import {NoData} from '@/components';
 
 const MONTH = 1;
 const YEAR = 12;
@@ -44,21 +45,6 @@ const Config: React.FC<{
           ))}
         </View>
       </RadioButton.Group>
-    </View>
-  );
-};
-
-const NoData = () => {
-  const t = useAppTheme();
-  return (
-    <View
-      style={{
-        height: 200,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: t.colors.white,
-      }}>
-      <Text variant="titleLarge">Brak danych</Text>
     </View>
   );
 };

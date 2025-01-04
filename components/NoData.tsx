@@ -2,7 +2,7 @@ import Text from '@/components/CustomText';
 import { useAppTheme } from '@/constants/theme';
 import { View } from 'react-native';
 
-const NoData = () => {
+const NoData = ({text = 'Brak danych'}) => {
     const t = useAppTheme();
     return (
         <View
@@ -12,7 +12,7 @@ const NoData = () => {
                 alignItems: 'center',
                 backgroundColor: t.colors.white,
             }}>
-            <Text variant="titleLarge">Brak danych</Text>
+            <Text variant="titleLarge">{text}</Text>
         </View>
     );
 };

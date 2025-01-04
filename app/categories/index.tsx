@@ -5,7 +5,7 @@ import {ScrollView, View} from 'react-native';
 import _ from 'lodash';
 import {IconButton} from 'react-native-paper';
 
-import {Modal, TextInput} from '@/components';
+import {Glow, Modal, NoData, TextInput} from '@/components';
 import {CustomModal} from '@/components/CustomModal';
 import {useAppTheme} from '@/constants/theme';
 import {useAppDispatch, useAppSelector} from '@/hooks';
@@ -16,6 +16,7 @@ import {
   handleGroupCategory,
 } from '@/redux/main/thunks';
 import GroupedItemsList from '@/components/categories/GroupedItemsList';
+import {DeleteCategory} from '@/components/categories/types';
 
 const modalState: () => CustomModal = () => ({
   visible: false,
@@ -61,10 +62,13 @@ export default function MainView() {
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <IconButton
-          icon={edit ? 'check' : 'pencil'}
-          onPressIn={() => setEdit(!edit)}
-        />
+        <Glow isGlowing={!edit} glowColor={t.colors.primary}>
+          <IconButton
+            icon={edit ? 'check' : 'pencil'}
+            onPressIn={() => setEdit(!edit)}
+            iconColor={t.colors.primary}
+          />
+        </Glow>
       ),
     });
   }, [navigation, edit]);
@@ -91,18 +95,22 @@ export default function MainView() {
   return (
     <View style={{height: '100%', backgroundColor: t.colors.white}}>
       <ScrollView>
-        {mainCategories.map(([groupName, groupId]) => (
-          <GroupedItemsList
-            key={groupName}
-            nameOfGroup={groupName}
-            items={grouped[groupName]}
-            edit={edit}
-            addModal={addModal}
-            emptyModal={emptyModal}
-            handleDelete={handleDelete}
-            groupId={groupId}
-          />
-        ))}
+        {!mainCategories.length ? (
+          <NoData text="Edytuj aby dodać kategorię" />
+        ) : (
+          mainCategories.map(([groupName, groupId]) => (
+            <GroupedItemsList
+              key={groupName}
+              nameOfGroup={groupName}
+              items={grouped[groupName]}
+              edit={edit}
+              addModal={addModal}
+              emptyModal={emptyModal}
+              handleDelete={handleDelete}
+              groupId={groupId}
+            />
+          ))
+        )}
         {edit && (
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <TextInput
