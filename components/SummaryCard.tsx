@@ -29,7 +29,7 @@ const SummaryCard = (props: Props) => {
   const sumCosts = _.sumBy(_.values(costs));
 
   const handleNavigate = (date: string) => () =>
-    router.navigate({pathname: '/summary/main-summary', params: {date}});
+    router.navigate({pathname: '/summary/chart-details', params: {date}});
 
   return (
     <Card style={styles.root}>

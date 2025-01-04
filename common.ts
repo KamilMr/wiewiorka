@@ -17,16 +17,16 @@ export const SUMMARY_CHART = 'summary/chart/:param';
 
 export const EXCLUDED_CAT = [];
 
-export const getURL = (p = '') => {
+const getURL = (p = '') => {
   return `${URL}/${p}`;
 };
 
-export const formatPrice = (grosz: number) => {
+const formatPrice = (grosz: number) => {
   const zloty = grosz;
   return `${zloty.toFixed(2)} zł`;
 };
 
-export const makeNewIdArr = (number: number) => {
+const makeNewIdArr = (number: number) => {
   const set = new Set();
   let num = number;
 
@@ -40,7 +40,7 @@ export const makeNewIdArr = (number: number) => {
 };
 
 // Function to check if the user scrolled to the bottom
-export const isCloseToBottom = ({
+const isCloseToBottom = ({
   layoutMeasurement,
   contentOffset,
   contentSize,
@@ -48,12 +48,12 @@ export const isCloseToBottom = ({
   return layoutMeasurement.height + contentOffset.y >= contentSize.height - 20;
 };
 
-export const dh = {
+const dh = {
   isBetweenDates: (d, s, e) =>
     (isBefore(d, e) && isAfter(d, s)) || isSameDay(d, s) || isSameDay(d, e),
 };
 
-export const convertDate = (
+const convertDate = (
   str: string,
   format: string = 'dd/MM/yyyy',
   newformat: string = 'yyyy-MM-dd',
@@ -61,6 +61,32 @@ export const convertDate = (
   return formatDate(parse(str, format, new Date()), newformat);
 };
 
-export const shortenText = (text: string, maxLength: number = 10) => {
+const shortenText = (text: string, maxLength: number = 10) => {
   return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+};
+
+/**
+ * Replace Polish diacritics with their English counterparts
+ * */
+const normalize = (str: string): string => {
+  const map = 'ąćęłńóśźż';
+  const norm = 'acelnoszz';
+
+  return str.replace(/./g, (c) => {
+    const isUpper = c === c.toUpperCase();
+    const idx = map.indexOf(c.toLowerCase());
+
+    return idx === -1 ? c : isUpper ? norm[idx].toUpperCase() : norm[idx];
+  });
+};
+
+export {
+  convertDate,
+  dh,
+  formatPrice,
+  getURL,
+  isCloseToBottom,
+  makeNewIdArr,
+  normalize,
+  shortenText,
 };

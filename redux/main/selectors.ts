@@ -2,7 +2,7 @@ import {createSelector} from '@reduxjs/toolkit';
 import {format, isAfter, isBefore, isSameDay} from 'date-fns';
 import _ from 'lodash';
 
-import {EXCLUDED_CAT, dh, makeNewIdArr} from '@/common';
+import {EXCLUDED_CAT, dh, makeNewIdArr, normalize} from '@/common';
 import {RootState} from '../store';
 import {Category, Expense, Income, Subcategory} from './mainSlice';
 
@@ -20,20 +20,23 @@ const filterCat = (exp: Expense, f: Array<string>) => {
   return f.includes(exp.category);
 };
 
-const filterTxt = (
-  exp: Pick<Expense, 'description' | 'category'>,
-  f: string,
-) => {
+const filterTxt = (exp: any, f: string) => {
   if (!f) return true;
-  const string = exp.description + exp.category;
-  return string.toLowerCase().includes(f.toLowerCase());
+  const string = ['description', 'category', 'source', 'date'].reduce(
+    (pv, cv) => {
+      if (cv === 'date') return pv + format(new Date(exp.date), 'dd/MM/yyyy');
+      return pv + exp[cv] + '';
+    },
+    '',
+  );
+  return normalize(string.toLowerCase()).includes(normalize(f.toLowerCase()));
 };
 
 export const selectRecords = (number: number, search: Search) =>
   createSelector(
     [selectExpensesAll, selectCategories, selectIncomes],
     (expenses, categories, incomes) => {
-      const {txt, categories: fc, dates} = search;
+      const {txt: searchedTxt, categories: fc, dates} = search;
       const isValidArr =
         Array.isArray(dates) &&
         dates.length === 2 &&
@@ -62,8 +65,8 @@ export const selectRecords = (number: number, search: Search) =>
           };
         });
 
-      tR = tR.filter((exp: Expense & Income) => {
-        return filterTxt(exp, txt) && filterCat(exp, fc);
+      tR = tR.filter((record: Expense & Income) => {
+        return filterTxt(record, searchedTxt) && filterCat(record, fc);
       });
       return _.chain(tR)
         .sortBy(['date'])
@@ -104,6 +107,7 @@ export const selectCategories = createSelector(
   (cat) => {
     const arr = Object.entries(cat);
     return arr.reduce((pv: Array<Subcategory>, [key, cv]: [string, any]) => {
+      if (!cv.subcategories) cv.subcategories = [];
       const subcategories: Array<Subcategory> = [...cv.subcategories].map(
         (obj) => ({
           ...obj,
@@ -137,9 +141,9 @@ export const selectMainCategories = createSelector(
   },
 );
 
-export const selectComparison = (num: number | string) =>
+export const selectComparison = (number1or12: number | string) =>
   createSelector([selectIncomes, selectExpensesAll], (income, expenses) => {
-    const pattern: string = +num === 1 ? 'MM/yyyy' : 'yyyy';
+    const pattern: string = +number1or12 === 1 ? 'MM/yyyy' : 'yyyy';
     const calPrice = (price: number, vat: number = 0): number =>
       price - price * (vat / 100);
 
@@ -176,18 +180,10 @@ export const selectSources = (state: RootState) => {
   return state.main.sources[state.auth.name];
 };
 
-const withinRange = (date: Date, dates: [Date, Date]) => {
-  return (
-    (isAfter(date, dates[0]) && isBefore(new Date(date), dates[1])) ||
-    isSameDay(date, dates[0]) ||
-    isSameDay(date, dates[1])
-  );
-};
-
 export const selectByTimeRange = (dates: [Date, Date]) => {
   return createSelector([(state) => state.main._aggregated], (data) => {
     if (dates?.length === 2)
-      return _.pickBy(data, (_, date) => withinRange(new Date(date), dates));
+      return _.pickBy(data, (_, date) => dh.isBetweenDates(new Date(date), dates[0], dates[1]));
     else return data;
   });
 };
