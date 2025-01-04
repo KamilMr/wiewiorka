@@ -19,26 +19,18 @@ interface SignupData {
 const Signup = () => {
   const dispatch = useAppDispatch();
   const [data, setData] = useState<SignupData>({
-    email: 'a',
-    password: 'a',
-    name: 'a',
+    email: '',
+    password: '',
+    name: '',
     surname: '',
   });
-
-  const [rememberUser, setRememberUser] = useState(false);
 
   const t = useAppTheme();
 
   const isFormReady = data.password && data.email;
 
-  const handleCheckbox = () => setRememberUser(!rememberUser);
-
   const handleData = (field: string) => (text: string) => {
     setData((data) => ({...data, [field]: text}));
-  };
-
-  const handleForgotPassword = () => {
-    // TODO:
   };
 
   const handleSave = () => {
