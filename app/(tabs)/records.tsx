@@ -16,6 +16,7 @@ import {selectRecords} from '@/redux/main/selectors';
 import {useAppSelector} from '@/hooks';
 import DynamicRecordList from '@/components/DynamicList';
 import {sizes, useAppTheme} from '@/constants/theme';
+import {NoData} from '@/components';
 
 const Records = () => {
   const t = useAppTheme();
@@ -46,19 +47,24 @@ const Records = () => {
   };
 
   return (
-    <SafeAreaView style={{padding: sizes.xl, backgroundColor: t.colors.background}}>
+    <SafeAreaView
+      style={{padding: sizes.xl, backgroundColor: t.colors.background}}>
       <Searchbar
         placeholder="Szukaj"
         onChangeText={setSearchQuery}
         value={searchQuery}
         style={{marginBottom: sizes.lg}}
       />
-      <ScrollView onScroll={handleScroll}>
-        <DynamicRecordList
-          records={records}
-          handleNavigate={handleNavigate}
-          handleScroll={handleScroll}
-        />
+      <ScrollView onScroll={handleScroll} style={{height: '100%'}}>
+        {!_.keys(records).length ? (
+          <NoData />
+        ) : (
+          <DynamicRecordList
+            records={records}
+            handleNavigate={handleNavigate}
+            handleScroll={handleScroll}
+          />
+        )}
       </ScrollView>
     </SafeAreaView>
   );

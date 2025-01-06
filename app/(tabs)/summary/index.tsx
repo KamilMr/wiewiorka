@@ -8,6 +8,7 @@ import {selectComparison} from '@/redux/main/selectors';
 import {SummaryCard, Text} from '@/components';
 import {useAppSelector} from '@/hooks';
 import {useAppTheme} from '@/constants/theme';
+import {NoData} from '@/components';
 
 const MONTH = 1;
 const YEAR = 12;
@@ -57,7 +58,12 @@ const Summary = () => {
 
   return (
     <SafeAreaView style={{backgroundColor: t.colors.white}}>
-      <ScrollView style={{backgroundColor: t.colors.white}}>
+      <ScrollView
+        style={{
+          backgroundColor: t.colors.white,
+          height: '100%',
+          marginTop: 4 * 4,
+        }}>
         <Config
           selection={[
             [MONTH, MONTH_LABEL],
@@ -65,15 +71,19 @@ const Summary = () => {
           ]}
           onChange={handleChange}
         />
-        {summary.map((sumObj) => (
-          <SummaryCard
-            key={sumObj.id}
-            income={sumObj.income}
-            outcome={sumObj.outcome}
-            date={sumObj.date}
-            costs={sumObj.costs}
-          />
-        ))}
+        {!summary.length ? (
+          <NoData />
+        ) : (
+          summary.map((sumObj) => (
+            <SummaryCard
+              key={sumObj.id}
+              income={sumObj.income}
+              outcome={sumObj.outcome}
+              date={sumObj.date}
+              costs={sumObj.costs}
+            />
+          ))
+        )}
         <View style={{height: 80}} />
       </ScrollView>
     </SafeAreaView>

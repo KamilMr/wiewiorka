@@ -1,38 +1,43 @@
 import {useState} from 'react';
-import {Link, router} from 'expo-router';
+import {router, Link} from 'expo-router';
 import {StyleSheet, View} from 'react-native';
 
 import {Button, TextInput} from 'react-native-paper';
 
-import {signIn} from '@/redux/auth/thunks';
+import {signIn, signup} from '@/redux/auth/thunks';
 import {useAppDispatch} from '@/hooks';
 import {Text} from '@/components';
 import {useAppTheme} from '@/constants/theme';
 
-const Login = () => {
+interface SignupData {
+  email: string;
+  password: string;
+  name: string;
+  surname?: string;
+}
+
+const Signup = () => {
   const dispatch = useAppDispatch();
-  const [data, setData] = useState({
-    email: process.env.EXPO_PUBLIC_USER_EMAIL || '',
-    password: process.env.EXPO_PUBLIC_USER_PASSWORD || '',
+  const [data, setData] = useState<SignupData>({
+    email: '',
+    password: '',
+    name: '',
+    surname: '',
   });
-  const [rememberUser, setRememberUser] = useState(false);
 
   const t = useAppTheme();
 
   const isFormReady = data.password && data.email;
 
-  const handleCheckbox = () => setRememberUser(!rememberUser);
-
   const handleData = (field: string) => (text: string) => {
     setData((data) => ({...data, [field]: text}));
   };
 
-  const handleForgotPassword = () => {
-    // TODO:
-  };
-
   const handleSave = () => {
-    dispatch(signIn(data)).then(() => router.replace('/'));
+    dispatch(signup(data))
+      .unwrap()
+      .then(() => router.replace('/sign-in'))
+      .catch((err) => console.log(err));
   };
 
   return (
@@ -40,19 +45,25 @@ const Login = () => {
       <View style={{flex: 1}}></View>
       <View style={{flex: 2, width: '100%'}}>
         <Text variant="bodyLarge" style={styles.heading}>
-          Logowanie do konta
+          Rejestracja konta
         </Text>
+        <TextInput
+          label="Imię"
+          value={data.name}
+          onChangeText={handleData('name')}
+          style={[styles.textInput, {marginBottom: 4 * 2}]}
+        />
         <TextInput
           label="Email"
           value={data.email}
-          keyboardType="email-address"
+          keyboardType='email-address'
           onChangeText={handleData('email')}
           style={[styles.textInput, {marginBottom: 4 * 2}]}
         />
         <TextInput
           label="Hasło"
           value={data.password}
-          keyboardType="visible-password"
+          keyboardType='visible-password'
           onChangeText={handleData('password')}
           style={styles.textInput}
         />
@@ -62,17 +73,17 @@ const Login = () => {
         disabled={!isFormReady}
         mode="contained"
         style={{width: '80%', marginBottom: 8 * 2}}>
-        Zaloguj się
+        Zarejestruj się
       </Button>
       <View style={{flexDirection: 'row', marginBottom: 4 * 2}}>
-        <Text>Nie masz konta? </Text>
-        <Link href="/sign-up">
+        <Text>Masz konto? </Text>
+        <Link href="/sign-in">
           <Text
             style={{
               color: t.colors.primary,
               textDecorationLine: 'underline',
             }}>
-            Zarejestruj się
+            Zaloguj się
           </Text>
         </Link>
       </View>
@@ -91,4 +102,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Login;
+export default Signup;

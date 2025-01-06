@@ -8,7 +8,7 @@ import {setSnackbar} from '@/redux/main/mainSlice';
 
 const CustomSnackBar = () => {
   const dispatch = useAppDispatch();
-  let {open: visible, type = '', msg} = useAppSelector(selectSnackbar);
+  let {open: visible, type = '', msg, time = 1500} = useAppSelector(selectSnackbar);
 
   if (typeof msg !== 'string') msg = '';
 
@@ -17,7 +17,7 @@ const CustomSnackBar = () => {
   useEffect(() => {
     const id = setTimeout(() => {
       dispatch(setSnackbar({}));
-    }, 1500);
+    }, time);
 
     return () => {
       clearTimeout(id);

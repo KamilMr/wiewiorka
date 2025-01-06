@@ -22,6 +22,7 @@ type Snackbar = {
   open: boolean;
   type: string;
   msg: string;
+  time?: number;
 };
 
 export interface Income {
@@ -103,12 +104,9 @@ const mainSlice = createSlice({
       state.status = action.payload;
     },
     setSnackbar: (state, action) => {
-      let {open = false, type = '', msg = ''} = action.payload || {};
+      let {open = false, type = '', msg = '', setTime} = action.payload || {};
       if (msg) open = true;
-      // state.snackbar.open = open;
-      // state.snackbar.msg = msg;
-      // state.snackbar.type = type;
-      state.snackbar = {type, msg, open};
+      state.snackbar = {type, msg, open, time: setTime};
     },
     initState: (state, action) => {
       state.expenses = action.payload.expenses.map((ex: Expense) => ({
