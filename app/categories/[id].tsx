@@ -3,7 +3,7 @@ import {ScrollView, View} from 'react-native';
 import {useLocalSearchParams, router, useNavigation} from 'expo-router';
 import {TouchableRipple} from 'react-native-paper';
 
-import _ from 'lodash';
+import _, {isNaN} from 'lodash';
 
 import {ColorPicker, Select, TextInput} from '@/components';
 import {useAppDispatch, useAppSelector} from '@/hooks';
@@ -40,7 +40,9 @@ export default function OneCategory() {
   const fetching = useAppSelector(selectStatus);
   const isFetching = fetching === 'fetching';
 
-  const category: Subcategory | undefined = useAppSelector(selectCategory(+id));
+  const category: Subcategory | undefined = useAppSelector(
+    selectCategory(isNaN(+id) ? null : +id),
+  );
   const categories = useAppSelector(selectMainCategories);
 
   const {
@@ -54,7 +56,8 @@ export default function OneCategory() {
   const initialState = emptyState({
     id: catId,
     name,
-    groupName,
+    groupName:
+      groupName || categories.find((k) => +k[1] === +incomingGrId)?.[0] || '',
     groupId: groupId || +incomingGrId,
     color,
   });

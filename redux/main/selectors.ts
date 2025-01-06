@@ -121,9 +121,9 @@ export const selectCategories = createSelector(
   },
 );
 
-export const selectCategory = (id: number) =>
+export const selectCategory = (id: number | null) =>
   createSelector([selectCategories], (categories) => {
-    return categories.find((c) => c.id === id);
+    return id ? categories.find((cat) => cat.id === id) : undefined;
   });
 
 export const selectMainCategories = createSelector(
