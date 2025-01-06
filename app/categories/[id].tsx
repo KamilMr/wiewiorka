@@ -1,6 +1,6 @@
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import {ScrollView, View} from 'react-native';
-import {useLocalSearchParams, router, useNavigation} from 'expo-router';
+import {useLocalSearchParams, router} from 'expo-router';
 import {TouchableRipple} from 'react-native-paper';
 
 import _, {isNaN} from 'lodash';

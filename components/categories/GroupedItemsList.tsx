@@ -1,7 +1,7 @@
 import {router, useNavigation} from 'expo-router';
 
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
-import {IconButton} from 'react-native-paper';
+import {IconButtonWithStatus as IconButton} from '@/components';
 import {Text} from '..';
 import {
   ItemsProps,

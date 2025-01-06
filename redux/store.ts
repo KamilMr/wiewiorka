@@ -3,7 +3,12 @@ import {createMigrate, persistReducer, persistStore} from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import authReducer, {authEmptyState, dropMe} from './auth/authSlice';
-import mainReducer, {dropMain, mainEmptyState} from './main/mainSlice';
+import mainReducer, {
+  dropMain,
+  mainEmptyState,
+  startLoading,
+  stopLoading,
+} from './main/mainSlice';
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -17,6 +22,19 @@ const authMiddleware = (store: Store) => (next: any) => async (action: any) => {
   }
   return next(action);
 };
+
+const setLoadingStatusMiddleware =
+  (store: Store) => (next: any) => async (action: any) => {
+    if (action.type.endsWith('/pending')) {
+      store.dispatch(startLoading(''));
+    } else if (
+      action.type.endsWith('/fulfilled') ||
+      action.type.endsWith('/rejected')
+    ) {
+      store.dispatch(stopLoading(''));
+    }
+    return next(action);
+  };
 
 const migrations = {
   0: (state: RootState) => {
@@ -62,7 +80,7 @@ const store = configureStore({
       // serializableCheck: {
       //   ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       // },
-    }).concat(authMiddleware),
+    }).concat([authMiddleware, setLoadingStatusMiddleware]),
 });
 
 const persistor = persistStore(store);

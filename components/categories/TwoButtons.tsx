@@ -1,7 +1,7 @@
 import {useIsLoading} from '@/hooks/index';
 import {View} from 'react-native';
 
-import {Button} from 'react-native-paper';
+import {ButtonWithStatus as Button} from '@/components';
 
 interface TwoButtonsProps {
   handleOk: () => void;
@@ -21,17 +21,19 @@ export const TwoButtons: React.FC<TwoButtonsProps> = ({
   disableOk = false,
 }) => {
   if (!visible) return null;
-  const loading = useIsLoading();
   return (
     <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
-      <Button mode="outlined" onPress={handleCancel} disabled={disableOk || loading}>
+      <Button
+        mode="outlined"
+        onPress={handleCancel}
+        disabled={disableOk}>
         {cancelTxt}
       </Button>
       <Button
-        loading={loading}
         mode="contained"
+        showLoading
         onPress={handleOk}
-        disabled={disableOk || loading}>
+        disabled={disableOk}>
         {okTxt}
       </Button>
     </View>

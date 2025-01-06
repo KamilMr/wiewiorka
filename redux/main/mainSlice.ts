@@ -100,8 +100,11 @@ const mainSlice = createSlice({
   name: 'main',
   initialState: emptyState,
   reducers: {
-    setStatus: (state, action) => {
-      state.status = action.payload;
+    startLoading: (state, action) => {
+      state.status = 'fetching'
+    },
+    stopLoading: (state, action) => {
+      state.status = 'idle';
     },
     setSnackbar: (state, action) => {
       let {open = false, type = '', msg = '', setTime} = action.payload || {};
@@ -174,11 +177,7 @@ const mainSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchIni.pending, (state, action) => {
-        state.status = 'fetching';
-      })
       .addCase(fetchIni.fulfilled, (state, action) => {
-        state.status = 'idle';
         let {expenses, income, categories} = action.payload;
         expenses = expenses.map((ex: Expense) => ({
           ...ex,
@@ -205,7 +204,6 @@ const mainSlice = createSlice({
         state.snackbar.open = true;
         state.snackbar.type = 'error';
         state.snackbar.msg = action.error.message || 'Coś poszło nie tak';
-        state.status = 'idle';
       })
       .addCase(handleCategory.rejected, (state, action) => {
         state.snackbar.open = true;
@@ -282,7 +280,8 @@ export const {
   initState,
   removeExpense,
   setSnackbar,
-  setStatus,
+  startLoading,
+  stopLoading,
   updateExpense,
 } = mainSlice.actions;
 
