@@ -8,7 +8,7 @@ import {
   useNavigation,
 } from 'expo-router';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {Button, IconButton} from 'react-native-paper';
+import {IconButton} from 'react-native-paper';
 
 import _ from 'lodash';
 import {format} from 'date-fns';
@@ -16,7 +16,12 @@ import {format} from 'date-fns';
 import {selectCategories, selectExpense} from '@/redux/main/selectors';
 import {deleteExpense, uploadExpense} from '@/redux/main/thunks';
 import {useAppDispatch, useAppSelector} from '@/hooks';
-import {Select, TextInput, Image} from '@/components';
+import {
+  ButtonWithStatus as Button,
+  Image,
+  Select,
+  TextInput,
+} from '@/components';
 import CustomeDatePicker from '@/components/DatePicker';
 import {useAppTheme} from '@/constants/theme';
 
@@ -58,7 +63,6 @@ const Expense = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedExpense, setEditedExpense] = useState(initState(expense));
 
-  const [isLoading, setIsLoading] = useState(false);
   const isValid = validateInput(editedExpense);
 
   const t = useAppTheme();
@@ -91,8 +95,6 @@ const Expense = () => {
   };
 
   const handleSave = () => {
-    if (isLoading) return;
-    setIsLoading(true);
     const newD = _.chain(editedExpense)
       .pick(['date', 'description', 'categoryId', 'price', 'image'])
       .omitBy((d) => !d || d === 'undefined')
@@ -123,7 +125,6 @@ const Expense = () => {
       .unwrap()
       .then(() => {
         setIsEditMode(false);
-        setIsLoading(false);
         router.navigate('/(tabs)/records');
       });
   };
@@ -247,8 +248,8 @@ const Expense = () => {
               <Button
                 mode="contained"
                 onPress={handleSave}
-                loading={isLoading}
                 disabled={!isValid}
+                showLoading
                 style={styles.button}>
                 Save
               </Button>

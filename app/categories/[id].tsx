@@ -36,9 +36,6 @@ const emptyState = ({id, color, name, groupName, groupId}: State): State => ({
 export default function OneCategory() {
   const dispatch = useAppDispatch();
   const {id, groupId: incomingGrId} = useLocalSearchParams();
-  const navigation = useNavigation();
-  const fetching = useAppSelector(selectStatus);
-  const isFetching = fetching === 'fetching';
 
   const category: Subcategory | undefined = useAppSelector(
     selectCategory(isNaN(+id) ? null : +id),
@@ -187,7 +184,6 @@ export default function OneCategory() {
         handleCancel={handleCancel}
         okTxt="Zapisz"
         disableOk={!isDirty}
-        loading={isFetching}
       />
       <ColorPicker
         value={state.color}

@@ -11,7 +11,7 @@ const rootReducer = combineReducers({
 });
 
 const authMiddleware = (store: Store) => (next: any) => async (action: any) => {
-  if (action.error?.message === 'session_not_active') {
+  if (['session_not_active', 'not_auth'].includes(action.error?.message)) {
     store.dispatch(dropMe());
     store.dispatch(dropMain());
   }
