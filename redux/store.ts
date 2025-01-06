@@ -1,24 +1,22 @@
-import {configureStore, combineReducers} from '@reduxjs/toolkit';
-import {
-  FLUSH,
-  PAUSE,
-  PERSIST,
-  PURGE,
-  REGISTER,
-  REHYDRATE,
-  createMigrate,
-  persistReducer,
-  persistStore,
-} from 'redux-persist';
+import {configureStore, combineReducers, Store} from '@reduxjs/toolkit';
+import {createMigrate, persistReducer, persistStore} from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import authReducer, {authEmptyState} from './auth/authSlice';
-import mainReducer, {mainEmptyState} from './main/mainSlice';
+import authReducer, {authEmptyState, dropMe} from './auth/authSlice';
+import mainReducer, {dropMain, mainEmptyState} from './main/mainSlice';
 
 const rootReducer = combineReducers({
   auth: authReducer,
   main: mainReducer,
 });
+
+const authMiddleware = (store: Store) => (next: any) => async (action: any) => {
+  if (action.error?.message === 'session_not_active') {
+    store.dispatch(dropMe());
+    store.dispatch(dropMain());
+  }
+  return next(action);
+};
 
 const migrations = {
   0: (state: RootState) => {
@@ -64,7 +62,7 @@ const store = configureStore({
       // serializableCheck: {
       //   ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       // },
-    }),
+    }).concat(authMiddleware),
 });
 
 const persistor = persistStore(store);

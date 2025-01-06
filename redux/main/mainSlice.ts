@@ -202,7 +202,6 @@ const mainSlice = createSlice({
         state._aggregated = aggregateDataByDay(expenses, categories);
       })
       .addCase(fetchIni.rejected, (state, action) => {
-        console.log('rejected');
         state.snackbar.open = true;
         state.snackbar.type = 'error';
         state.snackbar.msg = action.error.message || 'Coś poszło nie tak';
