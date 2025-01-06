@@ -3,9 +3,8 @@ import {useNavigation} from 'expo-router';
 import {ScrollView, View} from 'react-native';
 
 import _ from 'lodash';
-import {IconButton} from 'react-native-paper';
 
-import {Glow, Modal, NoData, TextInput} from '@/components';
+import {Glow, Modal, NoData, TextInput, IconButtonWithStatus as IconButton} from '@/components';
 import {CustomModal} from '@/components/CustomModal';
 import {useAppTheme} from '@/constants/theme';
 import {useAppDispatch, useAppSelector} from '@/hooks';
@@ -64,6 +63,7 @@ export default function MainView() {
       headerRight: () => (
         <Glow isGlowing={!edit} glowColor={t.colors.primary}>
           <IconButton
+            showLoading
             icon={edit ? 'check' : 'pencil'}
             onPressIn={() => setEdit(!edit)}
             iconColor={t.colors.primary}
@@ -123,7 +123,7 @@ export default function MainView() {
               }}
             />
 
-            <IconButton icon="check" onPress={handleSave} />
+            <IconButton showLoading icon="check" onPress={handleSave} />
           </View>
         )}
       </ScrollView>

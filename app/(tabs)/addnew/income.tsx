@@ -6,7 +6,7 @@ import {
   useNavigation,
 } from 'expo-router';
 import {View, StyleSheet, ScrollView} from 'react-native';
-import {Button, IconButton} from 'react-native-paper';
+import {IconButton} from 'react-native-paper';
 
 import {SafeAreaView} from 'react-native-safe-area-context';
 import _ from 'lodash';
@@ -15,7 +15,7 @@ import {format} from 'date-fns';
 import {selectIncome, selectSources} from '@/redux/main/selectors';
 import {deleteIncome, uploadIncome} from '@/redux/main/thunks';
 import {useAppDispatch, useAppSelector} from '@/hooks';
-import {Select, TextInput,Text} from '@/components';
+import {Select, TextInput,Text, ButtonWithStatus as Button} from '@/components';
 import CustomeDatePicker from '@/components/DatePicker';
 import {convertDate} from '@/common';
 import { useAppTheme } from '@/constants/theme';
@@ -217,6 +217,7 @@ const Income = () => {
                 mode="contained"
                 onPress={handleSave}
                 style={styles.button}>
+                showLoading
                 Zapisz
               </Button>
               <Button
