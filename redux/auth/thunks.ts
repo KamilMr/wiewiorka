@@ -45,29 +45,25 @@ export const signup = createAsyncThunk(
   '/user/signup',
   async ({email, password, name, surname}: SignUpCredentials, thunkAPI) => {
     let data: DataResponse;
-    try {
-      const resp = await fetch(getURL('users/signup'), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({email, password, name, surname}),
-      });
-      data = await resp.json();
-      if (data.err) {
-        const [key, ...string] = data.err.split(' ');
-        const newKey = {name: 'imię', email: 'email', password: 'hasło'}[key];
-        thunkAPI.dispatch(
-          setSnackbar({
-            msg: `${newKey} ${string.join(' ')}`,
-            type: 'error',
-            setTime: 3000,
-          }),
-        );
-        throw data.err;
-      }
-    } catch (err) {
-      throw err;
+    const resp = await fetch(getURL('users/signup'), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({email, password, name, surname}),
+    });
+    data = await resp.json();
+    if (data.err) {
+      const [key, ...string] = data.err.split(' ');
+      const newKey = {name: 'imię', email: 'email', password: 'hasło'}[key];
+      thunkAPI.dispatch(
+        setSnackbar({
+          msg: `${newKey} ${string.join(' ')}`,
+          type: 'error',
+          setTime: 3000,
+        }),
+      );
+      throw data.err;
     }
   },
 );
