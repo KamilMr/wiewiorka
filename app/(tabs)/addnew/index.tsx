@@ -234,11 +234,14 @@ const Expense = () => {
               value: cat.name,
             }))}
           />
+          {/*
           <Image
             imageSrc={editedExpense.image}
             editable={isEditMode}
             onChange={handleImageSave}
           />
+
+          */}
         </View>
 
         {/* Buttons for Edit, Save, Cancel */}
