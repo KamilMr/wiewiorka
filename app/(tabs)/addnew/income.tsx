@@ -216,8 +216,9 @@ const Income = () => {
               <Button
                 mode="contained"
                 onPress={handleSave}
-                style={styles.button}>
+                style={styles.button}
                 showLoading
+              >
                 Zapisz
               </Button>
               <Button

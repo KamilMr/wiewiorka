@@ -251,13 +251,13 @@ const Expense = () => {
                 disabled={!isValid}
                 showLoading
                 style={styles.button}>
-                Save
+                Zapisz
               </Button>
               <Button
                 mode="outlined"
                 onPress={handleCancel}
                 style={styles.button}>
-                Cancel
+                Przerwij
               </Button>
             </>
           ) : (
