@@ -16,7 +16,7 @@ import {selectIncome, selectSources} from '@/redux/main/selectors';
 import {deleteIncome, uploadIncome} from '@/redux/main/thunks';
 import {useAppDispatch, useAppSelector} from '@/hooks';
 import {Select, TextInput,Text, ButtonWithStatus as Button} from '@/components';
-import CustomeDatePicker from '@/components/DatePicker';
+import CustomDatePicker from '@/components/DatePicker';
 import {convertDate} from '@/common';
 import { useAppTheme } from '@/constants/theme';
 
@@ -151,7 +151,7 @@ const Income = () => {
           )}
 
           {isEditMode ? (
-            <CustomeDatePicker
+            <CustomDatePicker
               editable={!isEditMode}
               label="Wybierz datę"
               disabled={!isEditMode}
@@ -296,4 +296,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Income;
+// export default Income;

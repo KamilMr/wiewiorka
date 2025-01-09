@@ -22,7 +22,7 @@ import {
   Select,
   TextInput,
 } from '@/components';
-import CustomeDatePicker from '@/components/DatePicker';
+import CustomDatePicker from '@/components/DatePicker';
 import {useAppTheme} from '@/constants/theme';
 
 interface Expense {
@@ -166,7 +166,7 @@ const Expense = () => {
   return (
     <SafeAreaView style={[styles.container, {backgroundColor: t.colors.white}]}>
       <ScrollView keyboardShouldPersistTaps="always">
-        <View style={styles.detailsContainer}>
+        <View>
           {Number.isInteger(id * 1) && (
             <IconButton
               icon={'trash-can'}
@@ -185,7 +185,7 @@ const Expense = () => {
               setEditedExpense({...editedExpense, description: text})
             }
           />
-          <CustomeDatePicker
+          <CustomDatePicker
             editable={!isEditMode}
             label="Wybierz datę"
             disabled={!isEditMode}
@@ -293,7 +293,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-between', // Ensure buttons stay at the bottom
   },
-  detailsContainer: {},
   label: {
     fontSize: 16,
     fontWeight: 'bold',
@@ -328,4 +327,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Expense;
+// export default Expense;
