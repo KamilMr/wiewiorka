@@ -3,10 +3,11 @@ import {
   pl,
   registerTranslation,
 } from 'react-native-paper-dates';
+import {View} from 'react-native';
 
 registerTranslation('pl', pl);
 
-interface CustomeDatePickerProps {
+interface CustomDatePickerProps {
   editable?: boolean;
   disabled?: boolean;
   readOnly?: boolean;
@@ -18,7 +19,7 @@ interface CustomeDatePickerProps {
 
 const defaultValue = new Date();
 
-const CustomeDatePicker = ({
+const CustomDatePicker = ({
   label,
   editable,
   disabled,
@@ -26,26 +27,36 @@ const CustomeDatePicker = ({
   onChange = () => {},
   value,
   style,
-}: CustomeDatePickerProps) => {
+}: CustomDatePickerProps) => {
   const handleOnConfirm = (date: Date | undefined) => {
     if (!date) return;
     onChange(date);
   };
 
   return (
-    <DatePickerInput
-      inputMode="end"
-      editable={editable}
-      disabled={disabled}
-      readOnly={readOnly}
-      keyboardType="numeric"
-      locale="pl"
-      label={label}
-      value={value || defaultValue}
-      onChange={handleOnConfirm}
-      style={[style]}
-    />
+      <DatePickerInput
+        inputMode="start"
+        mode='outlined'
+        theme={{
+          colors: {
+          },
+        }}
+        editable={editable}
+        disabled={disabled}
+        readOnly={readOnly}
+        keyboardType="numeric"
+        locale="pl"
+        label={label}
+        value={value || defaultValue}
+        onChange={handleOnConfirm}
+        style={[
+          {
+            underlineColorAndroid: 'transparent',
+          },
+          style,
+        ]}
+      />
   );
 };
 
-export default CustomeDatePicker;
+export default CustomDatePicker;

@@ -8,7 +8,7 @@ import CustomSnackBar from './Snackbar';
 import CustomSwitch from './Switch';
 import CustomText from './CustomText';
 import CustomTextInput from './CustomTextInput';
-import CustomeDatePicker from './DatePicker';
+import CustomDatePicker from './DatePicker';
 import DropdownComponent from './CustomSelect';
 import FullWidthImage from './FullImage';
 import Glow from './Glowing';
@@ -32,7 +32,7 @@ export {
   CustomSwitch as Switch,
   CustomText as Text,
   CustomTextInput as TextInput,
-  CustomeDatePicker as DatePicker,
+  CustomDatePicker as DatePicker,
   DropdownComponent as Select,
   FullWidthImage,
   Glow,
