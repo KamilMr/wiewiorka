@@ -7,7 +7,6 @@ import {ActivityIndicator} from 'react-native-paper';
 import {selectToken} from '@/redux/auth/authSlice';
 import {fetchIni} from '@/redux/main/thunks';
 import {useAppDispatch, useAppSelector} from '@/hooks';
-import {TabBar} from '@/components';
 import {TabBarIcon} from '@/components/navigation/TabBarIcon';
 import {sizes} from '@/constants/theme';
 import {selectStatus} from '@/redux/main/selectors';
@@ -31,7 +30,6 @@ export default function TabLayout() {
 
   return (
     <Tabs
-      // tabBar={(props) => <TabBar {...props} />}
       screenOptions={{
         headerShown: true,
         headerTitle: '',
