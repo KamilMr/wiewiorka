@@ -12,6 +12,7 @@ import {View, StyleSheet} from 'react-native';
 import {RadioButton} from 'react-native-paper';
 import {useAppSelector} from '@/hooks';
 import {selectCategories, selectSources} from '@/redux/main/selectors';
+import { set } from 'lodash';
 
 const SelectRadioButtons = ({
   items,
@@ -50,6 +51,8 @@ export default function AddNew() {
     category: '',
   });
 
+  console.log('form', form);
+
   const itemsToSelect =
     type === 'expense'
       ? expenseCategories.map((cat) => ({label: cat.name, value: cat.name}))
@@ -57,11 +60,11 @@ export default function AddNew() {
           .concat(['Dodaj nową kategorię'])
           .map((item: string) => ({label: item, value: item}));
 
-  const handleSelectCategory = (category: string) => {
-    if (category === 'Dodaj nową kategorię') {
+  const handleSelectCategory = (category: {label: string; value: string}) => {
+    if (category.value === 'Dodaj nową kategorię') {
       console.log('dodaj nową kategorię');
     } else {
-      // todo
+      setForm({...form, category: category.value});
     }
   };
 
@@ -102,10 +105,8 @@ export default function AddNew() {
 
         <Select
           items={itemsToSelect}
-          onChange={(data: any) => {
-            console.log(data);
-          }}
-          value={undefined}
+          onChange={handleSelectCategory}
+          value={type === 'income' ? form.category : expenseCategories.find((cat) => cat.name === form.category)?.name}
         />
       </View>
       <View style={styles.buttons}>
