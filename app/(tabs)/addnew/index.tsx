@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   ButtonWithStatus,
   DatePicker,
@@ -5,12 +6,22 @@ import {
   Text,
   TextInput,
 } from '@/components';
-import { sizes } from '@/constants/theme';
+import {sizes} from '@/constants/theme';
 import {useState} from 'react';
 import {View, StyleSheet} from 'react-native';
 import {RadioButton} from 'react-native-paper';
+import {useAppSelector} from '@/hooks';
+import {selectCategories, selectSources} from '@/redux/main/selectors';
 
-const SelectRadioButtons = ({items, selected, onSelect}) => {
+const SelectRadioButtons = ({
+  items,
+  selected,
+  onSelect,
+}: {
+  items: {label: string; value: string}[];
+  selected: string;
+  onSelect: (value: string) => void;
+}) => {
   return (
     <View style={styles.radioButtons}>
       {items.map((item) => (
@@ -29,17 +40,56 @@ const SelectRadioButtons = ({items, selected, onSelect}) => {
 
 export default function AddNew() {
   const [type, setType] = useState('expense');
+  const expenseCategories = useAppSelector(selectCategories);
+  const incomeCategories = useAppSelector(selectSources) || [];
+
+  const [form, setForm] = useState({
+    description: '',
+    date: new Date(),
+    price: '',
+    category: '',
+  });
+
+  const itemsToSelect =
+    type === 'expense'
+      ? expenseCategories.map((cat) => ({label: cat.name, value: cat.name}))
+      : incomeCategories
+          .concat(['Dodaj nową kategorię'])
+          .map((item: string) => ({label: item, value: item}));
+
+  const handleSelectCategory = (category: string) => {
+    if (category === 'Dodaj nową kategorię') {
+      console.log('dodaj nową kategorię');
+    } else {
+      // todo
+    }
+  };
 
   return (
     <View style={{flex: 1, padding: sizes.lg}}>
       <View style={{flex: 1}}>
-        <TextInput style={styles.input} label={'Opis'} />
+        <TextInput
+          style={styles.input}
+          label={'Opis'}
+          onChangeText={(text) => setForm({...form, description: text})}
+          value={form.description}
+        />
 
         <View style={[styles.input, {padding: 0, marginVertical: 24}]}>
-          <DatePicker label="Wybierz Datę" />
+          <DatePicker
+            label="Wybierz Datę"
+            onChange={(date) => date && setForm({...form, date})}
+            value={form.date}
+          />
         </View>
 
-        <TextInput style={styles.input} label="Cena" keyboardType="numeric" />
+        <TextInput
+          style={styles.input}
+          label="Cena"
+          keyboardType="numeric"
+          onChangeText={(text) => setForm({...form, price: text})}
+          value={form.price}
+        />
 
         <SelectRadioButtons
           items={[
@@ -51,8 +101,11 @@ export default function AddNew() {
         />
 
         <Select
-          label="Kategoria"
-          items={[{label: 'Kategoria 1', value: '1'}]}
+          items={itemsToSelect}
+          onChange={(data: any) => {
+            console.log(data);
+          }}
+          value={undefined}
         />
       </View>
       <View style={styles.buttons}>
