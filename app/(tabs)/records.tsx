@@ -41,8 +41,8 @@ const Records = () => {
 
   const handleNavigate = (id: number, isExpense: boolean) => () => {
     router.push({
-      pathname: isExpense ? '/addnew' : '/addnew/income',
-      params: {id},
+      pathname: '/addnew',
+      params: {id, type: isExpense ? 'expense' : 'income'},
     });
   };
 
