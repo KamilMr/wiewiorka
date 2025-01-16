@@ -1,7 +1,7 @@
-import React, {useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 
-import _ from 'lodash';
-import {router} from 'expo-router';
+import _, {set} from 'lodash';
+import {router, useFocusEffect, useLocalSearchParams} from 'expo-router';
 import {formatDate} from 'date-fns';
 import {View, StyleSheet} from 'react-native';
 import {RadioButton} from 'react-native-paper';
@@ -51,14 +51,34 @@ const initState = (date = new Date()) => ({
 });
 
 export default function AddNew() {
-  const [type, setType] = useState('expense');
+  const [type, setType] = useState<string>('expense');
   const expenseCategories = useAppSelector(selectCategories);
+  const {id, type: incomingType = ''} = useLocalSearchParams();
   const incomeCategories = useAppSelector(selectSources) || [];
   const dispatch = useAppDispatch();
 
   const [form, setForm] = useState(initState());
 
-  console.log('form', form);
+  useEffect(() => {
+    if (incomingType && typeof incomingType === 'string') {
+      setType(incomingType);
+    }
+
+    return () => {
+      console.log('cleanup');
+    };
+  }, [incomingType]);
+
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        setForm(initState());
+        setType('expense');
+      };
+    }, [])
+  );
+
+  // console.log('form', form, id);
 
   const itemsToSelect =
     type === 'expense'
