@@ -71,7 +71,7 @@ export default function AddNew() {
   const dispatch = useAppDispatch();
   const navigation = useNavigation();
 
-  const disablTypeChange = !!id;
+  const disablTypeChange = isNaN(+id) ? false : true;
 
   // logic when editing an existing record
   const record = useAppSelector(
@@ -97,10 +97,6 @@ export default function AddNew() {
         price: record?.price.toString() || '',
         category: record?.category || record?.source || '',
       });
-      return () => {
-        setForm(initState());
-        setType('expense');
-      };
     }, [id]),
   );
 
@@ -109,6 +105,8 @@ export default function AddNew() {
       // clean up params
       const unsubscribe = navigation.addListener('blur', () => {
         navigation.setParams({id: undefined, type: undefined});
+        setForm(initState());
+        setType('expense');
       });
 
       return unsubscribe;
