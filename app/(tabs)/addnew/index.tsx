@@ -32,9 +32,11 @@ const SelectRadioButtons = ({
   items,
   selected,
   onSelect,
+  disabled = false,
 }: {
   items: {label: string; value: string}[];
   selected: string;
+  disabled?: boolean;
   onSelect: (value: string) => void;
 }) => {
   return (
@@ -43,6 +45,7 @@ const SelectRadioButtons = ({
         <View key={item.value} style={styles.radioButton}>
           <Text>{item.label}</Text>
           <RadioButton
+            disabled={disabled}
             value={item.value}
             status={selected === item.value ? 'checked' : 'unchecked'}
             onPress={() => onSelect(item.value)}
@@ -68,13 +71,12 @@ export default function AddNew() {
   const dispatch = useAppDispatch();
   const navigation = useNavigation();
 
+  const disablTypeChange = !!id;
+
   // logic when editing an existing record
   const record = useAppSelector(
     incomingType === 'expense' ? selectExpense(+id) : selectIncome(+id),
   );
-  console.log('record', record);
-
-  console.log(id, incomingType);
   const [form, setForm] = useState(initState());
 
   useEffect(() => {
@@ -209,6 +211,7 @@ export default function AddNew() {
         />
 
         <SelectRadioButtons
+          disabled={disablTypeChange}
           items={[
             {label: 'Wydatek', value: 'expense'},
             {label: 'Przychód', value: 'income'},
