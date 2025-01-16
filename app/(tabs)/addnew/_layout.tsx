@@ -1,11 +1,9 @@
 import {Stack} from 'expo-router';
+import React from 'react';
 
 const StackLayout = () => {
   return (
-    <Stack screenOptions={{headerShown: false}}>
-      <Stack.Screen name="expense" options={{title: 'Dodaj Wydatek'}} />
-      <Stack.Screen name="income" options={{title: 'Dodaj Wpływy'}} />
-    </Stack>
+    <Stack screenOptions={{headerShown: false}} />
   );
 };
 
