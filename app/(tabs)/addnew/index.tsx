@@ -1,7 +1,12 @@
 import React, {useCallback, useEffect, useState} from 'react';
 
 import _, {set} from 'lodash';
-import {router, useFocusEffect, useLocalSearchParams} from 'expo-router';
+import {
+  router,
+  useFocusEffect,
+  useLocalSearchParams,
+  useNavigation,
+} from 'expo-router';
 import {formatDate} from 'date-fns';
 import {View, StyleSheet} from 'react-native';
 import {RadioButton} from 'react-native-paper';
@@ -16,7 +21,12 @@ import {
 import {sizes} from '@/constants/theme';
 import {uploadExpense, uploadIncome} from '@/redux/main/thunks';
 import {useAppDispatch, useAppSelector} from '@/hooks';
-import {selectCategories, selectSources} from '@/redux/main/selectors';
+import {
+  selectCategories,
+  selectExpense,
+  selectIncome,
+  selectSources,
+} from '@/redux/main/selectors';
 
 const SelectRadioButtons = ({
   items,
@@ -56,28 +66,52 @@ export default function AddNew() {
   const {id, type: incomingType = ''} = useLocalSearchParams();
   const incomeCategories = useAppSelector(selectSources) || [];
   const dispatch = useAppDispatch();
+  const navigation = useNavigation();
 
+  // logic when editing an existing record
+  const record = useAppSelector(
+    incomingType === 'expense' ? selectExpense(+id) : selectIncome(+id),
+  );
+  console.log('record', record);
+
+  console.log(id, incomingType);
   const [form, setForm] = useState(initState());
 
   useEffect(() => {
     if (incomingType && typeof incomingType === 'string') {
       setType(incomingType);
     }
-
-    return () => {
-      console.log('cleanup');
-    };
   }, [incomingType]);
 
   useFocusEffect(
     useCallback(() => {
+      if (!record) return;
+      setForm({
+        description: record?.description || '',
+        date:
+          incomingType === 'income'
+            ? new Date(record?.date)
+            : new Date(record.date.split('/').reverse().join('-')),
+        price: record?.price.toString() || '',
+        category: record?.category || record?.source || '',
+      });
       return () => {
         setForm(initState());
         setType('expense');
       };
-    }, [])
+    }, [id]),
   );
 
+  useFocusEffect(
+    useCallback(() => {
+      // clean up params
+      const unsubscribe = navigation.addListener('blur', () => {
+        navigation.setParams({id: undefined, type: undefined});
+      });
+
+      return unsubscribe;
+    }, []),
+  );
   // console.log('form', form, id);
 
   const itemsToSelect =
@@ -119,7 +153,7 @@ export default function AddNew() {
     if (type === 'expense') {
       const {description, date, price} = form;
       dataToSave = {
-        id: '',
+        id: id ? +id : '',
         description,
         date: formatDate(date, 'yyyy-MM-dd'),
         price: +price,
@@ -130,7 +164,7 @@ export default function AddNew() {
       dataToSave = _.omitBy(dataToSave, (v) => typeof v === 'string' && !v);
     } else {
       dataToSave = {
-        id: '',
+        id: id ? +id : '',
         date: formatDate(form.date, 'yyyy-MM-dd'),
         price: +form.price,
         source: form.category,
