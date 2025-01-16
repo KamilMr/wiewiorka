@@ -112,7 +112,6 @@ export default function AddNew() {
       return unsubscribe;
     }, []),
   );
-  // console.log('form', form, id);
 
   const itemsToSelect =
     type === 'expense'
