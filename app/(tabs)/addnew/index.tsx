@@ -1,4 +1,11 @@
-import React from 'react';
+import React, {useState} from 'react';
+
+import _ from 'lodash';
+import {router} from 'expo-router';
+import {formatDate} from 'date-fns';
+import {View, StyleSheet} from 'react-native';
+import {RadioButton} from 'react-native-paper';
+
 import {
   ButtonWithStatus,
   DatePicker,
@@ -7,12 +14,9 @@ import {
   TextInput,
 } from '@/components';
 import {sizes} from '@/constants/theme';
-import {useState} from 'react';
-import {View, StyleSheet} from 'react-native';
-import {RadioButton} from 'react-native-paper';
-import {useAppSelector} from '@/hooks';
+import {uploadExpense, uploadIncome} from '@/redux/main/thunks';
+import {useAppDispatch, useAppSelector} from '@/hooks';
 import {selectCategories, selectSources} from '@/redux/main/selectors';
-import { set } from 'lodash';
 
 const SelectRadioButtons = ({
   items,
@@ -39,17 +43,20 @@ const SelectRadioButtons = ({
   );
 };
 
+const initState = (date = new Date()) => ({
+  description: '',
+  date,
+  price: '',
+  category: '',
+});
+
 export default function AddNew() {
   const [type, setType] = useState('expense');
   const expenseCategories = useAppSelector(selectCategories);
   const incomeCategories = useAppSelector(selectSources) || [];
+  const dispatch = useAppDispatch();
 
-  const [form, setForm] = useState({
-    description: '',
-    date: new Date(),
-    price: '',
-    category: '',
-  });
+  const [form, setForm] = useState(initState());
 
   console.log('form', form);
 
@@ -66,6 +73,59 @@ export default function AddNew() {
     } else {
       setForm({...form, category: category.value});
     }
+  };
+
+  const handleSelectType = (type: string) => {
+    setType(type);
+    setForm({...form, category: ''});
+  };
+
+  const validateForm = () => {
+    // price and category are required
+    if (!form.price || !form.category) {
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleNavigateBack = () => {
+    setForm(initState());
+    router.navigate('/(tabs)/records');
+  };
+
+  const handleSave = () => {
+    let dataToSave;
+    if (type === 'expense') {
+      const {description, date, price} = form;
+      dataToSave = {
+        id: '',
+        description,
+        date: formatDate(date, 'yyyy-MM-dd'),
+        price: +price,
+        categoryId:
+          expenseCategories.find((cat) => cat.name === form.category)?.id || 0,
+      };
+
+      dataToSave = _.omitBy(dataToSave, (v) => typeof v === 'string' && !v);
+    } else {
+      dataToSave = {
+        id: '',
+        date: formatDate(form.date, 'yyyy-MM-dd'),
+        price: +form.price,
+        source: form.category,
+        vat: 0,
+      };
+      dataToSave = _.omitBy(dataToSave, (v) => typeof v === 'string' && !v);
+    }
+    dispatch(
+      type === 'expense' ? uploadExpense(dataToSave) : uploadIncome(dataToSave),
+    )
+      .unwrap()
+      .then(() => {
+        setForm(initState());
+        router.navigate('/(tabs)/records');
+      });
   };
 
   return (
@@ -99,19 +159,30 @@ export default function AddNew() {
             {label: 'Wydatek', value: 'expense'},
             {label: 'Przychód', value: 'income'},
           ]}
-          onSelect={setType}
+          onSelect={handleSelectType}
           selected={type}
         />
 
         <Select
           items={itemsToSelect}
           onChange={handleSelectCategory}
-          value={type === 'income' ? form.category : expenseCategories.find((cat) => cat.name === form.category)?.name}
+          value={
+            type === 'income'
+              ? form.category
+              : expenseCategories.find((cat) => cat.name === form.category)
+                  ?.name
+          }
         />
       </View>
       <View style={styles.buttons}>
-        <ButtonWithStatus>Przerwj</ButtonWithStatus>
-        <ButtonWithStatus showLoading mode="contained">
+        <ButtonWithStatus onPress={handleNavigateBack}>
+          Przerwj
+        </ButtonWithStatus>
+        <ButtonWithStatus
+          showLoading
+          mode="contained"
+          disabled={!validateForm()}
+          onPress={handleSave}>
           Dodaj
         </ButtonWithStatus>
       </View>
