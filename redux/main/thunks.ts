@@ -234,7 +234,7 @@ export const deleteExpense = createAsyncThunk(
 
 export const deleteIncome = createAsyncThunk(
   'income/delete',
-  async ({id}: Expense, thunkAPI) => {
+  async ({id}: Income, thunkAPI) => {
     const token = thunkAPI.getState().auth.token;
 
     let data;
