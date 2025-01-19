@@ -71,7 +71,7 @@ export default function AddNew() {
   const dispatch = useAppDispatch();
   const navigation = useNavigation();
 
-  const disablTypeChange = isNaN(+id) ? false : true;
+  const isPasRecord = isNaN(+id) ? false : true;
 
   // logic when editing an existing record
   const record = useAppSelector(
@@ -208,7 +208,7 @@ export default function AddNew() {
         />
 
         <SelectRadioButtons
-          disabled={disablTypeChange}
+          disabled={isPasRecord}
           items={[
             {label: 'Wydatek', value: 'expense'},
             {label: 'Przychód', value: 'income'},
@@ -237,7 +237,7 @@ export default function AddNew() {
           mode="contained"
           disabled={!validateForm()}
           onPress={handleSave}>
-          Dodaj
+            {isPasRecord ? 'Zapisz zmiany' : 'Zapisz'}
         </ButtonWithStatus>
       </View>
     </View>
