@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 
 import _, {set} from 'lodash';
 import {
@@ -71,6 +71,8 @@ export default function AddNew() {
   const dispatch = useAppDispatch();
   const navigation = useNavigation();
 
+  const focusRef = useRef<HTMLInputElement>(null);
+
   const isPasRecord = isNaN(+id) ? false : true;
 
   // logic when editing an existing record
@@ -78,6 +80,24 @@ export default function AddNew() {
     incomingType === 'expense' ? selectExpense(+id) : selectIncome(+id),
   );
   const [form, setForm] = useState(initState());
+
+  useFocusEffect(
+    useCallback(() => {
+      // set focus 
+      if (focusRef.current) {
+        setTimeout(() => {
+          if (!focusRef.current) return;
+          focusRef.current.focus();
+        }, 0); 
+      }
+
+      return () => {
+        if (focusRef.current) {
+          focusRef.current.blur();
+        }
+      };
+    }, []),
+  );
 
   useEffect(() => {
     if (incomingType && typeof incomingType === 'string' && incomingType !== 'undefined') {
@@ -200,6 +220,7 @@ export default function AddNew() {
         </View>
 
         <TextInput
+          ref={focusRef}
           style={styles.input}
           label="Cena"
           keyboardType="numeric"
