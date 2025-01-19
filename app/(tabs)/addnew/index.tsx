@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 
-import _, {set} from 'lodash';
+import _ from 'lodash';
 import {
   router,
   useFocusEffect,
@@ -8,7 +8,12 @@ import {
   useNavigation,
 } from 'expo-router';
 import {formatDate} from 'date-fns';
-import {View, StyleSheet} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  SafeAreaView,
+} from 'react-native';
 import {RadioButton} from 'react-native-paper';
 
 import {
@@ -73,6 +78,7 @@ export default function AddNew() {
 
   const focusRef = useRef<HTMLInputElement>(null);
   const dirty = useRef({});
+  const buttonRef = useRef<HTMLButtonElement>(null);  
 
   const isPasRecord = isNaN(+id) ? false : true;
 
@@ -88,12 +94,12 @@ export default function AddNew() {
 
   useFocusEffect(
     useCallback(() => {
-      // set focus 
+      // set focus
       if (focusRef.current) {
         setTimeout(() => {
           if (!focusRef.current) return;
           focusRef.current.focus();
-        }, 0); 
+        }, 0);
       }
 
       return () => {
@@ -105,7 +111,11 @@ export default function AddNew() {
   );
 
   useEffect(() => {
-    if (incomingType && typeof incomingType === 'string' && incomingType !== 'undefined') {
+    if (
+      incomingType &&
+      typeof incomingType === 'string' &&
+      incomingType !== 'undefined'
+    ) {
       setType(incomingType);
     }
   }, [incomingType]);
@@ -121,7 +131,7 @@ export default function AddNew() {
             : new Date(record.date.split('/').reverse().join('-')),
         price: record?.price.toString() || '',
         category: record?.category || record?.source || '',
-      }
+      };
       setForm(tR);
       dirty.current = tR;
     }, [id]),
@@ -153,6 +163,9 @@ export default function AddNew() {
       console.log('dodaj nową kategorię');
     } else {
       setForm({...form, category: category.value});
+      if (!form.price) return focusRef.current?.focus();
+      focusRef.current?.blur();
+      buttonRef.current?.focus();
     }
   };
 
@@ -211,66 +224,74 @@ export default function AddNew() {
   };
 
   return (
-    <View style={{flex: 1, padding: sizes.lg}}>
-      <View style={{flex: 1}}>
-        <TextInput
-          style={styles.input}
-          label={'Opis'}
-          onChangeText={(text) => setForm({...form, description: text})}
-          value={form.description}
-        />
+    <SafeAreaView style={{flex: 1}}>
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{
+          flexGrow: 1,
+          padding: sizes.lg,
+        }}>
+        <View style={{flex: 1}}>
+          <TextInput
+            style={styles.input}
+            label={'Opis'}
+            onChangeText={(text) => setForm({...form, description: text})}
+            value={form.description}
+          />
 
-        <View style={[styles.input, {padding: 0, marginVertical: 24}]}>
-          <DatePicker
-            label="Wybierz Datę"
-            onChange={(date) => date && setForm({...form, date})}
-            value={form.date}
+          <View style={[styles.input, {padding: 0, marginVertical: 24}]}>
+            <DatePicker
+              label="Wybierz Datę"
+              onChange={(date) => date && setForm({...form, date})}
+              value={form.date}
+            />
+          </View>
+
+          <TextInput
+            ref={focusRef}
+            style={styles.input}
+            label="Cena"
+            keyboardType="numeric"
+            onChangeText={(text) => setForm({...form, price: text})}
+            value={form.price}
+          />
+
+          <SelectRadioButtons
+            disabled={isPasRecord}
+            items={[
+              {label: 'Wydatek', value: 'expense'},
+              {label: 'Przychód', value: 'income'},
+            ]}
+            onSelect={handleSelectType}
+            selected={type}
+          />
+
+          <Select
+            items={itemsToSelect}
+            onChange={handleSelectCategory}
+            value={
+              type === 'income'
+                ? form.category
+                : expenseCategories.find((cat) => cat.name === form.category)
+                    ?.name
+            }
           />
         </View>
-
-        <TextInput
-          ref={focusRef}
-          style={styles.input}
-          label="Cena"
-          keyboardType="numeric"
-          onChangeText={(text) => setForm({...form, price: text})}
-          value={form.price}
-        />
-
-        <SelectRadioButtons
-          disabled={isPasRecord}
-          items={[
-            {label: 'Wydatek', value: 'expense'},
-            {label: 'Przychód', value: 'income'},
-          ]}
-          onSelect={handleSelectType}
-          selected={type}
-        />
-
-        <Select
-          items={itemsToSelect}
-          onChange={handleSelectCategory}
-          value={
-            type === 'income'
-              ? form.category
-              : expenseCategories.find((cat) => cat.name === form.category)
-                  ?.name
-          }
-        />
-      </View>
       <View style={styles.buttons}>
         <ButtonWithStatus onPress={handleNavigateBack}>
           Przerwij
         </ButtonWithStatus>
         <ButtonWithStatus
+          ref={buttonRef}
           showLoading
           mode="contained"
           disabled={!validateForm() || isDataTheSame()}
           onPress={handleSave}>
-            {isPasRecord ? 'Zapisz zmiany' : 'Zapisz'}
+          {isPasRecord ? 'Zapisz zmiany' : 'Zapisz'}
         </ButtonWithStatus>
       </View>
-    </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -284,10 +305,7 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   buttons: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginVertical: 16,
-    paddingHorizontal: 16,
+    // flex: 1,
   },
   radioButtons: {
     marginVertical: 16,

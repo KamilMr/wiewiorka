@@ -56,7 +56,8 @@ const DropdownComponent = ({
         labelField="label"
         valueField="value"
         placeholder={!isFocus ? 'Wybierz kategorię' : '...'}
-        keyboardAvoiding
+        // keyboardAvoiding
+        // dropdownPosition='top'
         searchPlaceholder="Szuka..."
         value={value}
         onFocus={() => setIsFocus(true)}
