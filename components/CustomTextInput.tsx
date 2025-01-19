@@ -1,26 +1,26 @@
 import {sizes} from '@/constants/theme';
+import React, { forwardRef } from 'react';
 import {StyleSheet} from 'react-native';
 import {TextInput, TextInputProps} from 'react-native-paper';
 
-const CustomTextInput = ({
+const CustomTextInput = forwardRef<typeof TextInput, TextInputProps>(({
   onChangeText,
   value,
   style,
-  innerRef,
   ...props
-}: TextInputProps) => {
+}, ref) => {
   return (
     <TextInput
       onChangeText={onChangeText}
       dense
       mode="outlined"
       value={value}
-      ref={innerRef}
+      ref={ref}
       style={[styles.root, style]}
       {...props}
     />
   );
-};
+});
 
 const styles = StyleSheet.create({
   root: {
