@@ -72,6 +72,7 @@ export default function AddNew() {
   const navigation = useNavigation();
 
   const focusRef = useRef<HTMLInputElement>(null);
+  const dirty = useRef({});
 
   const isPasRecord = isNaN(+id) ? false : true;
 
@@ -80,6 +81,10 @@ export default function AddNew() {
     incomingType === 'expense' ? selectExpense(+id) : selectIncome(+id),
   );
   const [form, setForm] = useState(initState());
+
+  const isDataTheSame = () => {
+    return _.isEqual(dirty.current, form);
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -108,7 +113,7 @@ export default function AddNew() {
   useFocusEffect(
     useCallback(() => {
       if (!record) return;
-      setForm({
+      const tR = {
         description: record?.description || '',
         date:
           incomingType === 'income'
@@ -116,7 +121,9 @@ export default function AddNew() {
             : new Date(record.date.split('/').reverse().join('-')),
         price: record?.price.toString() || '',
         category: record?.category || record?.source || '',
-      });
+      }
+      setForm(tR);
+      dirty.current = tR;
     }, [id]),
   );
 
@@ -127,6 +134,7 @@ export default function AddNew() {
         navigation.setParams({id: undefined, type: undefined});
         setForm(initState());
         setType('expense');
+        dirty.current = {};
       });
 
       return unsubscribe;
@@ -164,6 +172,7 @@ export default function AddNew() {
 
   const handleNavigateBack = () => {
     setForm(initState());
+    dirty.current = {};
     router.navigate('/(tabs)/records');
   };
 
@@ -256,7 +265,7 @@ export default function AddNew() {
         <ButtonWithStatus
           showLoading
           mode="contained"
-          disabled={!validateForm()}
+          disabled={!validateForm() || isDataTheSame()}
           onPress={handleSave}>
             {isPasRecord ? 'Zapisz zmiany' : 'Zapisz'}
         </ButtonWithStatus>
