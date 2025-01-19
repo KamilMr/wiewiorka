@@ -80,7 +80,7 @@ export default function AddNew() {
   const [form, setForm] = useState(initState());
 
   useEffect(() => {
-    if (incomingType && typeof incomingType === 'string') {
+    if (incomingType && typeof incomingType === 'string' && incomingType !== 'undefined') {
       setType(incomingType);
     }
   }, [incomingType]);
