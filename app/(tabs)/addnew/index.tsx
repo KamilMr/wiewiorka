@@ -1,328 +1,302 @@
-import {useCallback, useState} from 'react';
-import {View, StyleSheet, ScrollView} from 'react-native';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
+
+import _, {set} from 'lodash';
 import {
-  Link,
   router,
   useFocusEffect,
   useLocalSearchParams,
   useNavigation,
 } from 'expo-router';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {IconButton} from 'react-native-paper';
+import {formatDate} from 'date-fns';
+import {View, StyleSheet} from 'react-native';
+import {RadioButton} from 'react-native-paper';
 
-import _ from 'lodash';
-import {format} from 'date-fns';
-
-import {selectCategories, selectExpense} from '@/redux/main/selectors';
-import {deleteExpense, uploadExpense} from '@/redux/main/thunks';
-import {useAppDispatch, useAppSelector} from '@/hooks';
 import {
-  ButtonWithStatus as Button,
-  Image,
+  ButtonWithStatus,
+  DatePicker,
   Select,
+  Text,
   TextInput,
 } from '@/components';
-import CustomeDatePicker from '@/components/DatePicker';
-import {useAppTheme} from '@/constants/theme';
+import {sizes} from '@/constants/theme';
+import {uploadExpense, uploadIncome} from '@/redux/main/thunks';
+import {useAppDispatch, useAppSelector} from '@/hooks';
+import {
+  selectCategories,
+  selectExpense,
+  selectIncome,
+  selectSources,
+} from '@/redux/main/selectors';
 
-interface Expense {
-  id: string;
-  description: string;
-  date: string;
-  price: string;
-  categoryId: number;
-  category: string;
-  image: string;
-  owner: string;
-}
-
-const initState = (expense?: Expense) => ({
-  id: '',
-  description: '',
-  price: '',
-  owner: '',
-  categoryId: '',
-  image: '',
-  ...expense,
-  date: format(new Date(), 'dd/MM/yyyy'),
-});
-
-const validateInput = (ob: Pick<Expense, 'date' | 'categoryId' | 'price'>) => {
-  if (ob.date && ob.price && ob.categoryId) return true;
-  return false;
+const SelectRadioButtons = ({
+  items,
+  selected,
+  onSelect,
+  disabled = false,
+}: {
+  items: {label: string; value: string}[];
+  selected: string;
+  disabled?: boolean;
+  onSelect: (value: string) => void;
+}) => {
+  return (
+    <View style={styles.radioButtons}>
+      {items.map((item) => (
+        <View key={item.value} style={styles.radioButton}>
+          <Text>{item.label}</Text>
+          <RadioButton
+            disabled={disabled}
+            value={item.value}
+            status={selected === item.value ? 'checked' : 'unchecked'}
+            onPress={() => onSelect(item.value)}
+          />
+        </View>
+      ))}
+    </View>
+  );
 };
 
-const Expense = () => {
+const initState = (date = new Date()) => ({
+  description: '',
+  date,
+  price: '',
+  category: '',
+});
+
+export default function AddNew() {
+  const [type, setType] = useState<string>('expense');
+  const expenseCategories = useAppSelector(selectCategories);
+  const {id, type: incomingType = ''} = useLocalSearchParams();
+  const incomeCategories = useAppSelector(selectSources) || [];
   const dispatch = useAppDispatch();
   const navigation = useNavigation();
-  const {id} = useLocalSearchParams();
-  const expense = useAppSelector(selectExpense(+id)) || initState();
-  const categories = useAppSelector(selectCategories);
 
-  // State for edit mode and editing fields
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [editedExpense, setEditedExpense] = useState(initState(expense));
+  const focusRef = useRef<HTMLInputElement>(null);
+  const dirty = useRef({});
 
-  const isValid = validateInput(editedExpense);
+  const isPasRecord = isNaN(+id) ? false : true;
 
-  const t = useAppTheme();
+  // logic when editing an existing record
+  const record = useAppSelector(
+    incomingType === 'expense' ? selectExpense(+id) : selectIncome(+id),
+  );
+  const [form, setForm] = useState(initState());
+
+  const isDataTheSame = () => {
+    return _.isEqual(dirty.current, form);
+  };
 
   useFocusEffect(
     useCallback(() => {
-      setIsEditMode(!Number.isInteger(+id));
-      setEditedExpense(initState(expense));
+      // set focus 
+      if (focusRef.current) {
+        setTimeout(() => {
+          if (!focusRef.current) return;
+          focusRef.current.focus();
+        }, 0); 
+      }
 
       return () => {
-        setEditedExpense(initState());
-        setIsEditMode(false);
+        if (focusRef.current) {
+          focusRef.current.blur();
+        }
       };
+    }, []),
+  );
+
+  useEffect(() => {
+    if (incomingType && typeof incomingType === 'string' && incomingType !== 'undefined') {
+      setType(incomingType);
+    }
+  }, [incomingType]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!record) return;
+      const tR = {
+        description: record?.description || '',
+        date:
+          incomingType === 'income'
+            ? new Date(record?.date)
+            : new Date(record.date.split('/').reverse().join('-')),
+        price: record?.price.toString() || '',
+        category: record?.category || record?.source || '',
+      }
+      setForm(tR);
+      dirty.current = tR;
     }, [id]),
   );
 
   useFocusEffect(
     useCallback(() => {
+      // clean up params
       const unsubscribe = navigation.addListener('blur', () => {
-        navigation.setParams({id: undefined, screen: undefined});
+        navigation.setParams({id: undefined, type: undefined});
+        setForm(initState());
+        setType('expense');
+        dirty.current = {};
       });
+
       return unsubscribe;
-    }, [navigation]),
+    }, []),
   );
 
-  // Toggle between edit and view modes
-  const handleEdit = () => {
-    setEditedExpense({...expense});
-    setIsEditMode(true);
+  const itemsToSelect =
+    type === 'expense'
+      ? expenseCategories.map((cat) => ({label: cat.name, value: cat.name}))
+      : incomeCategories
+          .concat(['Dodaj nową kategorię'])
+          .map((item: string) => ({label: item, value: item}));
+
+  const handleSelectCategory = (category: {label: string; value: string}) => {
+    if (category.value === 'Dodaj nową kategorię') {
+      console.log('dodaj nową kategorię');
+    } else {
+      setForm({...form, category: category.value});
+    }
+  };
+
+  const handleSelectType = (type: string) => {
+    setType(type);
+    setForm({...form, category: ''});
+  };
+
+  const validateForm = () => {
+    // price and category are required
+    if (!form.price || !form.category) {
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleNavigateBack = () => {
+    setForm(initState());
+    dirty.current = {};
+    router.navigate('/(tabs)/records');
   };
 
   const handleSave = () => {
-    const newD = _.chain(editedExpense)
-      .pick(['date', 'description', 'categoryId', 'price', 'image'])
-      .omitBy((d) => !d || d === 'undefined')
-      .value();
+    let dataToSave;
+    if (type === 'expense') {
+      const {description, date, price} = form;
+      dataToSave = {
+        id: id ? +id : '',
+        description,
+        date: formatDate(date, 'yyyy-MM-dd'),
+        price: +price,
+        categoryId:
+          expenseCategories.find((cat) => cat.name === form.category)?.id || 0,
+      };
 
-    if (newD.date) {
-      try {
-        const [day, month, year] = newD.date.split('/');
-        const parsedDate = new Date(+year, +month - 1, +day);
-        if (isNaN(parsedDate.getTime())) {
-          throw new Error('Invalid date');
-        }
-        newD.date = format(parsedDate, 'yyyy-MM-dd');
-      } catch (error) {
-        console.error('Invalid date format:', error);
-        // Handle the error (e.g., show an error message to the user)
-        return;
-      }
+      dataToSave = _.omitBy(dataToSave, (v) => typeof v === 'string' && !v);
+    } else {
+      dataToSave = {
+        id: id ? +id : '',
+        date: formatDate(form.date, 'yyyy-MM-dd'),
+        price: +form.price,
+        source: form.category,
+        vat: 0,
+      };
+      dataToSave = _.omitBy(dataToSave, (v) => typeof v === 'string' && !v);
     }
-    newD.image = newD.image ? newD.image : '';
-
     dispatch(
-      uploadExpense({
-        id: Number.isInteger(id * 1) ? id : '',
-        ...newD,
-      }),
+      type === 'expense' ? uploadExpense(dataToSave) : uploadIncome(dataToSave),
     )
       .unwrap()
       .then(() => {
-        setIsEditMode(false);
+        setForm(initState());
         router.navigate('/(tabs)/records');
       });
   };
 
-  const handleCancel = () => {
-    setEditedExpense({...expense}); // Revert changes
-
-    setIsEditMode(false);
-    if (!id || id === 'null') router.navigate('/(tabs)/records');
-  };
-
-  const handleDate = (date: Date | undefined) => {
-    if (!date) return;
-    setEditedExpense({
-      ...editedExpense,
-      date: format(date, 'dd/MM/yyyy'),
-    });
-  };
-
-  const handleSelectCategory = (cat: {value: string} | undefined) => {
-    if (!cat) return;
-    setEditedExpense({
-      ...editedExpense,
-      categoryId: categories.find((c) => c.name === cat.value)?.id,
-    });
-  };
-
-  const handleImageSave = (url: string) => {
-    setEditedExpense({...editedExpense, image: url});
-  };
-
-  const handleDeleteExpense = () => {
-    if (!id) return;
-    dispatch(deleteExpense({id}))
-      .unwrap()
-      .then(() => router.navigate('/(tabs)/records'));
-  };
-
   return (
-    <SafeAreaView style={[styles.container, {backgroundColor: t.colors.white}]}>
-      <ScrollView keyboardShouldPersistTaps="always">
-        <View style={styles.detailsContainer}>
-          {Number.isInteger(id * 1) && (
-            <IconButton
-              icon={'trash-can'}
-              style={{
-                alignSelf: 'flex-end',
-              }}
-              onPress={handleDeleteExpense}
-            />
-          )}
-          <TextInput
-            style={styles.input}
-            value={editedExpense.description}
-            label="Opis"
-            readOnly={!isEditMode}
-            onChangeText={(text: string) =>
-              setEditedExpense({...editedExpense, description: text})
-            }
-          />
-          <CustomeDatePicker
-            editable={!isEditMode}
-            label="Wybierz datę"
-            disabled={!isEditMode}
-            style={styles.input}
-            value={new Date(editedExpense.date.split('/').reverse().join('-'))}
-            onChange={handleDate}
-          />
-          <TextInput
-            style={styles.input}
-            value={String(editedExpense.price)}
-            label="Cena"
-            readOnly={!isEditMode}
-            autoFocus={true}
-            keyboardType="numeric"
-            onChangeText={(text) =>
-              setEditedExpense({
-                ...editedExpense,
-                price: text.replace(',', '.'),
-              })
-            }
-          />
+    <View style={{flex: 1, padding: sizes.lg}}>
+      <View style={{flex: 1}}>
+        <TextInput
+          style={styles.input}
+          label={'Opis'}
+          onChangeText={(text) => setForm({...form, description: text})}
+          value={form.description}
+        />
 
-          {isEditMode ? null : (
-            <TextInput
-              style={styles.input}
-              label="Kto dokonał zakupu"
-              readOnly={true}
-              disabled={true}
-              value={editedExpense.owner}
-              onChangeText={(text) =>
-                setEditedExpense({...editedExpense, owner: text})
-              }
-            />
-          )}
-
-          <Select
-            value={
-              categories.find(({id}) => id === editedExpense.categoryId)
-                ?.name || ''
-            }
-            title="Wybierz kategorię"
-            onChange={handleSelectCategory}
-            disable={!isEditMode}
-            items={categories.map((cat) => ({
-              label: cat.name,
-              value: cat.name,
-            }))}
-          />
-          <Image
-            imageSrc={editedExpense.image}
-            editable={isEditMode}
-            onChange={handleImageSave}
+        <View style={[styles.input, {padding: 0, marginVertical: 24}]}>
+          <DatePicker
+            label="Wybierz Datę"
+            onChange={(date) => date && setForm({...form, date})}
+            value={form.date}
           />
         </View>
 
-        {/* Buttons for Edit, Save, Cancel */}
-        <View style={styles.buttonContainer}>
-          {isEditMode ? (
-            <>
-              <Button
-                mode="contained"
-                onPress={handleSave}
-                disabled={!isValid}
-                showLoading
-                style={styles.button}>
-                Save
-              </Button>
-              <Button
-                mode="outlined"
-                onPress={handleCancel}
-                style={styles.button}>
-                Cancel
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button
-                mode="contained"
-                onPress={handleEdit}
-                style={styles.button}>
-                Edytuj
-              </Button>
-              <Button
-                mode="outlined"
-                onPress={() => {
-                  router.navigate('/(tabs)/records');
-                }}
-                style={styles.button}>
-                Zamknij
-              </Button>
-            </>
-          )}
-        </View>
-        <View style={{height: 80}} />
-      </ScrollView>
-    </SafeAreaView>
+        <TextInput
+          ref={focusRef}
+          style={styles.input}
+          label="Cena"
+          keyboardType="numeric"
+          onChangeText={(text) => setForm({...form, price: text})}
+          value={form.price}
+        />
+
+        <SelectRadioButtons
+          disabled={isPasRecord}
+          items={[
+            {label: 'Wydatek', value: 'expense'},
+            {label: 'Przychód', value: 'income'},
+          ]}
+          onSelect={handleSelectType}
+          selected={type}
+        />
+
+        <Select
+          items={itemsToSelect}
+          onChange={handleSelectCategory}
+          value={
+            type === 'income'
+              ? form.category
+              : expenseCategories.find((cat) => cat.name === form.category)
+                  ?.name
+          }
+        />
+      </View>
+      <View style={styles.buttons}>
+        <ButtonWithStatus onPress={handleNavigateBack}>
+          Przerwij
+        </ButtonWithStatus>
+        <ButtonWithStatus
+          showLoading
+          mode="contained"
+          disabled={!validateForm() || isDataTheSame()}
+          onPress={handleSave}>
+            {isPasRecord ? 'Zapisz zmiany' : 'Zapisz'}
+        </ButtonWithStatus>
+      </View>
+    </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'space-between', // Ensure buttons stay at the bottom
-  },
-  detailsContainer: {},
-  label: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginTop: 12,
-  },
-  value: {
-    fontSize: 16,
-    marginBottom: 8,
+    padding: 16,
   },
   input: {
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#ccc',
+    marginVertical: 8,
     padding: 8,
-    borderRadius: 4,
-    marginBottom: 12,
   },
-  image: {
-    width: '100%',
-    height: 200,
-    marginTop: 16,
-    borderRadius: 8,
+  buttons: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginVertical: 16,
+    paddingHorizontal: 16,
   },
-  buttonContainer: {
+  radioButtons: {
+    marginVertical: 16,
+    flexDirection: 'row',
+  },
+  radioButton: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 16,
-  },
-  button: {
-    flex: 1,
-    marginHorizontal: 8,
+    alignItems: 'center',
+    marginVertical: 8,
   },
 });
-
-export default Expense;

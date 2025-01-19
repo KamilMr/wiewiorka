@@ -7,7 +7,6 @@ import {ActivityIndicator} from 'react-native-paper';
 import {selectToken} from '@/redux/auth/authSlice';
 import {fetchIni} from '@/redux/main/thunks';
 import {useAppDispatch, useAppSelector} from '@/hooks';
-import {TabBar} from '@/components';
 import {TabBarIcon} from '@/components/navigation/TabBarIcon';
 import {sizes} from '@/constants/theme';
 import {selectStatus} from '@/redux/main/selectors';
@@ -31,7 +30,6 @@ export default function TabLayout() {
 
   return (
     <Tabs
-      tabBar={(props) => <TabBar {...props} />}
       screenOptions={{
         headerShown: true,
         headerTitle: '',
@@ -46,17 +44,45 @@ export default function TabLayout() {
           );
         },
       }}>
-      <Tabs.Screen name="index" options={{title: 'Stron główna'}} />
+      <Tabs.Screen
+        name="index"
+        options={{
+          tabBarIcon: ({color}) => <TabBarIcon name="home" color={color} />,
+          title: 'Stron główna',
+        }}
+      />
       <Tabs.Screen
         name="records"
-        options={{title: 'Wydatki/Wpływy', headerShown: true}}
+        options={{
+          tabBarIcon: ({color}) => <TabBarIcon name="cash" color={color} />,
+          title: 'Wydatki/Wpływy',
+          headerShown: true,
+        }}
       />
-      <Tabs.Screen name="addnew" options={{title: 'Dodaj'}} />
+      <Tabs.Screen
+        name="addnew"
+        options={{
+          tabBarIcon: ({color}) => <TabBarIcon name="add" color={color} />,
+          title: 'Dodaj',
+        }}
+      />
       <Tabs.Screen
         name="summary"
-        options={{title: 'Podsumowanie', headerShown: true}}
+        options={{
+          tabBarIcon: ({color}) => (
+            <TabBarIcon name="bar-chart" color={color} />
+          ),
+          title: 'Podsumowanie',
+          headerShown: true,
+        }}
       />
-      <Tabs.Screen name="settings" options={{title: 'Ustawienia'}} />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          tabBarIcon: ({color}) => <TabBarIcon name="settings" color={color} />,
+          title: 'Ustawienia',
+        }}
+      />
     </Tabs>
   );
 }

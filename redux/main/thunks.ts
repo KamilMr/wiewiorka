@@ -3,8 +3,20 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 import {getURL} from '@/common';
 
 interface Expense {
-  id: string;
-  rest: object;
+  id?: string;
+  description?: string;
+  date: string;
+  price: number;
+  categoryId?: number;
+}
+
+interface Income {
+  id?: string;
+  description?: string;
+  date: string;
+  price: number;
+  source: string;
+  vat: number;
 }
 
 const DEFFERED = 0;
@@ -48,7 +60,7 @@ export const uploadExpense = createAsyncThunk(
 
 export const uploadIncome = createAsyncThunk(
   'income/add',
-  async ({id, ...rest}: Expense, thunkAPI) => {
+  async ({id, ...rest}: Income, thunkAPI) => {
     const token = thunkAPI.getState().auth.token;
 
     let data;
@@ -222,7 +234,7 @@ export const deleteExpense = createAsyncThunk(
 
 export const deleteIncome = createAsyncThunk(
   'income/delete',
-  async ({id}: Expense, thunkAPI) => {
+  async ({id}: Income, thunkAPI) => {
     const token = thunkAPI.getState().auth.token;
 
     let data;
