@@ -260,7 +260,7 @@ export default function AddNew() {
       </View>
       <View style={styles.buttons}>
         <ButtonWithStatus onPress={handleNavigateBack}>
-          Przerwj
+          Przerwij
         </ButtonWithStatus>
         <ButtonWithStatus
           showLoading
