@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import React, {useState} from 'react';
 import {Link, router} from 'expo-router';
 import {StyleSheet, View} from 'react-native';
 
@@ -62,7 +62,7 @@ const Login = () => {
         disabled={!isFormReady}
         mode="contained"
         style={{width: '80%', marginBottom: 8 * 2}}>
-        Zaloguj się
+        <Text style={{color: t.colors.white}}>Zaloguj się</Text>
       </Button>
       <View style={{flexDirection: 'row', marginBottom: 4 * 2}}>
         <Text>Nie masz konta? </Text>
