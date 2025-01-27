@@ -8,12 +8,7 @@ import {
   useNavigation,
 } from 'expo-router';
 import {formatDate} from 'date-fns';
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  SafeAreaView,
-} from 'react-native';
+import {View, StyleSheet, ScrollView, SafeAreaView} from 'react-native';
 import {RadioButton} from 'react-native-paper';
 
 import {
@@ -70,6 +65,7 @@ const initState = (date = new Date()) => ({
 
 export default function AddNew() {
   const [type, setType] = useState<string>('expense');
+  const [newCustomIncome, setNewCustomIncome] = useState<string | null>(null);
   const expenseCategories = useAppSelector(selectCategories);
   const {id, type: incomingType = ''} = useLocalSearchParams();
   const incomeCategories = useAppSelector(selectSources) || [];
@@ -78,7 +74,7 @@ export default function AddNew() {
 
   const focusRef = useRef<HTMLInputElement>(null);
   const dirty = useRef({});
-  const buttonRef = useRef<HTMLButtonElement>(null);  
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   const isPasRecord = isNaN(+id) ? false : true;
 
@@ -90,6 +86,13 @@ export default function AddNew() {
 
   const isDataTheSame = () => {
     return _.isEqual(dirty.current, form);
+  };
+
+  const cleanState = () => {
+    setForm(initState());
+    dirty.current = {};
+    setNewCustomIncome(null);
+    setType('expense');
   };
 
   useFocusEffect(
@@ -142,9 +145,7 @@ export default function AddNew() {
       // clean up params
       const unsubscribe = navigation.addListener('blur', () => {
         navigation.setParams({id: undefined, type: undefined});
-        setForm(initState());
-        setType('expense');
-        dirty.current = {};
+        cleanState();
       });
 
       return unsubscribe;
@@ -154,9 +155,7 @@ export default function AddNew() {
   const itemsToSelect =
     type === 'expense'
       ? expenseCategories.map((cat) => ({label: cat.name, value: cat.name}))
-      : incomeCategories
-          .concat(['Dodaj nową kategorię'])
-          .map((item: string) => ({label: item, value: item}));
+      : incomeCategories.map((item: string) => ({label: item, value: item}));
 
   const handleSelectCategory = (category: {label: string; value: string}) => {
     if (category.value === 'Dodaj nową kategorię') {
@@ -266,30 +265,63 @@ export default function AddNew() {
             selected={type}
           />
 
-          <Select
-            items={itemsToSelect}
-            onChange={handleSelectCategory}
-            value={
-              type === 'income'
-                ? form.category
-                : expenseCategories.find((cat) => cat.name === form.category)
-                    ?.name
-            }
-          />
+          {/* Add new category  selection */}
+          {type === 'income' && (
+            <SelectRadioButtons
+              items={[
+                {label: 'Dodaj nową kategorię', value: 'new'},
+                {label: 'Wybierz z listy', value: 'list'},
+              ]}
+              onSelect={(value) => {
+                if (value === 'new') {
+                  setNewCustomIncome('');
+                } else {
+                  setNewCustomIncome(null);
+                }
+                setForm({...form, category: ''});
+              }}
+              selected={newCustomIncome !== null ? 'new' : 'list'}
+            />
+          )}
+
+          {/* Add new category  input */}
+          {newCustomIncome !== null && (
+            <TextInput
+              style={styles.input}
+              label="Nowy rodzaj wpływu"
+              onChangeText={(text) => setForm({...form, category: text})}
+              value={form.category}
+            />
+          )}
+
+          {(type === 'expense' ||
+            (type === 'income' && newCustomIncome === null)) && (
+            <Select
+              items={itemsToSelect}
+              onChange={handleSelectCategory}
+              value={
+                type === 'income'
+                  ? form.category
+                  : expenseCategories.find((cat) => cat.name === form.category)
+                      ?.name
+              }
+            />
+          )}
+
         </View>
-      <View style={styles.buttons}>
-        <ButtonWithStatus onPress={handleNavigateBack}>
-          Przerwij
-        </ButtonWithStatus>
-        <ButtonWithStatus
-          ref={buttonRef}
-          showLoading
-          mode="contained"
-          disabled={!validateForm() || isDataTheSame()}
-          onPress={handleSave}>
-          {isPasRecord ? 'Zapisz zmiany' : 'Zapisz'}
-        </ButtonWithStatus>
-      </View>
+        <View style={styles.buttons}>
+          <ButtonWithStatus onPress={handleNavigateBack}>
+            Przerwij
+          </ButtonWithStatus>
+          <ButtonWithStatus
+            ref={buttonRef}
+            showLoading
+            mode="contained"
+            disabled={!validateForm() || isDataTheSame()}
+            onPress={handleSave}>
+            {isPasRecord ? 'Zapisz zmiany' : 'Zapisz'}
+          </ButtonWithStatus>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );

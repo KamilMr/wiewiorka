@@ -33,6 +33,7 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: true,
         headerTitle: '',
+        tabBarShowLabel: false,
         headerRightContainerStyle: {paddingRight: sizes.xxl},
         headerRight: () => {
           return fetching === 'idle' ? (
@@ -54,6 +55,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="records"
         options={{
+          tabBarShowLabel: false,
           tabBarIcon: ({color}) => <TabBarIcon name="cash" color={color} />,
           title: 'Wydatki/Wpływy',
           headerShown: true,
