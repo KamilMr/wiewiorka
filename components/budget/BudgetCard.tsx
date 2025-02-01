@@ -2,19 +2,11 @@ import {Card, ProgressBar} from 'react-native-paper';
 import {StyleSheet, View} from 'react-native';
 import {Button, Text} from '..';
 import {sizes, useAppTheme} from '@/constants/theme';
+import {formatPrice} from '@/common';
+import {BudgetCardProps} from '@/utils/types';
 
-type Item = {
-  budgetedName: string;
-  amount: number;
-  allocated: number;
-};
-
-type Props = {
-  items: Item[];
-};
-
-export default function BudgetCard({items = []}: Props) {
-  items = mockItems;
+export default function BudgetCard({items = []}: BudgetCardProps) {
+  items = items.length ? items : mockItems;
   const t = useAppTheme();
   // three stages of color based of percentage
   const getColor = (percentage: number) => {
@@ -26,21 +18,21 @@ export default function BudgetCard({items = []}: Props) {
   };
   return (
     <Card>
-      <Card.Title title="Budzety" />
+      <Card.Title title="Budżety" />
       <Card.Content>
         {items.map((item) => (
-          <View style={styles.mainContentBox}>
+          <View key={item.id} style={styles.mainContentBox}>
             {/* Top box */}
             <View style={styles.mainInnerBox}>
               {/* Left side */}
               <View>
                 <Text variant="titleMedium">{item.budgetedName}</Text>
-                <Text variant="bodySmall">{item.amount}</Text>
+                <Text variant="bodySmall">{formatPrice(item.amount)}</Text>
               </View>
 
               {/* Right side */}
               <View>
-                <Text variant="titleMedium">{item.allocated}</Text>
+                <Text variant="titleMedium">{formatPrice(item.allocated)}</Text>
               </View>
             </View>
 
@@ -72,16 +64,19 @@ const styles = StyleSheet.create({
 
 const mockItems: Item[] = [
   {
+    id: '1',
     budgetedName: 'Food',
     amount: 1000,
     allocated: 5000,
   },
   {
+    id: '2',
     budgetedName: 'Transport',
     amount: 200,
     allocated: 1000,
   },
   {
+    id: '3',
     budgetedName: 'Entertainment',
     amount: 300,
     allocated: 200,
