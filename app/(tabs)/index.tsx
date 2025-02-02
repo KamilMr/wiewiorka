@@ -1,11 +1,14 @@
+import {View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
-import {Text} from '@/components';
-import {View} from 'react-native';
+import {BudgetCard} from '@/components';
 import {useAppTheme} from '@/constants/theme';
+import {useAppSelector} from '@/hooks';
+import {selectBudgets} from '@/redux/main/selectors';
 
 const Home = () => {
   const t = useAppTheme();
+  const items = useAppSelector(selectBudgets());
   return (
     <SafeAreaView style={{backgroundColor: t.colors.white}}>
       <View
@@ -15,7 +18,9 @@ const Home = () => {
           alignItems: 'center',
           backgroundColor: t.colors.white,
         }}>
-        <Text>Tu coś będzie.</Text>
+        <View style={{width: '90%'}}>
+          <BudgetCard items={items} />
+        </View>
       </View>
     </SafeAreaView>
   );
