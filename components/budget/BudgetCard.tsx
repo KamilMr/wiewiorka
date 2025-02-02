@@ -10,12 +10,17 @@ export default function BudgetCard({items = []}: BudgetCardProps) {
   const t = useAppTheme();
   // three stages of color based of percentage
   const getColor = (percentage: number) => {
-    if (percentage > 0.7) {
+    if (percentage > 0.9) {
       return t.colors.error;
     } else {
       return t.colors.primary;
     }
   };
+
+  const calculateProgress = (amount: number, allocated: number) => {
+    return Math.floor(((amount * 100 / allocated) / 100) * 100) / 100;
+  };
+
   return (
     <Card>
       <Card.Title title="Budżety" />
@@ -39,8 +44,8 @@ export default function BudgetCard({items = []}: BudgetCardProps) {
             {/* Bottom box slider */}
             <View>
               <ProgressBar
-                progress={(item.amount * 100) / item.allocated / 100}
-                color={getColor((item.amount * 100) / item.allocated / 100)}
+                progress={calculateProgress(item.amount, item.allocated)}
+                color={getColor(calculateProgress(item.amount, item.allocated))}
               />
             </View>
           </View>
