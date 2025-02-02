@@ -1,12 +1,12 @@
 import {Card, ProgressBar} from 'react-native-paper';
 import {StyleSheet, View} from 'react-native';
-import {Button, Text} from '..';
+
+import {Text} from '..';
 import {sizes, useAppTheme} from '@/constants/theme';
 import {formatPrice} from '@/common';
 import {BudgetCardProps} from '@/utils/types';
 
 export default function BudgetCard({items = []}: BudgetCardProps) {
-  items = items.length ? items : mockItems;
   const t = useAppTheme();
   // three stages of color based of percentage
   const getColor = (percentage: number) => {
@@ -53,7 +53,7 @@ export default function BudgetCard({items = []}: BudgetCardProps) {
       </Card.Content>
     </Card>
   );
-}
+};
 
 const styles = StyleSheet.create({
   mainContentBox: {
@@ -66,24 +66,3 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
 });
-
-const mockItems: Item[] = [
-  {
-    id: '1',
-    budgetedName: 'Food',
-    amount: 1000,
-    allocated: 5000,
-  },
-  {
-    id: '2',
-    budgetedName: 'Transport',
-    amount: 200,
-    allocated: 1000,
-  },
-  {
-    id: '3',
-    budgetedName: 'Entertainment',
-    amount: 300,
-    allocated: 200,
-  },
-];
