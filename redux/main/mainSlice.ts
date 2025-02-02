@@ -16,7 +16,7 @@ import {
   uploadIncome,
 } from './thunks';
 import aggregateDataByDay from '../../utils/aggregateData';
-import {AggregatedData} from '@/utils/types';
+import {AggregatedData, BudgetMainSlice as MonthlyBudget} from '@/utils/types';
 
 type Snackbar = {
   open: boolean;
@@ -75,6 +75,7 @@ export interface Category {
 export interface MainSlice {
   status: 'idle' | 'fetching';
   expenses: Array<Expense>;
+  budgets: Array<MonthlyBudget>;
   incomes: Array<Income>;
   categories: {[key: number]: Category};
   _aggregated: AggregatedData;
@@ -85,6 +86,7 @@ export interface MainSlice {
 const emptyState: MainSlice = {
   status: 'idle',
   expenses: [],
+  budgets: [],
   incomes: [],
   categories: {},
   sources: {},
@@ -183,6 +185,7 @@ const mainSlice = createSlice({
           ...ex,
           date: format(ex.date, 'yyyy-MM-dd'),
         }));
+        state.budgets = action.payload.budgets || [];
         state.expenses = expenses;
         state.categories = categories;
         state.incomes = income.map((inc: Income) => ({
