@@ -1,4 +1,4 @@
-import {View} from 'react-native';
+import {View, Text} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {BudgetCard} from '@/components';
@@ -19,7 +19,7 @@ const Home = () => {
           backgroundColor: t.colors.white,
         }}>
         <View style={{width: '90%'}}>
-          <BudgetCard items={items} />
+          {/* <BudgetCard items={items} /> */}
         </View>
       </View>
     </SafeAreaView>
