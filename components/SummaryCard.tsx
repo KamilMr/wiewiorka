@@ -65,12 +65,12 @@ const SummaryCard = (props: Props) => {
             </View>
           </View>
         </View>
-        <View style={{marginTop: 8}}>
+        {/* <View style={{marginTop: 8}}>
           <Text>Koszta niewliczone:</Text>
           {_.keys(costs).map((name) => (
             <Text key={name}>{`${name}: ${formatPrice(costs[name])}`}</Text>
           ))}
-        </View>
+        </View> */}
       </Card.Content>
       <Card.Actions>
         <Button

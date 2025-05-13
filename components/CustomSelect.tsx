@@ -15,6 +15,7 @@ export interface Props {
   items: Items[];
   title?: string;
   disable?: boolean;
+  placeholder?: string;
 }
 
 const DropdownComponent = ({
@@ -23,6 +24,7 @@ const DropdownComponent = ({
   items,
   title = '',
   disable = false,
+  placeholder = 'Wybierz',
 }: Props) => {
   const [isFocus, setIsFocus] = useState(false);
 
@@ -55,7 +57,7 @@ const DropdownComponent = ({
         maxHeight={300}
         labelField="label"
         valueField="value"
-        placeholder={!isFocus ? 'Wybierz kategorię' : '...'}
+        placeholder={!isFocus ? placeholder : '...'}
         // keyboardAvoiding
         // dropdownPosition='top'
         searchPlaceholder="Szuka..."
