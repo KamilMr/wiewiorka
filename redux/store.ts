@@ -59,6 +59,13 @@ const migrations = {
       main: mainEmptyState(),
     };
   },
+  3: (state: RootState) => {
+    return {
+      ...state,
+      auth: authEmptyState(),
+      main: mainEmptyState(),
+    };
+  },
 };
 
 const persistConfig = {
