@@ -2,7 +2,6 @@ import {useState} from 'react';
 import {
   SafeAreaView,
   ScrollView,
-  Touchable,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -79,6 +78,7 @@ const SelectMonthAndYear = ({
       <View style={{flex: 1}}>
         <Select
           label="Miesiąc"
+          placeholder="Wybierz miesiąc"
           items={monthAndYearSliders}
           value={month}
           onChange={handleMonthChange}
@@ -87,6 +87,7 @@ const SelectMonthAndYear = ({
       <View style={{flex: 1}}>
         <Select
           label="Rok"
+          placeholder="Wybierz rok"
           items={yearSliders}
           disable={true}
           value={year}
@@ -211,7 +212,7 @@ export default function NewBudget() {
           }}>
           <Text variant="titleMedium">{selectedCatagory?.name ?? ''}</Text>
           <Button onPress={() => setShowCategories(!showCategories)}>
-            Pokaż kategorie
+            {showCategories ? 'Ukryj kategorie' : 'Pokaż kategorie'}
           </Button>
         </View>
         {showCategories && (
