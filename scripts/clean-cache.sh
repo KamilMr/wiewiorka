@@ -1,6 +1,6 @@
 rm -rf node_modules
-npm cache clean --force
-npm install
+pnpm cache clean --force
+pnpm install
 watchman watch-del-all
 rm -rf %localappdata%Temphaste-map-*
 rm -rf %localappdata%Tempmetro-cache
