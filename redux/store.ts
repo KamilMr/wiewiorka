@@ -37,29 +37,7 @@ const setLoadingStatusMiddleware =
   };
 
 const migrations = {
-  0: (state: RootState) => {
-    // migration: flush store
-    return {
-      ...state,
-      auth: authEmptyState(),
-      main: mainEmptyState(),
-    };
-  },
-  1: (state: RootState) => {
-    return {
-      ...state,
-      auth: authEmptyState(),
-      main: mainEmptyState(),
-    };
-  },
-  2: (state: RootState) => {
-    return {
-      ...state,
-      auth: authEmptyState(),
-      main: mainEmptyState(),
-    };
-  },
-  3: (state: RootState) => {
+  4: (state: RootState) => {
     return {
       ...state,
       auth: authEmptyState(),
