@@ -10,19 +10,17 @@ interface AuthSlice {
   token: string;
 }
 
-const emptyState: AuthSlice = {
+const emptyState = (): AuthSlice => ({
   name: '',
   email: '',
   token: '',
-};
+});
 
 export const authSlice = createSlice({
   name: 'auth',
-  initialState: emptyState,
+  initialState: emptyState(),
   reducers: {
-    dropMe: () => {
-      return emptyState;
-    },
+    dropMe: () => emptyState(),
   },
   extraReducers: (builder) => {
     builder
@@ -32,13 +30,8 @@ export const authSlice = createSlice({
         state.email = email;
         state.token = token;
       })
-      .addCase(logout.pending, () => {
-        return emptyState;
-      })
-      .addCase(signIn.rejected, (_, action) => {
-        console.log('logout rejected', action.payload);
-        return emptyState;
-      });
+      .addCase(logout.pending, () => emptyState())
+      .addCase(signIn.rejected, (_, action) => emptyState());
   },
 });
 

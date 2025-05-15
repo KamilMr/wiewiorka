@@ -83,7 +83,7 @@ export interface MainSlice {
   snackbar: Snackbar;
 }
 
-const emptyState: MainSlice = {
+const emptyState = (): MainSlice => ({
   status: 'idle',
   expenses: [],
   budgets: [],
@@ -96,11 +96,11 @@ const emptyState: MainSlice = {
     type: 'success',
     msg: '',
   },
-};
+});
 
 const mainSlice = createSlice({
   name: 'main',
-  initialState: emptyState,
+  initialState: emptyState(),
   reducers: {
     startLoading: (state, action) => {
       state.status = 'fetching'
@@ -168,9 +168,7 @@ const mainSlice = createSlice({
         {},
       );
     },
-    dropMain: () => {
-      return emptyState;
-    },
+    dropMain: () => emptyState(),
     removeExpense: (state, action) => {
       state.expenses = state.expenses.filter(
         (exp) => exp.id !== action.payload,
