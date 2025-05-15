@@ -3,7 +3,7 @@ import {View, StyleSheet, TouchableOpacity} from 'react-native';
 import {router} from 'expo-router';
 
 import _ from 'lodash';
-import {Avatar, Button, Card, IconButton, Text} from 'react-native-paper';
+import {Avatar, Card, IconButton, Text} from 'react-native-paper';
 
 import {formatPrice} from '@/common';
 
@@ -40,14 +40,12 @@ const SummaryCard = (props: Omit<SummaryCardProps, 'id'>) => {
         left={icon ? () => <LeftContent icon={icon} /> : undefined}
       />
       <Card.Content style={{padding: 8}}>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            marginBottom: 16,
-          }}>
-          <TouchableOpacity onPress={() => router.navigate('/income-summary')}>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+        <View style={{flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16}}>
+          <TouchableOpacity
+            onPress={() => router.navigate('/income-summary')}
+            style={styles.buttonContainer}
+          >
+            <View style={[styles.buttonContent, {backgroundColor: 'rgba(0, 255, 0, 0.1)'}]}>
               <IconButton icon="arrow-down" iconColor="green" />
               <View>
                 <Text>Wpłynęło netto</Text>
@@ -58,8 +56,11 @@ const SummaryCard = (props: Omit<SummaryCardProps, 'id'>) => {
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={handleNavigate(date.split('/').reverse().join('-') + '-01')}>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <TouchableOpacity
+            onPress={handleNavigate(date.split('/').reverse().join('-') + '-01')}
+            style={styles.buttonContainer}
+          >
+            <View style={[styles.buttonContent, {backgroundColor: 'rgba(255, 0, 0, 0.1)'}]}>
               <IconButton icon="arrow-up" iconColor="red" />
               <View>
                 <Text>Wydano:</Text>
@@ -82,6 +83,17 @@ const SummaryCard = (props: Omit<SummaryCardProps, 'id'>) => {
 const styles = StyleSheet.create({
   root: {
     margin: 8,
+  },
+  buttonContainer: {
+    borderRadius: 8,
+    overflow: 'hidden',
+    width: '45%',
+  },
+  buttonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 8,
+    borderRadius: 8,
   },
 });
 
