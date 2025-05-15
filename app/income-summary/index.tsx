@@ -3,9 +3,10 @@ import {useAppTheme} from '@/constants/theme';
 import {useSelector} from 'react-redux';
 import {selectIncomes} from '@/redux/main/selectors';
 import {PieChartBar, Text} from '@/components';
-import {generateColor, formatPrice} from '@/common';
+import {generateColor, formatPrice, printJsonIndent} from '@/common';
 import {useLocalSearchParams} from 'expo-router';
 import {selectMe} from '@/redux/auth/authSlice';
+import {Tooltip, IconButton} from 'react-native-paper';
 
 interface Income {
   date: string;
@@ -33,10 +34,14 @@ const IncomeSummary = () => {
   const income = useSelector(selectIncomes);
   const currentUser = useSelector(selectMe);
   const filteredIncome = income.filter((income: Income) =>
-    isYear ? getYearMonth(income.date, 'yyyy') === getYearMonth(date, 'yyyy') : getYearMonth(income.date, 'yyyy-MM') === getYearMonth(date, 'yyyy-MM'),
+    isYear
+      ? getYearMonth(income.date, 'yyyy') === getYearMonth(date, 'yyyy')
+      : getYearMonth(income.date, 'yyyy-MM') === getYearMonth(date, 'yyyy-MM'),
   );
 
-  const incomeOwners: string[] = filteredIncome.map((income: Income) => income.owner);
+  const incomeOwners: string[] = filteredIncome.map(
+    (income: Income) => income.owner,
+  );
   const uniqueIncomeOwners: string[] = [...new Set(incomeOwners)];
 
   const tR: Record<string, Record<string, number>> = {};
@@ -51,14 +56,16 @@ const IncomeSummary = () => {
     });
   });
 
-  const incomeData: IncomeData[] = Object.entries(tR).map(([owner, income]) => {
-    return Object.entries(income).map(([source, price]) => ({
-      value: price,
-      label: source,
-      owner: owner,
-      color: generateColor(source + owner),
-    }));
-  }).flat();
+  const incomeData: IncomeData[] = Object.entries(tR)
+    .map(([owner, income]) => {
+      return Object.entries(income).map(([source, price]) => ({
+        value: price,
+        label: source,
+        owner: owner,
+        color: generateColor(source + owner),
+      }));
+    })
+    .flat();
 
   const isCurrentUser = (owner: string) => owner === currentUser.name;
 
@@ -76,25 +83,45 @@ const IncomeSummary = () => {
             />
           </View>
           <View style={styles.legendContainer}>
-            {incomeData.map((item, index) => (
+            {incomeData.sort((a, b) => b.value - a.value).map((item, index) => (
               <View key={index} style={styles.legendItem}>
-                <View style={[styles.legendColor, {backgroundColor: item.color}]} />
-                <Text style={styles.legendText}>{`${item.label} - ${item.owner}`}</Text>
+                <View
+                  style={[styles.legendColor, {backgroundColor: item.color}]}
+                />
+                <View style={styles.legendTextContainer}>
+                  <Text style={styles.legendText}>{`${item.label} - ${item.owner}`}</Text>
+                  <Tooltip title={`${formatPrice(item.value)}`} enterTouchDelay={0} leaveTouchDelay={500}
+                  theme={{colors: {background: t.colors.background}}}>
+                    <IconButton
+                      icon="information-outline"
+                      size={16}
+                      iconColor="rgba(0, 0, 0, 0.5)"
+                    />
+                  </Tooltip>
+                </View>
               </View>
             ))}
           </View>
         </View>
       </View>
       <View style={styles.listSection}>
-        <Text>Lista wpływów</Text>
+        <Text variant="titleMedium" style={{marginBottom: 16}}>
+          Lista wpływów
+        </Text>
         <FlatList
-          data={filteredIncome.sort((a: Income, b: Income) => new Date(b.date).getTime() - new Date(a.date).getTime())}
+          data={filteredIncome.sort(
+            (a: Income, b: Income) =>
+              new Date(b.date).getTime() - new Date(a.date).getTime(),
+          )}
           renderItem={({item}) => (
-            <View style={[
-              styles.listItem,
-              isCurrentUser(item.owner) && styles.currentUserItem
-            ]}>
-              <Text>{`${item.date}: ${item.source} - ${item.owner}: ${formatPrice(item.price)}`}</Text>
+            <View
+              style={[
+                styles.listItem,
+                isCurrentUser(item.owner) && styles.currentUserItem,
+              ]}>
+              <Text>{`${item.date}: ${item.source} - ${
+                item.owner
+              }: ${formatPrice(item.price)}`}</Text>
             </View>
           )}
         />
@@ -133,8 +160,15 @@ const styles = StyleSheet.create({
     marginRight: 8,
     borderRadius: 4,
   },
+  legendTextContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   legendText: {
     fontSize: 12,
+    flex: 1,
   },
   listSection: {
     flex: 1,
