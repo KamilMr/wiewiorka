@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, TouchableOpacity} from 'react-native';
 import {router} from 'expo-router';
 
 import _ from 'lodash';
@@ -46,17 +46,19 @@ const SummaryCard = (props: Omit<SummaryCardProps, 'id'>) => {
             justifyContent: 'space-between',
             marginBottom: 16,
           }}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <IconButton icon="arrow-down" iconColor="green" />
-            <View>
-              <Text>Wpłynęło netto</Text>
-              <Text>
-                {`${formatPrice(income - sumCosts < 0 ? 0 : income - sumCosts)} `}
-              </Text>
+          <TouchableOpacity onPress={() => router.navigate('/income-summary')}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <IconButton icon="arrow-down" iconColor="green" />
+              <View>
+                <Text>Wpłynęło netto</Text>
+                <Text>
+                  {`${formatPrice(income - sumCosts < 0 ? 0 : income - sumCosts)} `}
+                </Text>
+              </View>
             </View>
-          </View>
+          </TouchableOpacity>
 
-          <View>
+          <TouchableOpacity onPress={handleNavigate(date.split('/').reverse().join('-') + '-01')}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
               <IconButton icon="arrow-up" iconColor="red" />
               <View>
@@ -64,7 +66,7 @@ const SummaryCard = (props: Omit<SummaryCardProps, 'id'>) => {
                 <Text>{`${formatPrice(outcome - sumCosts)}`}</Text>
               </View>
             </View>
-          </View>
+          </TouchableOpacity>
         </View>
         {/* <View style={{marginTop: 8}}>
           <Text>Koszta niewliczone:</Text>
@@ -73,12 +75,6 @@ const SummaryCard = (props: Omit<SummaryCardProps, 'id'>) => {
           ))}
         </View> */}
       </Card.Content>
-      <Card.Actions>
-        <Button
-          onPress={handleNavigate(date.split('/').reverse().join('-') + '-01')}>
-          Zobacz Szczegóły
-        </Button>
-      </Card.Actions>
     </Card>
   );
 };

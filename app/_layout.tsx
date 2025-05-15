@@ -40,6 +40,7 @@ const RootLayout = () => {
             <Stack.Screen name="(tabs)" options={{headerShown: false}} />
             <Stack.Screen name="categories" options={{headerShown: false}} />
             <Stack.Screen name="budget" options={{headerShown: false}} />
+            <Stack.Screen name="income-summary" options={{headerShown: false}} />
             <Stack.Screen name="+not-found" />
           </Stack>
           <SnackBar />
