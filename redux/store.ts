@@ -48,7 +48,7 @@ const migrations = {
 
 const persistConfig = {
   key: 'squirrel',
-  version: 1,
+  version: 4,
   storage: AsyncStorage,
   whitelist: ['auth', 'main'],
   migrate: createMigrate(migrations, {debug: false}),
