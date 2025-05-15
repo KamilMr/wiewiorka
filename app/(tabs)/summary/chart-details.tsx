@@ -9,7 +9,7 @@ import _ from 'lodash';
 import {selectByTimeRange, selectCategories} from '@/redux/main/selectors';
 import {useAppSelector} from '@/hooks';
 import {BarChart, Chip, DatePicker, PieChartBar, Text} from '@/components';
-import {EXCLUDED_CAT, formatPrice, shortenText} from '@/common';
+import {EXCLUDED_CAT, formatPrice, printJsonIndent, shortenText} from '@/common';
 import {Axis, PickFilter, decId, groupBy} from '@/utils/aggregateData';
 import {Category, Subcategory} from '@/redux/main/mainSlice';
 import {useAppTheme} from '@/constants/theme';
@@ -157,6 +157,7 @@ const Summary = () => {
     setAxis([ax, ax === '1-0' ? '0-0' : axis[1]]);
   };
 
+  // printJsonIndent(data)
   return (
     <ScrollView style={{backgroundColor: t.colors.white}}>
       <DatePicker

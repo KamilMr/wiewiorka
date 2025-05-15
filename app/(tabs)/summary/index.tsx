@@ -55,7 +55,6 @@ const Summary = () => {
   const summary: SummaryCardProps[] = useAppSelector(selectComparison(filter));
   const handleChange = (f: string) => setFilter(+f);
 
-  console.log('summary', summary);
   const t = useAppTheme();
 
   return (

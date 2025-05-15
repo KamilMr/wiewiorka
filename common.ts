@@ -17,6 +17,22 @@ export const SUMMARY_CHART = 'summary/chart/:param';
 
 export const EXCLUDED_CAT = [];
 
+const generateColor = (str: string) => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+
+  // Convert to hex color
+  let color = '#';
+  for (let i = 0; i < 3; i++) {
+    const value = (hash >> (i * 8)) & 0xFF;
+    color += ('00' + value.toString(16)).slice(-2);
+  }
+
+  return color;
+};
+
 const getURL = (p = '') => {
   return `${URL}/${p}`;
 };
@@ -80,13 +96,19 @@ const normalize = (str: string): string => {
   });
 };
 
+const printJsonIndent = (title: string, obj: any) => {
+  console.log(title, JSON.stringify(obj, null, 2));
+};
+
 export {
   convertDate,
   dh,
   formatPrice,
+  generateColor,
   getURL,
   isCloseToBottom,
   makeNewIdArr,
   normalize,
+  printJsonIndent,
   shortenText,
 };

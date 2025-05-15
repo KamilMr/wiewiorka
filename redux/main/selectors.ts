@@ -213,7 +213,7 @@ export const selectBudgets = (
         return year === expYear && month === expMonth;
       });
 
-      const tR: BudgetCardItem[] = budgets
+      const tR: BudgetCardItem[] = budgets.length ? budgets : []
         .filter((b) => {
           const {yearMonth} = b;
           const [budgetYear, budgetMonth] = yearMonth.split('-');

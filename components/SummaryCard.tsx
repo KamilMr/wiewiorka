@@ -42,7 +42,7 @@ const SummaryCard = (props: Omit<SummaryCardProps, 'id'>) => {
       <Card.Content style={{padding: 8}}>
         <View style={{flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16}}>
           <TouchableOpacity
-            onPress={() => router.navigate('/income-summary')}
+            onPress={() => router.navigate({pathname: '/income-summary', params: {date: date.split('/').reverse().join('-') + '-01'}})}
             style={styles.buttonContainer}
           >
             <View style={[styles.buttonContent, {backgroundColor: 'rgba(0, 255, 0, 0.1)'}]}>
