@@ -40,27 +40,47 @@ const SummaryCard = (props: Omit<SummaryCardProps, 'id'>) => {
         left={icon ? () => <LeftContent icon={icon} /> : undefined}
       />
       <Card.Content style={{padding: 8}}>
-        <View style={{flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16}}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginBottom: 16,
+          }}>
           <TouchableOpacity
-            onPress={() => router.navigate({pathname: '/income-summary', params: {date: date.split('/').reverse().join('-') + '-01'}})}
-            style={styles.buttonContainer}
-          >
-            <View style={[styles.buttonContent, {backgroundColor: 'rgba(0, 255, 0, 0.1)'}]}>
+            onPress={() =>
+              router.navigate({
+                pathname: '/income-summary',
+                params: {date: date.split('/').reverse().join('-') + '-01'},
+              })
+            }
+            style={styles.buttonContainer}>
+            <View
+              style={[
+                styles.buttonContent,
+                {backgroundColor: 'rgba(0, 255, 0, 0.1)'},
+              ]}>
               <IconButton icon="arrow-down" iconColor="green" />
               <View>
                 <Text>Wpłynęło netto</Text>
                 <Text>
-                  {`${formatPrice(income - sumCosts < 0 ? 0 : income - sumCosts)} `}
+                  {`${formatPrice(
+                    income - sumCosts < 0 ? 0 : income - sumCosts,
+                  )} `}
                 </Text>
               </View>
             </View>
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={handleNavigate(date.split('/').reverse().join('-') + '-01')}
-            style={styles.buttonContainer}
-          >
-            <View style={[styles.buttonContent, {backgroundColor: 'rgba(255, 0, 0, 0.1)'}]}>
+            onPress={handleNavigate(
+              date.split('/').reverse().join('-') + '-01',
+            )}
+            style={styles.buttonContainer}>
+            <View
+              style={[
+                styles.buttonContent,
+                {backgroundColor: 'rgba(255, 0, 0, 0.1)'},
+              ]}>
               <IconButton icon="arrow-up" iconColor="red" />
               <View>
                 <Text>Wydano:</Text>

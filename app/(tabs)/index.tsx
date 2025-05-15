@@ -5,6 +5,7 @@ import {BudgetCard} from '@/components';
 import {useAppTheme} from '@/constants/theme';
 import {useAppSelector} from '@/hooks';
 import {selectBudgets} from '@/redux/main/selectors';
+import SummaryCard_v2 from '@/components/SummaryCardv2';
 
 const Home = () => {
   const t = useAppTheme();
@@ -19,6 +20,7 @@ const Home = () => {
           backgroundColor: t.colors.white,
         }}>
         <View style={{width: '90%'}}>
+          <SummaryCard_v2 date="2025-04-01" />
           {/* <BudgetCard items={items} /> */}
         </View>
       </View>
