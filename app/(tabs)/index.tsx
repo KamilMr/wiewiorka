@@ -6,6 +6,7 @@ import {useAppTheme} from '@/constants/theme';
 import {useAppSelector} from '@/hooks';
 import {selectBudgets} from '@/redux/main/selectors';
 import SummaryCard_v2 from '@/components/SummaryCardv2';
+import FinancialQuote from '@/components/FinancialQuote';
 
 const Home = () => {
   const t = useAppTheme();
@@ -15,12 +16,12 @@ const Home = () => {
       <View
         style={{
           height: '100%',
-          justifyContent: 'center',
           alignItems: 'center',
           backgroundColor: t.colors.white,
         }}>
-        <View style={{width: '90%'}}>
-          <SummaryCard_v2 date="2025-04-01" />
+        <View style={{width: '90%', gap: 16}}>
+          <FinancialQuote />
+          <SummaryCard_v2 />
           {/* <BudgetCard items={items} /> */}
         </View>
       </View>
@@ -29,3 +30,4 @@ const Home = () => {
 };
 
 export default Home;
+
