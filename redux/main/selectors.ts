@@ -6,6 +6,7 @@ import {EXCLUDED_CAT, dh, makeNewIdArr, normalize} from '@/common';
 import {RootState} from '../store';
 import {Category, Expense, Income, Subcategory} from './mainSlice';
 import {BudgetMainSlice, BudgetCardItem} from '@/utils/types';
+import {SummaryCardProps} from '@/components/SummaryCard';
 
 export type Search = {
   txt: string;
@@ -143,7 +144,7 @@ export const selectMainCategories = createSelector(
 );
 
 export const selectComparison = (number1or12: number | string) =>
-  createSelector([selectIncomes, selectExpensesAll], (income, expenses) => {
+  createSelector([selectIncomes, selectExpensesAll], (income, expenses): SummaryCardProps[] => {
     const pattern: string = +number1or12 === 1 ? 'MM/yyyy' : 'yyyy';
     const calPrice = (price: number, vat: number = 0): number =>
       price - price * (vat / 100);

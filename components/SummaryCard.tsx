@@ -11,7 +11,8 @@ type Costs = {
   [key: string]: number;
 };
 
-interface Props {
+export interface SummaryCardProps {
+  id: string;
   income: number;
   outcome: number;
   date: string;
@@ -23,7 +24,7 @@ const LeftContent = (props: {icon: string}) => (
   <Avatar.Icon {...props} icon={props.icon} />
 );
 
-const SummaryCard = (props: Props) => {
+const SummaryCard = (props: Omit<SummaryCardProps, 'id'>) => {
   const {income, outcome, date, costs, icon = ''} = props;
   // the amount of costs total
   const sumCosts = _.sumBy(_.values(costs));
