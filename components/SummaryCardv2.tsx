@@ -23,7 +23,6 @@ const SummaryCard_v2 = (props: SummaryCard_v2Props) => {
     outcome: 0,
   };
 
-  const income = filteredSummary?.income - filteredSummary?.outcome;
 
   return (
     <Card style={styles.root}>
@@ -42,9 +41,7 @@ const SummaryCard_v2 = (props: SummaryCard_v2Props) => {
               <IconButton icon="arrow-down" iconColor="green" />
               <View>
                 <Text>Wpłynęło</Text>
-                <Text>{`${formatPrice(
-                  income < 0 ? 0 : income,
-                )}`}</Text>
+                <Text>{`${formatPrice(filteredSummary?.income)}`}</Text>
               </View>
             </View>
           </TouchableOpacity>
