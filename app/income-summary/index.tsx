@@ -83,49 +83,69 @@ const IncomeSummary = () => {
             />
           </View>
           <View style={styles.legendContainer}>
-            {incomeData.sort((a, b) => b.value - a.value).map((item, index) => (
-              <View key={index} style={styles.legendItem}>
-                <View
-                  style={[styles.legendColor, {backgroundColor: item.color}]}
-                />
-                <View style={styles.legendTextContainer}>
-                  <Text style={styles.legendText}>{`${item.label} - ${item.owner}`}</Text>
-                  <Tooltip title={`${formatPrice(item.value)}`} enterTouchDelay={0} leaveTouchDelay={500}
-                  theme={{colors: {background: t.colors.background}}}>
-                    <IconButton
-                      icon="information-outline"
-                      size={16}
-                      iconColor="rgba(0, 0, 0, 0.5)"
-                    />
-                  </Tooltip>
+            {incomeData
+              .sort((a, b) => b.value - a.value)
+              .map((item, index) => (
+                <View key={index} style={styles.legendItem}>
+                  <View
+                    style={[styles.legendColor, {backgroundColor: item.color}]}
+                  />
+                  <View style={styles.legendTextContainer}>
+                    <Text
+                      style={
+                        styles.legendText
+                      }>{`${item.label} - ${item.owner}`}</Text>
+                    <Tooltip
+                      title={`${formatPrice(item.value)}`}
+                      enterTouchDelay={0}
+                      leaveTouchDelay={500}
+                      theme={{colors: {background: t.colors.background}}}>
+                      <IconButton
+                        icon="information-outline"
+                        size={16}
+                        iconColor="rgba(0, 0, 0, 0.5)"
+                      />
+                    </Tooltip>
+                  </View>
                 </View>
-              </View>
-            ))}
+              ))}
           </View>
         </View>
       </View>
-      <View style={styles.listSection}>
-        <Text variant="titleMedium" style={{marginBottom: 16}}>
-          Lista wpływów
-        </Text>
-        <FlatList
-          data={filteredIncome.sort(
-            (a: Income, b: Income) =>
-              new Date(b.date).getTime() - new Date(a.date).getTime(),
-          )}
-          renderItem={({item}) => (
-            <View
-              style={[
-                styles.listItem,
-                isCurrentUser(item.owner) && styles.currentUserItem,
-              ]}>
-              <Text>{`${item.date}: ${item.source} - ${
-                item.owner
-              }: ${formatPrice(item.price)}`}</Text>
-            </View>
-          )}
-        />
-      </View>
+      {filteredIncome.length > 0 ? (
+        <View style={styles.listSection}>
+          <Text variant="titleMedium" style={{marginBottom: 16}}>
+            Lista wpływów
+          </Text>
+          <FlatList
+            data={filteredIncome.sort(
+              (a: Income, b: Income) =>
+                new Date(b.date).getTime() - new Date(a.date).getTime(),
+            )}
+            renderItem={({item}) => (
+              <View
+                style={[
+                  styles.listItem,
+                  isCurrentUser(item.owner) && styles.currentUserItem,
+                ]}>
+                <Text>{`${item.date}: ${item.source} - ${
+                  item.owner
+                }: ${formatPrice(item.price)}`}</Text>
+              </View>
+            )}
+          />
+        </View>
+      ) : (
+        <View style={styles.listSection}>
+          <Text
+            variant="titleMedium"
+            style={{
+              textAlign: 'center',
+            }}>
+            Brak wpływów
+          </Text>
+        </View>
+      )}
     </View>
   );
 };
