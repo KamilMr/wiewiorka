@@ -1,4 +1,4 @@
-import {configureStore, combineReducers, Store} from '@reduxjs/toolkit';
+import {configureStore, combineReducers, Store, MiddlewareAPI} from '@reduxjs/toolkit';
 import {createMigrate, persistReducer, persistStore} from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -15,7 +15,7 @@ const rootReducer = combineReducers({
   main: mainReducer,
 });
 
-const authMiddleware = (store: Store) => (next: any) => async (action: any) => {
+const authMiddleware = (store: MiddlewareAPI) => (next: any) => async (action: any) => {
   if (['session_not_active', 'not_auth'].includes(action.error?.message)) {
     store.dispatch(dropMe());
     store.dispatch(dropMain());
@@ -24,7 +24,7 @@ const authMiddleware = (store: Store) => (next: any) => async (action: any) => {
 };
 
 const setLoadingStatusMiddleware =
-  (store: Store) => (next: any) => async (action: any) => {
+  (store: MiddlewareAPI) => (next: any) => async (action: any) => {
     if (action.type.endsWith('/pending')) {
       store.dispatch(startLoading(''));
     } else if (
@@ -56,7 +56,7 @@ const persistConfig = {
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-const store = configureStore({
+const store: Store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
