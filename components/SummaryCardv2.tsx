@@ -23,6 +23,8 @@ const SummaryCard_v2 = (props: SummaryCard_v2Props) => {
     outcome: 0,
   };
 
+  const income = filteredSummary?.income - filteredSummary?.outcome;
+
   return (
     <Card style={styles.root}>
       <Card.Title title={date} />
@@ -39,9 +41,9 @@ const SummaryCard_v2 = (props: SummaryCard_v2Props) => {
             <View style={[styles.buttonContent, {backgroundColor: 'rgba(0, 255, 0, 0.1)'}]}>
               <IconButton icon="arrow-down" iconColor="green" />
               <View>
-                <Text>Wpłynęło netto</Text>
+                <Text>Wpłynęło</Text>
                 <Text>{`${formatPrice(
-                  filteredSummary?.income - filteredSummary?.outcome,
+                  income < 0 ? 0 : income,
                 )}`}</Text>
               </View>
             </View>
@@ -86,7 +88,6 @@ const styles = StyleSheet.create({
   buttonContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 8,
     borderRadius: 8,
   },
 });
