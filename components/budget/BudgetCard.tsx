@@ -17,8 +17,12 @@ export default function BudgetCard({items = []}: BudgetCardProps) {
     }
   };
 
-  const calculateProgress = (amount: number, allocated: number) => {
-    return Math.floor(((amount * 100 / allocated) / 100) * 100) / 100;
+  const calculateProgress = (amount: number, allocated: number = 0) => {
+    if (Number.isNaN(amount) || Number.isNaN(allocated)) return 0;
+    const progress = Math.floor(((amount * 100 / allocated) / 100) * 100) / 100;
+
+    if (!Number.isFinite(progress)) return 0;
+    return progress;
   };
 
   return (
@@ -44,8 +48,8 @@ export default function BudgetCard({items = []}: BudgetCardProps) {
             {/* Bottom box slider */}
             <View>
               <ProgressBar
-                progress={calculateProgress(item.amount, item.allocated)}
-                color={getColor(calculateProgress(item.amount, item.allocated))}
+                progress={calculateProgress(+item.amount, item?.allocated || 0)}
+                color={getColor(calculateProgress(+item.amount, +item.allocated))}
               />
             </View>
           </View>

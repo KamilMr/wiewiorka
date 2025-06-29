@@ -38,6 +38,8 @@ const getURL = (p = '') => {
 };
 
 const formatPrice = (grosz: number) => {
+  if (!grosz) return '0.00 zł';
+  if (typeof grosz === 'string') return grosz;
   const zloty = grosz;
   return `${zloty.toFixed(2)} zł`;
 };

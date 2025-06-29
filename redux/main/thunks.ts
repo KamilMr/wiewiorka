@@ -22,7 +22,7 @@ interface Income {
   vat: number;
 }
 
-const DEFFERED = 0;
+const DIFFERED = 0;
 
 export const fetchIni = createAsyncThunk(
   'ini/fetchIni',
@@ -69,7 +69,7 @@ export const uploadExpense = createAsyncThunk(
     data = await resp.json();
     if (data.err) throw data.err;
     // deffered fetch
-    setTimeout(() => thunkAPI.dispatch(fetchIni()), DEFFERED);
+    setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
   },
 );
 
@@ -98,7 +98,7 @@ export const uploadIncome = createAsyncThunk(
     if (data.err) throw data.err;
 
     // deffered fetch
-    setTimeout(() => thunkAPI.dispatch(fetchIni()), DEFFERED);
+    setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
   },
 );
 
@@ -136,8 +136,8 @@ export const handleCategory = createAsyncThunk(
     });
     data = await resp.json();
     if (data.err) throw data.err;
-    // deffered fetch
-    setTimeout(() => thunkAPI.dispatch(fetchIni()), DEFFERED);
+    // differed fetch
+    setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
     return data.d;
   },
 );
@@ -169,7 +169,7 @@ export const handleDeleteCategory = createAsyncThunk(
     data = await resp.json();
     if (data.err) throw data.err;
     // deffered fetch
-    setTimeout(() => thunkAPI.dispatch(fetchIni()), DEFFERED);
+    setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
     return data.d;
   },
 );
@@ -201,7 +201,7 @@ export const handleDeleteGroupCategory = createAsyncThunk(
     data = await resp.json();
     if (data.err) throw data.err;
     // deffered fetch
-    setTimeout(() => thunkAPI.dispatch(fetchIni()), DEFFERED);
+    setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
     return data.d;
   },
 );
@@ -235,7 +235,7 @@ export const handleGroupCategory = createAsyncThunk(
     data = await resp.json();
     if (data.err) throw data.err;
     // deffered fetch
-    setTimeout(() => thunkAPI.dispatch(fetchIni()), DEFFERED);
+    setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
     return data.d;
   },
 );
@@ -263,7 +263,7 @@ export const uploadFile = createAsyncThunk(
 
     if (data.err) throw data;
     // deffered fetch
-    setTimeout(() => thunkAPI.dispatch(fetchIni()), DEFFERED);
+    setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
     return data.d;
   },
 );
@@ -291,7 +291,7 @@ export const deleteExpense = createAsyncThunk(
     if (data.err) throw data.err;
 
     // deffered fetch
-    setTimeout(() => thunkAPI.dispatch(fetchIni()), DEFFERED);
+    setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
   },
 );
 
@@ -318,6 +318,33 @@ export const deleteIncome = createAsyncThunk(
     if (data.err) throw data.err;
 
     // deffered fetch
-    setTimeout(() => thunkAPI.dispatch(fetchIni()), DEFFERED);
+    setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
+  },
+);
+
+export const uploadBudget = createAsyncThunk(
+  'budget/upload',
+  async (
+    {id, ...rest}: Income,
+    thunkAPI: {
+      getState: () => RootState;
+      dispatch: ThunkDispatch<RootState, unknown, AnyAction>;
+    },
+  ) => {
+    const token = thunkAPI.getState().auth.token;
+
+    let data;
+    const path = 'budget' + (id ? `/${id}` : '');
+    let resp = await fetch(getURL(path), {
+      method: id ? 'PATCH' : 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-type': 'application/json',
+      },
+      body: JSON.stringify(rest),
+    });
+    data = await resp.json();
+    if (data.err) throw data.err;
+    setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
   },
 );
