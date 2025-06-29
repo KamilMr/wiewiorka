@@ -1,20 +1,9 @@
-import {useState} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {useEffect, useRef, useState} from 'react';
+import {SafeAreaView, ScrollView, TouchableOpacity, View} from 'react-native';
 import {formatDate} from 'date-fns';
 import _ from 'lodash';
 
-import {
-  TextInput,
-  ButtonWithStatus as Button,
-  Select,
-  Text,
-  IconButton,
-} from '@/components';
+import {TextInput, ButtonWithStatus as Button, Select, Text, IconButton} from '@/components';
 
 import {useAppDispatch, useAppSelector} from '@/hooks';
 import {sizes, useAppTheme} from '@/constants/theme';
@@ -44,24 +33,23 @@ const monthAndYearSliders = [
   },
   // + 1 month
   {
-    label: new Date(
-      new Date().setMonth(new Date().getMonth() + 1),
-    ).toLocaleString('pl', {month: 'long'}),
-    value: new Date(
-      new Date().setMonth(new Date().getMonth() + 1),
-    ).toLocaleString('pl', {month: '2-digit'}),
+    label: new Date(new Date().setMonth(new Date().getMonth() + 1)).toLocaleString('pl', {month: 'long'}),
+    value: new Date(new Date().setMonth(new Date().getMonth() + 1)).toLocaleString('pl', {month: '2-digit'}),
   },
 ];
 
 const yearSliders = [{label: '2025', value: '2025'}];
 
-const SelectMonthAndYear = ({
-  onChange,
-}: {
-  onChange: (month: string, year: string) => void;
-}) => {
-  const [month, setMonth] = useState('01');
-  const [year, setYear] = useState('2025');
+const SelectMonthAndYear = ({onChange}: {onChange: (month: string, year: string) => void}) => {
+  const [month, setMonth] = useState(new Date().toLocaleString('pl', {month: '2-digit'}));
+  const [year, setYear] = useState(new Date().getFullYear().toString());
+
+  const firstRender = useRef(true);
+
+  if (firstRender.current) {
+    onChange(month, year);
+    firstRender.current = false;
+  }
 
   const handleMonthChange = (value: string) => {
     setMonth(value);
@@ -130,21 +118,14 @@ const ExtendablesCategories = ({
               }>
               <Text variant="titleMedium">{groupName}</Text>
             </TouchableOpacity>
-            <IconButton
-              icon={expand[index] ? 'chevron-down' : 'chevron-right'}
-              onPress={() => handleExpand(index)}
-            />
+            <IconButton icon={expand[index] ? 'chevron-down' : 'chevron-right'} onPress={() => handleExpand(index)} />
           </View>
           {expand[index] &&
             items.map((item) => (
               <TouchableOpacity
                 key={item.id}
-                onPress={() =>
-                  onChange?.({name: item.name, id: item.id, type: 'category'})
-                }>
-                <Text
-                  key={item.id}
-                  style={{marginLeft: sizes.xl, marginVertical: sizes.md}}>
+                onPress={() => onChange?.({name: item.name, id: item.id, type: 'category'})}>
+                <Text key={item.id} style={{marginLeft: sizes.xl, marginVertical: sizes.md}}>
                   {item.name}
                 </Text>
               </TouchableOpacity>
@@ -160,8 +141,7 @@ export default function NewBudget() {
   const [amount, setAmount] = useState<string>('');
   const [budgetDate, setBudgetDate] = useState(null);
   const [showCategories, setShowCategories] = useState(false);
-  const [selectedCatagory, setSelectedCategory] =
-    useState<SelectedCategory | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<SelectedCategory | null>(null);
   const dispatch = useAppDispatch();
   const t = useAppTheme();
 
@@ -177,15 +157,7 @@ export default function NewBudget() {
     );
   };
 
-  const handleChangeCategory = ({
-    name,
-    id,
-    type,
-  }: {
-    name: string;
-    id: number;
-    type: string;
-  }) => {
+  const handleChangeCategory = ({name, id, type}: {name: string; id: number; type: string}) => {
     setSelectedCategory({name, id, [`${type}Id`]: id});
     setShowCategories(false);
   };
@@ -193,41 +165,32 @@ export default function NewBudget() {
   return (
     <SafeAreaView>
       <ScrollView style={{padding: sizes.xl}}>
-        <View
-          style={{marginTop: sizes.xl * 3, backgroundColor: t.colors.white}}>
-          <SelectMonthAndYear
-            onChange={(month, year) => console.log(month, year)}
-          />
+        <View style={{marginTop: sizes.xl * 3, backgroundColor: t.colors.white}}>
+          <SelectMonthAndYear onChange={(month, year) => setBudgetDate(`${year}-${month}-01`)} />
         </View>
-        <TextInput
-          label="Kwota"
-          value={amount}
-          onChangeText={(text) => setAmount(text)}
-        />
+        <TextInput label="Kwota" value={amount} keyboardType="numeric" onChangeText={(text) => setAmount(text)} />
         <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
           }}>
-          <Text variant="titleMedium">{selectedCatagory?.name ?? ''}</Text>
+          <Text variant={selectedCategory?.name ? 'titleMedium' : 'bodySmall'} style={{color: t.colors.secondary}}>
+            {selectedCategory?.name ?? 'Nie wybrano kategorii'}
+          </Text>
           <Button onPress={() => setShowCategories(!showCategories)}>
             {showCategories ? 'Ukryj kategorie' : 'Pokaż kategorie'}
           </Button>
         </View>
-        {showCategories && (
-          <ExtendablesCategories
-            categories={groupedByMain}
-            onChange={handleChangeCategory}
-          />
-        )}
+        {showCategories && <ExtendablesCategories categories={groupedByMain} onChange={handleChangeCategory} />}
         <Button
           mode="contained"
           onPress={handleSave}
+          disabled={!amount || !budgetDate || !selectedCategory?.name}
           style={{marginTop: sizes.lg, alignSelf: 'center'}}>
           Dodaj budżet
         </Button>
       </ScrollView>
     </SafeAreaView>
   );
-};
+}

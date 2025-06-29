@@ -23,7 +23,6 @@ const SummaryCard_v2 = (props: SummaryCard_v2Props) => {
     outcome: 0,
   };
 
-
   return (
     <Card style={styles.root}>
       <Card.Title title={date} />
