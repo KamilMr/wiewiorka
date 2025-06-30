@@ -1,4 +1,4 @@
-import {configureStore, combineReducers, Store, MiddlewareAPI} from '@reduxjs/toolkit';
+import {configureStore, combineReducers, MiddlewareAPI} from '@reduxjs/toolkit';
 import {createMigrate, persistReducer, persistStore} from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -37,7 +37,7 @@ const setLoadingStatusMiddleware =
   };
 
 const migrations = {
-  4: (state: RootState) => {
+  4: (state: any ) => {
     return {
       ...state,
       auth: authEmptyState(),
@@ -56,7 +56,7 @@ const persistConfig = {
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-const store: Store = configureStore({
+const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -71,7 +71,9 @@ const store: Store = configureStore({
 const persistor = persistStore(store);
 
 export {store, persistor};
+// Get the type of our store variable
+export type AppStore = typeof store;
 // Infer the `RootState` and `AppDispatch` types from the store itself
-export type RootState = ReturnType<typeof store.getState>;
+export type RootState = ReturnType<typeof rootReducer>;
 // Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
 export type AppDispatch = typeof store.dispatch;

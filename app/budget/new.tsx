@@ -8,7 +8,9 @@ import {TextInput, ButtonWithStatus as Button, Select, Text, IconButton} from '@
 import {useAppDispatch, useAppSelector} from '@/hooks';
 import {sizes, useAppTheme} from '@/constants/theme';
 import {selectCategories} from '@/redux/main/selectors';
-import {uploadBudget} from '@/redux/main/thunks';
+import {Budget, uploadBudget} from '@/redux/main/thunks';
+import { AppDispatch } from '@/redux/store';
+import { ThunkAction } from '@reduxjs/toolkit';
 
 interface Category {
   id: number;
@@ -150,12 +152,13 @@ export default function NewBudget() {
     if (!amount || !budgetDate) return;
     const isGroup = selectedCategory?.groupId;
     const key = isGroup ? 'groupId' : 'categoryId';
+    const budgetData: Budget = {
+      amount: parseInt(amount),
+      date: formatDate(budgetDate, 'yyyy-MM-dd'),
+      [key]: selectedCategory?.[key],
+    };
     dispatch(
-      uploadBudget({
-        amount: parseInt(amount),
-        date: formatDate(budgetDate, 'yyyy-MM-dd'),
-        [key]: selectedCategory[key],
-      }),
+      uploadBudget(budgetData)
     );
   };
 
