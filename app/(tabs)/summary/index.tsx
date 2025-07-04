@@ -9,6 +9,7 @@ import {SummaryCard, Text} from '@/components';
 import {useAppSelector} from '@/hooks';
 import {useAppTheme} from '@/constants/theme';
 import {NoData} from '@/components';
+import {SummaryCardProps} from '@/components/SummaryCard';
 
 const MONTH = 1;
 const YEAR = 12;
@@ -29,7 +30,7 @@ const Config: React.FC<{
 
   return (
     <View style={{alignItems: 'center', marginBottom: 16}}>
-      {title && <Text variant="headlineLarge">{title}</Text>}
+      {title && <Text variant="titleLarge">{title}</Text>}
       <RadioButton.Group
         onValueChange={(value) => handleChange(value)}
         value={selection[active][0].toString()}>
@@ -51,8 +52,8 @@ const Config: React.FC<{
 
 const Summary = () => {
   const [filter, setFilter] = useState(MONTH);
-  const summary = useAppSelector(selectComparison(filter));
-  const handleChange = (f) => setFilter(f);
+  const summary: SummaryCardProps[] = useAppSelector(selectComparison(filter));
+  const handleChange = (f: string) => setFilter(+f);
 
   const t = useAppTheme();
 
@@ -74,7 +75,7 @@ const Summary = () => {
         {!summary.length ? (
           <NoData />
         ) : (
-          summary.map((sumObj) => (
+          summary.map((sumObj: SummaryCardProps) => (
             <SummaryCard
               key={sumObj.id}
               income={sumObj.income}

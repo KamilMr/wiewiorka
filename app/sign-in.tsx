@@ -31,8 +31,13 @@ const Login = () => {
     // TODO:
   };
 
-  const handleSave = () => {
-    dispatch(signIn(data)).then(() => router.replace('/'));
+  const handleSave = async () => {
+    try {
+      await dispatch(signIn(data)).unwrap();
+      router.replace('/');
+    } catch (error: any) {
+      console.error('error', error?.message || 'Coś poszło nie tak');
+    }
   };
 
   return (

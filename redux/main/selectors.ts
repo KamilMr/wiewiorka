@@ -1,10 +1,12 @@
 import {createSelector} from '@reduxjs/toolkit';
-import {format, isAfter, isBefore, isSameDay} from 'date-fns';
+import {format, formatDate, isAfter, isBefore, isSameDay} from 'date-fns';
 import _ from 'lodash';
 
 import {EXCLUDED_CAT, dh, makeNewIdArr, normalize} from '@/common';
 import {RootState} from '../store';
 import {Category, Expense, Income, Subcategory} from './mainSlice';
+import {BudgetMainSlice, BudgetCardItem} from '@/utils/types';
+import {SummaryCardProps} from '@/components/SummaryCard';
 
 export type Search = {
   txt: string;
@@ -142,7 +144,7 @@ export const selectMainCategories = createSelector(
 );
 
 export const selectComparison = (number1or12: number | string) =>
-  createSelector([selectIncomes, selectExpensesAll], (income, expenses) => {
+  createSelector([selectIncomes, selectExpensesAll], (income, expenses): SummaryCardProps[] => {
     const pattern: string = +number1or12 === 1 ? 'MM/yyyy' : 'yyyy';
     const calPrice = (price: number, vat: number = 0): number =>
       price - price * (vat / 100);
@@ -183,9 +185,75 @@ export const selectSources = (state: RootState) => {
 export const selectByTimeRange = (dates: [Date, Date]) => {
   return createSelector([(state) => state.main._aggregated], (data) => {
     if (dates?.length === 2)
-      return _.pickBy(data, (_, date) => dh.isBetweenDates(new Date(date), dates[0], dates[1]));
+      return _.pickBy(data, (_, date) =>
+        dh.isBetweenDates(new Date(date), dates[0], dates[1]),
+      );
     else return data;
   });
 };
 
 export const selectStatus = (state: RootState) => state.main.status;
+
+export const selectBudgets = (
+  yearMonth = formatDate(new Date(), 'yyyy-MM-dd'),
+) =>
+  createSelector(
+    [
+      (state) => state.main.budgets,
+      selectCategories,
+      selectExpensesAll,
+      selectMainCategories,
+    ],
+    (budgets: BudgetMainSlice[], categories, expenses, mainCat) => {
+      const [year, month] = yearMonth.split('-');
+      const filteredExpense = expenses.filter((exp: Expense) => {
+        const [expYear, expMonth] = exp.date.split('-');
+
+        return year === expYear && month === expMonth;
+      });
+
+      const tR: BudgetCardItem[] = (budgets.length ? budgets : [])
+        .filter((b) => {
+          const {yearMonth} = b;
+          const [budgetYear, budgetMonth] = yearMonth.split('-');
+          if (year !== budgetYear || month !== budgetMonth) return;
+
+          return true;
+        })
+        .map((budget) => {
+          const {categoryId, amount, groupId, yearMonth} = budget;
+          const isGroup = groupId !== null;
+          const item: BudgetCardItem = {
+            id: budget.id,
+            budgetedName: isGroup
+              ? categories.find((cat: Subcategory) => +cat.groupId === +groupId)
+                  ?.groupName || ''
+              : //@ts-ignore
+                categories.find((cat: Subcategory) => +cat.id === +categoryId)
+                  ?.name || '',
+            allocated: +amount,
+            amount: filteredExpense.reduce(
+              (prevExp: number, currExp: Expense) => {
+
+                if (isGroup) {
+                  const cat = categories.find(
+                    (cat: Subcategory) => cat.id === currExp.categoryId,
+                  );
+                  console.log(cat);
+
+                  if (cat.groupId === groupId) prevExp += currExp.price;
+                } else if (currExp.categoryId === categoryId)
+                  prevExp += currExp.price;
+
+                return prevExp;
+              },
+              0,
+            ),
+          };
+
+          return item;
+        });
+
+      return tR;
+    },
+  );

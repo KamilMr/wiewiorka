@@ -1,9 +1,9 @@
 import * as React from 'react';
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, TouchableOpacity} from 'react-native';
 import {router} from 'expo-router';
 
 import _ from 'lodash';
-import {Avatar, Button, Card, IconButton, Text} from 'react-native-paper';
+import {Avatar, Card, IconButton, Text} from 'react-native-paper';
 
 import {formatPrice} from '@/common';
 
@@ -11,7 +11,8 @@ type Costs = {
   [key: string]: number;
 };
 
-interface Props {
+export interface SummaryCardProps {
+  id: string;
   income: number;
   outcome: number;
   date: string;
@@ -23,7 +24,7 @@ const LeftContent = (props: {icon: string}) => (
   <Avatar.Icon {...props} icon={props.icon} />
 );
 
-const SummaryCard = (props: Props) => {
+const SummaryCard = (props: Omit<SummaryCardProps, 'id'>) => {
   const {income, outcome, date, costs, icon = ''} = props;
   // the amount of costs total
   const sumCosts = _.sumBy(_.values(costs));
@@ -45,39 +46,56 @@ const SummaryCard = (props: Props) => {
             justifyContent: 'space-between',
             marginBottom: 16,
           }}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <IconButton icon="arrow-down" iconColor="green" />
-            <View>
-              <Text>Wpłynęło netto</Text>
-              <Text>
-                {`${formatPrice(income - sumCosts < 0 ? 0 : income - sumCosts)} `}
-              </Text>
+          <TouchableOpacity
+            onPress={() =>
+              router.navigate({
+                pathname: '/income-summary',
+                params: {date: date.split('/').reverse().join('-') + '-01'},
+              })
+            }
+            style={styles.buttonContainer}>
+            <View
+              style={[
+                styles.buttonContent,
+                {backgroundColor: 'rgba(0, 255, 0, 0.1)'},
+              ]}>
+              <IconButton icon="arrow-down" iconColor="green" />
+              <View>
+                <Text>Wpłynęło netto</Text>
+                <Text>
+                  {`${formatPrice(
+                    income - sumCosts < 0 ? 0 : income - sumCosts,
+                  )} `}
+                </Text>
+              </View>
             </View>
-          </View>
+          </TouchableOpacity>
 
-          <View>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <TouchableOpacity
+            onPress={handleNavigate(
+              date.split('/').reverse().join('-') + '-01',
+            )}
+            style={styles.buttonContainer}>
+            <View
+              style={[
+                styles.buttonContent,
+                {backgroundColor: 'rgba(255, 0, 0, 0.1)'},
+              ]}>
               <IconButton icon="arrow-up" iconColor="red" />
               <View>
                 <Text>Wydano:</Text>
                 <Text>{`${formatPrice(outcome - sumCosts)}`}</Text>
               </View>
             </View>
-          </View>
+          </TouchableOpacity>
         </View>
-        <View style={{marginTop: 8}}>
+        {/* <View style={{marginTop: 8}}>
           <Text>Koszta niewliczone:</Text>
           {_.keys(costs).map((name) => (
             <Text key={name}>{`${name}: ${formatPrice(costs[name])}`}</Text>
           ))}
-        </View>
+        </View> */}
       </Card.Content>
-      <Card.Actions>
-        <Button
-          onPress={handleNavigate(date.split('/').reverse().join('-') + '-01')}>
-          Zobacz Szczegóły
-        </Button>
-      </Card.Actions>
     </Card>
   );
 };
@@ -85,6 +103,17 @@ const SummaryCard = (props: Props) => {
 const styles = StyleSheet.create({
   root: {
     margin: 8,
+  },
+  buttonContainer: {
+    borderRadius: 8,
+    overflow: 'hidden',
+    width: '45%',
+  },
+  buttonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 8,
+    borderRadius: 8,
   },
 });
 

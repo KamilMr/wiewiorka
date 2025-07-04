@@ -16,7 +16,7 @@ import {
   uploadIncome,
 } from './thunks';
 import aggregateDataByDay from '../../utils/aggregateData';
-import {AggregatedData} from '@/utils/types';
+import {AggregatedData, BudgetMainSlice as MonthlyBudget} from '@/utils/types';
 
 type Snackbar = {
   open: boolean;
@@ -75,6 +75,7 @@ export interface Category {
 export interface MainSlice {
   status: 'idle' | 'fetching';
   expenses: Array<Expense>;
+  budgets: Array<MonthlyBudget>;
   incomes: Array<Income>;
   categories: {[key: number]: Category};
   _aggregated: AggregatedData;
@@ -82,9 +83,10 @@ export interface MainSlice {
   snackbar: Snackbar;
 }
 
-const emptyState: MainSlice = {
+const emptyState = (): MainSlice => ({
   status: 'idle',
   expenses: [],
+  budgets: [],
   incomes: [],
   categories: {},
   sources: {},
@@ -94,11 +96,11 @@ const emptyState: MainSlice = {
     type: 'success',
     msg: '',
   },
-};
+});
 
 const mainSlice = createSlice({
   name: 'main',
-  initialState: emptyState,
+  initialState: emptyState(),
   reducers: {
     startLoading: (state, action) => {
       state.status = 'fetching'
@@ -166,9 +168,7 @@ const mainSlice = createSlice({
         {},
       );
     },
-    dropMain: () => {
-      return emptyState;
-    },
+    dropMain: () => emptyState(),
     removeExpense: (state, action) => {
       state.expenses = state.expenses.filter(
         (exp) => exp.id !== action.payload,
@@ -183,6 +183,7 @@ const mainSlice = createSlice({
           ...ex,
           date: format(ex.date, 'yyyy-MM-dd'),
         }));
+        state.budgets = action.payload.budgets || [];
         state.expenses = expenses;
         state.categories = categories;
         state.incomes = income.map((inc: Income) => ({

@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 
 import _ from 'lodash';
 import {
@@ -8,7 +8,7 @@ import {
   useNavigation,
 } from 'expo-router';
 import {formatDate} from 'date-fns';
-import {View, StyleSheet, ScrollView, SafeAreaView} from 'react-native';
+import {View, StyleSheet, ScrollView, SafeAreaView, Alert} from 'react-native';
 import {RadioButton} from 'react-native-paper';
 
 import {
@@ -19,7 +19,7 @@ import {
   TextInput,
 } from '@/components';
 import {sizes} from '@/constants/theme';
-import {uploadExpense, uploadIncome} from '@/redux/main/thunks';
+import {deleteExpense, deleteIncome, uploadExpense, uploadIncome} from '@/redux/main/thunks';
 import {useAppDispatch, useAppSelector} from '@/hooks';
 import {
   selectCategories,
@@ -222,6 +222,38 @@ export default function AddNew() {
       });
   };
 
+  const handleDelete = () => {
+    Alert.alert(
+      'Potwierdź usunięcie',
+      'Czy na pewno chcesz usunąć ten wpis?',
+      [
+        {
+          text: 'Anuluj',
+          style: 'cancel',
+        },
+        {
+          text: 'Usuń',
+          style: 'destructive',
+          onPress: () => {
+            if (type === 'expense') {
+              dispatch(deleteExpense(id as string))
+                .unwrap()
+                .then(() => {
+                  router.navigate('/(tabs)/records');
+                });
+            } else {
+              dispatch(deleteIncome(id as string))
+                .unwrap()
+                .then(() => {
+                  router.navigate('/(tabs)/records');
+                });
+            }
+          },
+        },
+      ],
+    );
+  };
+
   return (
     <SafeAreaView style={{flex: 1}}>
       <ScrollView
@@ -310,6 +342,11 @@ export default function AddNew() {
 
         </View>
         <View style={styles.buttons}>
+          {+id ? (<ButtonWithStatus
+            textColor="red"
+            onPress={handleDelete}>
+            Usuń
+          </ButtonWithStatus>) : null}
           <ButtonWithStatus onPress={handleNavigateBack}>
             Przerwij
           </ButtonWithStatus>

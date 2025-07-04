@@ -1,9 +1,7 @@
+import React from 'react';
 import {
   Redirect,
   Stack,
-  useRootNavigationState,
-  useLocalSearchParams,
-  router,
 } from 'expo-router';
 
 import {IconButton} from 'react-native-paper';

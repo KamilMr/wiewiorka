@@ -1,4 +1,4 @@
-import {configureStore, combineReducers, Store} from '@reduxjs/toolkit';
+import {configureStore, combineReducers, MiddlewareAPI} from '@reduxjs/toolkit';
 import {createMigrate, persistReducer, persistStore} from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -15,7 +15,7 @@ const rootReducer = combineReducers({
   main: mainReducer,
 });
 
-const authMiddleware = (store: Store) => (next: any) => async (action: any) => {
+const authMiddleware = (store: MiddlewareAPI) => (next: any) => async (action: any) => {
   if (['session_not_active', 'not_auth'].includes(action.error?.message)) {
     store.dispatch(dropMe());
     store.dispatch(dropMain());
@@ -24,7 +24,7 @@ const authMiddleware = (store: Store) => (next: any) => async (action: any) => {
 };
 
 const setLoadingStatusMiddleware =
-  (store: Store) => (next: any) => async (action: any) => {
+  (store: MiddlewareAPI) => (next: any) => async (action: any) => {
     if (action.type.endsWith('/pending')) {
       store.dispatch(startLoading(''));
     } else if (
@@ -37,22 +37,7 @@ const setLoadingStatusMiddleware =
   };
 
 const migrations = {
-  0: (state: RootState) => {
-    // migration: flush store
-    return {
-      ...state,
-      auth: authEmptyState(),
-      main: mainEmptyState(),
-    };
-  },
-  1: (state: RootState) => {
-    return {
-      ...state,
-      auth: authEmptyState(),
-      main: mainEmptyState(),
-    };
-  },
-  2: (state: RootState) => {
+  4: (state: any ) => {
     return {
       ...state,
       auth: authEmptyState(),
@@ -63,7 +48,7 @@ const migrations = {
 
 const persistConfig = {
   key: 'squirrel',
-  version: 1,
+  version: 4,
   storage: AsyncStorage,
   whitelist: ['auth', 'main'],
   migrate: createMigrate(migrations, {debug: false}),
@@ -86,7 +71,9 @@ const store = configureStore({
 const persistor = persistStore(store);
 
 export {store, persistor};
+// Get the type of our store variable
+export type AppStore = typeof store;
 // Infer the `RootState` and `AppDispatch` types from the store itself
-export type RootState = ReturnType<typeof store.getState>;
+export type RootState = ReturnType<typeof rootReducer>;
 // Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
 export type AppDispatch = typeof store.dispatch;

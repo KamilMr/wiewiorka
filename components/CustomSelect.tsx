@@ -6,15 +6,16 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 
 import Text from './CustomText';
 
-type Items = Array<{label: string; value: string}>;
+export type Items = Array<{label: string; value: string}>;
 
 export interface Props {
   onChange: (data: any) => any;
   value: any;
   styles?: Object;
-  items: Items[];
+  items: Items;
   title?: string;
   disable?: boolean;
+  placeholder?: string;
 }
 
 const DropdownComponent = ({
@@ -23,6 +24,7 @@ const DropdownComponent = ({
   items,
   title = '',
   disable = false,
+  placeholder = 'Wybierz',
 }: Props) => {
   const [isFocus, setIsFocus] = useState(false);
 
@@ -55,7 +57,7 @@ const DropdownComponent = ({
         maxHeight={300}
         labelField="label"
         valueField="value"
-        placeholder={!isFocus ? 'Wybierz kategorię' : '...'}
+        placeholder={!isFocus ? placeholder : '...'}
         // keyboardAvoiding
         // dropdownPosition='top'
         searchPlaceholder="Szuka..."

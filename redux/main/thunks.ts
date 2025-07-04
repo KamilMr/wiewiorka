@@ -1,4 +1,5 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
+import {RootState, AppStore} from '../store';
 
 import {getURL} from '@/common';
 
@@ -19,11 +20,14 @@ interface Income {
   vat: number;
 }
 
-const DEFFERED = 0;
+const DIFFERED = 0;
 
-export const fetchIni = createAsyncThunk(
+export const fetchIni = createAsyncThunk<any, void, {state: RootState}>(
   'ini/fetchIni',
-  async (_, thunkAPI) => {
+  async (
+    _,
+    thunkAPI,
+  ) => {
     const token = thunkAPI.getState().auth.token;
     let data;
     let resp = await fetch(getURL('ini'), {
@@ -37,9 +41,20 @@ export const fetchIni = createAsyncThunk(
   },
 );
 
-export const uploadExpense = createAsyncThunk(
+export interface Budget {
+  id?: string;
+  amount: number;
+  date: string;
+  categoryId?: number;
+  groupId?: number;
+}
+
+export const uploadExpense = createAsyncThunk<any, {id?: string; rest: Expense}, {state: RootState}>(
   'expense/add',
-  async ({id, ...rest}: Expense, thunkAPI) => {
+  async (
+    {id, ...rest},
+    thunkAPI,
+  ) => {
     const token = thunkAPI.getState().auth.token;
     let data;
     const path = 'expenses' + (id ? `/${id}` : '');
@@ -54,13 +69,16 @@ export const uploadExpense = createAsyncThunk(
     data = await resp.json();
     if (data.err) throw data.err;
     // deffered fetch
-    setTimeout(() => thunkAPI.dispatch(fetchIni()), DEFFERED);
+    setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
   },
 );
 
-export const uploadIncome = createAsyncThunk(
+export const uploadIncome = createAsyncThunk<any, {id?: string; rest: Income}, {state: RootState}>(
   'income/add',
-  async ({id, ...rest}: Income, thunkAPI) => {
+  async (
+    {id, ...rest},
+    thunkAPI,
+  ) => {
     const token = thunkAPI.getState().auth.token;
 
     let data;
@@ -77,13 +95,22 @@ export const uploadIncome = createAsyncThunk(
     if (data.err) throw data.err;
 
     // deffered fetch
-    setTimeout(() => thunkAPI.dispatch(fetchIni()), DEFFERED);
+    setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
   },
 );
 
-export const handleCategory = createAsyncThunk(
+export const handleCategory = createAsyncThunk<any, {
+  method?: string;
+  id?: string;
+  name?: string;
+  color?: string;
+  groupId?: number;
+}, {state: RootState}>(
   'category/upsert',
-  async (payload = {}, thunkAPI) => {
+  async (
+    payload,
+    thunkAPI,
+  ) => {
     const {token} = thunkAPI.getState().auth;
 
     if (!Object.keys(payload).length) return;
@@ -99,19 +126,22 @@ export const handleCategory = createAsyncThunk(
         'content-type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({name, color: color.split('#')[1], groupId}),
+      body: JSON.stringify({name, color: color?.split('#')[1] || '', groupId}),
     });
     data = await resp.json();
     if (data.err) throw data.err;
-    // deffered fetch
-    setTimeout(() => thunkAPI.dispatch(fetchIni()), DEFFERED);
+    // differed fetch
+    setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
     return data.d;
   },
 );
 
-export const handleDeleteCategory = createAsyncThunk(
+export const handleDeleteCategory = createAsyncThunk<any, {id?: string}, {state: RootState}>(
   'category/delete',
-  async (payload = {}, thunkAPI) => {
+  async (
+    payload,
+    thunkAPI,
+  ) => {
     const {token} = thunkAPI.getState().auth;
 
     if (!Object.keys(payload).length) return;
@@ -130,14 +160,17 @@ export const handleDeleteCategory = createAsyncThunk(
     data = await resp.json();
     if (data.err) throw data.err;
     // deffered fetch
-    setTimeout(() => thunkAPI.dispatch(fetchIni()), DEFFERED);
+    setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
     return data.d;
   },
 );
 
-export const handleDeleteGroupCategory = createAsyncThunk(
+export const handleDeleteGroupCategory = createAsyncThunk<any, {id?: string}, {state: RootState}>(
   'categoryGroup/delete',
-  async (payload = {}, thunkAPI) => {
+  async (
+    payload,
+    thunkAPI,
+  ) => {
     const {token} = thunkAPI.getState().auth;
 
     if (!Object.keys(payload).length) return;
@@ -155,15 +188,18 @@ export const handleDeleteGroupCategory = createAsyncThunk(
     });
     data = await resp.json();
     if (data.err) throw data.err;
-    // deffered fetch
-    setTimeout(() => thunkAPI.dispatch(fetchIni()), DEFFERED);
+    // differed fetch
+    setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
     return data.d;
   },
 );
 
-export const handleGroupCategory = createAsyncThunk(
+export const handleGroupCategory = createAsyncThunk<any, {method?: string; id?: string; name?: string; color?: string}, {state: RootState}>(
   'categoryGroup/upsert',
-  async (payload = {}, thunkAPI) => {
+  async (
+    payload,
+    thunkAPI,
+  ) => {
     const {token} = thunkAPI.getState().auth;
 
     if (!Object.keys(payload).length) return;
@@ -179,19 +215,22 @@ export const handleGroupCategory = createAsyncThunk(
         'content-type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({name, color: color.split('#')[1]}),
+      body: JSON.stringify({name, color: color?.split('#')[1] || ''}),
     });
     data = await resp.json();
     if (data.err) throw data.err;
-    // deffered fetch
-    setTimeout(() => thunkAPI.dispatch(fetchIni()), DEFFERED);
+    // differed fetch
+    setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
     return data.d;
   },
 );
 
-export const uploadFile = createAsyncThunk(
+export const uploadFile = createAsyncThunk<any, {file: any}, {state: RootState}>(
   'expense/image',
-  async ({file}, thunkAPI) => {
+  async (
+    {file}: {file: any},
+    thunkAPI,
+  ) => {
     const token = thunkAPI.getState().auth.token;
     let data;
     const path = 'expenses/image';
@@ -206,14 +245,17 @@ export const uploadFile = createAsyncThunk(
 
     if (data.err) throw data;
     // deffered fetch
-    setTimeout(() => thunkAPI.dispatch(fetchIni()), DEFFERED);
+    setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
     return data.d;
   },
 );
 
-export const deleteExpense = createAsyncThunk(
+export const deleteExpense = createAsyncThunk<any, {id?: string}, {state: RootState}>(
   'expense/delete',
-  async ({id}: Expense, thunkAPI) => {
+  async (
+    id,
+    thunkAPI,
+  ) => {
     const token = thunkAPI.getState().auth.token;
 
     let data;
@@ -227,14 +269,17 @@ export const deleteExpense = createAsyncThunk(
     data = await resp.json();
     if (data.err) throw data.err;
 
-    // deffered fetch
-    setTimeout(() => thunkAPI.dispatch(fetchIni()), DEFFERED);
+    // differed fetch
+    setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
   },
 );
 
-export const deleteIncome = createAsyncThunk(
+export const deleteIncome = createAsyncThunk<any, {id?: string}, {state: RootState}>(
   'income/delete',
-  async ({id}: Income, thunkAPI) => {
+  async (
+    id,
+    thunkAPI,
+  ) => {
     const token = thunkAPI.getState().auth.token;
 
     let data;
@@ -248,7 +293,31 @@ export const deleteIncome = createAsyncThunk(
     data = await resp.json();
     if (data.err) throw data.err;
 
-    // deffered fetch
-    setTimeout(() => thunkAPI.dispatch(fetchIni()), DEFFERED);
+    // differed fetch
+    setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
+  },
+);
+
+export const uploadBudget = createAsyncThunk<any, Budget, {state: RootState}>(
+  'budget/upload',
+  async (
+    {id, ...rest}: Budget,
+    thunkAPI,
+  ): Promise<void> => {
+    const token = thunkAPI.getState().auth.token;
+
+    let data;
+    const path = 'budget' + (id ? `/${id}` : '');
+    let resp = await fetch(getURL(path), {
+      method: id ? 'PATCH' : 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-type': 'application/json',
+      },
+      body: JSON.stringify(rest),
+    });
+    data = await resp.json();
+    if (data.err) throw data.err;
+    setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
   },
 );
