@@ -6,13 +6,13 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 
 import Text from './CustomText';
 
-type Items = Array<{label: string; value: string}>;
+export type Items = Array<{label: string; value: string}>;
 
 export interface Props {
   onChange: (data: any) => any;
   value: any;
   styles?: Object;
-  items: Items[];
+  items: Items;
   title?: string;
   disable?: boolean;
   placeholder?: string;

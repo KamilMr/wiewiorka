@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {SafeAreaView, ScrollView, TouchableOpacity, View} from 'react-native';
 import {formatDate} from 'date-fns';
 import _ from 'lodash';
@@ -9,8 +9,7 @@ import {useAppDispatch, useAppSelector} from '@/hooks';
 import {sizes, useAppTheme} from '@/constants/theme';
 import {selectCategories} from '@/redux/main/selectors';
 import {Budget, uploadBudget} from '@/redux/main/thunks';
-import { AppDispatch } from '@/redux/store';
-import { ThunkAction } from '@reduxjs/toolkit';
+import {Items} from '@/components/CustomSelect';
 
 interface Category {
   id: number;
@@ -26,7 +25,7 @@ type SelectedCategory = {
   [key: string]: number | string;
 };
 
-const monthAndYearSliders = [
+const monthAndYearSliders: Items = [
   // this month
   {
     label: new Date().toLocaleString('pl', {month: 'long'}),
@@ -41,32 +40,32 @@ const monthAndYearSliders = [
 
 const yearSliders = [{label: '2025', value: '2025'}];
 
-const SelectMonthAndYear = ({onChange}: {onChange: (month: string, year: string) => void}) => {
+const SelectMonthAndYear = ({onChange}: {onChange: (month: number, year: number) => void}) => {
   const [month, setMonth] = useState(new Date().toLocaleString('pl', {month: '2-digit'}));
   const [year, setYear] = useState(new Date().getFullYear().toString());
 
-  const firstRender = useRef(true);
+  useEffect(() => {
+    if (Number.isNaN(parseInt(month)) || Number.isNaN(parseInt(year))) return;
+    onChange(parseInt(month), parseInt(year));
+  }, []);
 
-  if (firstRender.current) {
-    onChange(month, year);
-    firstRender.current = false;
-  }
-
-  const handleMonthChange = (value: string) => {
-    setMonth(value);
-    onChange(value, year);
+  const handleMonthChange = (month: {label: string; value: string}) => {
+    setMonth(month.value);
+    if (Number.isNaN(parseInt(month.value))) return;
+    onChange(parseInt(month.value), parseInt(year));
   };
 
   const handleYearChange = (value: string) => {
     setYear(value);
-    onChange(month, value);
+    if (Number.isNaN(parseInt(value))) return;
+    onChange(parseInt(month), parseInt(value));
   };
 
   return (
     <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
       <View style={{flex: 1}}>
         <Select
-          label="Miesiąc"
+          title="Miesiąc"
           placeholder="Wybierz miesiąc"
           items={monthAndYearSliders}
           value={month}
@@ -75,7 +74,7 @@ const SelectMonthAndYear = ({onChange}: {onChange: (month: string, year: string)
       </View>
       <View style={{flex: 1}}>
         <Select
-          label="Rok"
+          title="Rok"
           placeholder="Wybierz rok"
           items={yearSliders}
           disable={true}
@@ -137,14 +136,15 @@ const ExtendablesCategories = ({
   );
 };
 
-export default function NewBudget() {
+const NewBudget = () => {
   const categories = useAppSelector(selectCategories);
   const [amount, setAmount] = useState<string>('');
-  const [budgetDate, setBudgetDate] = useState(null);
+  const [budgetDate, setBudgetDate] = useState<string | null>(null);
   const [showCategories, setShowCategories] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<SelectedCategory | null>(null);
   const dispatch = useAppDispatch();
   const t = useAppTheme();
+  console.log(budgetDate);
 
   const groupedByMain = _.groupBy(categories, 'groupName');
 
@@ -157,9 +157,7 @@ export default function NewBudget() {
       date: formatDate(budgetDate, 'yyyy-MM-dd'),
       [key]: selectedCategory?.[key],
     };
-    dispatch(
-      uploadBudget(budgetData)
-    );
+    dispatch(uploadBudget(budgetData));
   };
 
   const handleChangeCategory = ({name, id, type}: {name: string; id: number; type: string}) => {
@@ -167,11 +165,15 @@ export default function NewBudget() {
     setShowCategories(false);
   };
 
+  const handleSelectMonthAndYear = (month: number, year: number) => {
+    setBudgetDate(`${year}-${month}-01`);
+  };
+
   return (
     <SafeAreaView>
       <ScrollView style={{padding: sizes.xl}}>
         <View style={{marginTop: sizes.xl * 3, backgroundColor: t.colors.white}}>
-          <SelectMonthAndYear onChange={(month, year) => setBudgetDate(`${year}-${month}-01`)} />
+          <SelectMonthAndYear onChange={handleSelectMonthAndYear} />
         </View>
         <TextInput label="Kwota" value={amount} keyboardType="numeric" onChangeText={(text) => setAmount(text)} />
         <View
@@ -198,4 +200,6 @@ export default function NewBudget() {
       </ScrollView>
     </SafeAreaView>
   );
-}
+};
+
+export default NewBudget;
