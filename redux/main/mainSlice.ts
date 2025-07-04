@@ -149,7 +149,7 @@ const mainSlice = createSlice({
       .addCase(uploadFile.rejected, (state, action) => {
         state.snackbar.open = true;
         state.snackbar.type = 'error';
-        state.snackbar.msg = action.error.message || 'Coś poszło nie tak';
+        state.snackbar.msg = action.error.message ?? 'Coś poszło nie tak';
       })
       .addCase(uploadExpense.fulfilled, (state, action) => {
         state.snackbar.open = true;
@@ -159,7 +159,7 @@ const mainSlice = createSlice({
       .addCase(uploadExpense.rejected, (state, action) => {
         state.snackbar.open = true;
         state.snackbar.type = 'error';
-        state.snackbar.msg = action.error.message || 'Coś poszło nie tak';
+        state.snackbar.msg = action.error.message ?? 'Coś poszło nie tak';
       })
       .addCase(deleteExpense.fulfilled, (state, action) => {
         state.snackbar.open = true;
@@ -169,7 +169,7 @@ const mainSlice = createSlice({
       .addCase(deleteExpense.rejected, (state, action) => {
         state.snackbar.open = true;
         state.snackbar.type = 'info';
-        state.snackbar.msg = action.error.message || 'Coś poszło nie tak';
+        state.snackbar.msg = action.error.message ?? 'Coś poszło nie tak';
       })
       .addCase(uploadIncome.fulfilled, (state, action) => {
         state.snackbar.open = true;
@@ -179,7 +179,7 @@ const mainSlice = createSlice({
       .addCase(uploadIncome.rejected, (state, action) => {
         state.snackbar.open = true;
         state.snackbar.type = 'error';
-        state.snackbar.msg = action.error.message ?? 'Coś poszło nie tak';
+        state.snackbar.msg = action.error.message || 'Coś poszło nie tak';
       })
       .addCase(deleteIncome.fulfilled, (state, action) => {
         state.snackbar.open = true;
@@ -189,22 +189,22 @@ const mainSlice = createSlice({
       .addCase(deleteIncome.rejected, (state, action) => {
         state.snackbar.open = true;
         state.snackbar.type = 'info';
-        state.snackbar.msg = action.error.message || 'Coś poszło nie tak';
+        state.snackbar.msg = action.error.message ?? 'Coś poszło nie tak';
       })
       .addCase(handleGroupCategory.rejected, (state, action) => {
         state.snackbar.open = true;
         state.snackbar.type = 'error';
-        state.snackbar.msg = action.error.message || 'Coś poszło nie tak';
+        state.snackbar.msg = action.error.message ?? 'Coś poszło nie tak';
       })
       .addCase(handleDeleteCategory.rejected, (state, action) => {
         state.snackbar.open = true;
         state.snackbar.type = 'error';
-        state.snackbar.msg = action.error.message || 'Coś poszło nie tak';
+        state.snackbar.msg = action.error.message ?? 'Coś poszło nie tak';
       })
       .addCase(handleDeleteGroupCategory.rejected, (state, action) => {
         state.snackbar.open = true;
         state.snackbar.type = 'error';
-        state.snackbar.msg = action.error.message || 'Coś poszło nie tak';
+        state.snackbar.msg = action.error.message ?? 'Coś poszło nie tak';
       });
   },
 });
