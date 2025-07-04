@@ -4,7 +4,7 @@ import _ from 'lodash';
 
 import {EXCLUDED_CAT, dh, makeNewIdArr, normalize} from '@/common';
 import {RootState} from '../store';
-import {Category, Expense, Income, Subcategory} from './mainSlice';
+import {Category, Expense, Income, Subcategory} from '@/types';
 import {BudgetMainSlice, BudgetCardItem} from '@/utils/types';
 import {SummaryCardProps} from '@/components/SummaryCard';
 
@@ -19,7 +19,7 @@ const selectExpensesAll = (state: RootState) => state.main.expenses;
 
 const filterCat = (exp: Expense, f: Array<string>) => {
   if (!f.length) return true;
-  return f.includes(exp.category);
+  return f.includes(exp.categoryId.toString());
 };
 
 const filterTxt = (exp: any, f: string) => {
@@ -56,7 +56,7 @@ export const selectRecords = (number: number, search: Search) =>
         })
         .map((obj: Expense & {exp: true}) => {
           const catObj = obj?.exp
-            ? categories.find(({id}: {catId: number}) => id === obj.categoryId)
+            ? categories.find(({id}) => id === obj.categoryId)
             : null;
 
           return {

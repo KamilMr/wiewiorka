@@ -16,72 +16,7 @@ import {
   uploadIncome,
 } from './thunks';
 import aggregateDataByDay from '../../utils/aggregateData';
-import {AggregatedData, BudgetMainSlice as MonthlyBudget} from '@/utils/types';
-
-type Snackbar = {
-  open: boolean;
-  type: string;
-  msg: string;
-  time?: number;
-};
-
-export interface Income {
-  id: number;
-  date: string;
-  price: number;
-  source: string;
-  ownerId: number;
-  vat: number;
-  houseId: string;
-  description: string;
-  owner: string;
-}
-
-export interface Expense {
-  id: number;
-  description: string;
-  date: string;
-  price: number;
-  categoryId: number;
-  image: string;
-  houseId: string;
-  owner: string;
-}
-
-export interface ExpenseMore {
-  categoryName: string;
-  isExp: boolean;
-}
-
-type Owner = 'house' | 'user';
-type OwnerId = string | number;
-
-export interface Subcategory {
-  id: number;
-  name: string;
-  color: string;
-  groupId: number;
-  groupName?: string;
-  owner: Owner;
-  ownerId: OwnerId;
-}
-
-export interface Category {
-  subcategories: Subcategory[];
-  name: string;
-  color: string;
-}
-
-export interface MainSlice {
-  status: 'idle' | 'fetching';
-  expenses: Array<Expense>;
-  budgets: Array<MonthlyBudget>;
-  incomes: Array<Income>;
-  categories: {[key: number]: Category};
-  _aggregated: AggregatedData;
-  sources: {[key: string]: string[]};
-  snackbar: Snackbar;
-}
+import {MainSlice, Income, Expense} from '@/types';
 
 const emptyState = (): MainSlice => ({
   status: 'idle',
@@ -204,12 +139,12 @@ const mainSlice = createSlice({
       .addCase(fetchIni.rejected, (state, action) => {
         state.snackbar.open = true;
         state.snackbar.type = 'error';
-        state.snackbar.msg = action.error.message || 'Coś poszło nie tak';
+        state.snackbar.msg = action.error.message ?? 'Coś poszło nie tak';
       })
       .addCase(handleCategory.rejected, (state, action) => {
         state.snackbar.open = true;
         state.snackbar.type = 'error';
-        state.snackbar.msg = action.error.message;
+        state.snackbar.msg = action.error.message ?? 'Coś poszło nie tak';
       })
       .addCase(uploadFile.rejected, (state, action) => {
         state.snackbar.open = true;
@@ -244,7 +179,7 @@ const mainSlice = createSlice({
       .addCase(uploadIncome.rejected, (state, action) => {
         state.snackbar.open = true;
         state.snackbar.type = 'error';
-        state.snackbar.msg = action.error.message;
+        state.snackbar.msg = action.error.message ?? 'Coś poszło nie tak';
       })
       .addCase(deleteIncome.fulfilled, (state, action) => {
         state.snackbar.open = true;

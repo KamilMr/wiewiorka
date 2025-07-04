@@ -1,4 +1,4 @@
-import {Subcategory} from '@/redux/main/mainSlice';
+import {Subcategory} from '@/types';
 import {CustomModal} from '../CustomModal';
 
 interface GroupedItemsProps {
