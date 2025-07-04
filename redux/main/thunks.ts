@@ -2,23 +2,7 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 import {RootState, AppStore} from '../store';
 
 import {getURL} from '@/common';
-
-interface Expense {
-  id?: string;
-  description?: string;
-  date: string;
-  price: number;
-  categoryId?: number;
-}
-
-interface Income {
-  id?: string;
-  description?: string;
-  date: string;
-  price: number;
-  source: string;
-  vat: number;
-}
+import {Expense, Income} from '@/types';
 
 const DIFFERED = 0;
 

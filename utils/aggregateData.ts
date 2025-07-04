@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 import {AggregatedData} from './types';
 import {convertDate} from '@/common';
-import {Category, Expense} from '../redux/main/mainSlice';
+import {Category, Expense} from '@/types';
 
 type Axis = '1-1' | '1-0';
 type PickFilter = `${string}-${string}`;
@@ -85,7 +85,7 @@ const sumById = (data: AggregatedData) => {
   const values = _.values(data); // [{12:13: [2], 12-14: [2]}]
   values.forEach((obj) => {
     const catAndValue = _.entries(obj); // [[12-11, [10]]]
-    catAndValue.forEach(([id, valueArr]: [string, [number]]) => {
+    catAndValue.forEach(([id, valueArr]) => {
       tR[id] ??= [0];
       tR[id][0] += valueArr[0];
     });

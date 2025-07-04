@@ -3,12 +3,7 @@ import _ from 'lodash';
 
 import {logout, signIn} from './thunks';
 import {RootState} from '../store';
-
-interface AuthSlice {
-  name: string;
-  email: string;
-  token: string;
-}
+import {AuthSlice} from '@/types';
 
 const emptyState = (): AuthSlice => ({
   name: '',
