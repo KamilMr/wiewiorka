@@ -40,7 +40,7 @@ const mainSlice = createSlice({
     startLoading: (state, action) => {
       state.status = 'fetching'
     },
-    stopLoading: (state, action) => {
+    stopLoading: (state) => {
       state.status = 'idle';
     },
     setSnackbar: (state, action) => {
