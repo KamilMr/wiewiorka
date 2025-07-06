@@ -1,4 +1,3 @@
-import React from 'react';
 import {Modal, Portal, Button} from 'react-native-paper';
 import ColorPicker, {
   Panel1,
@@ -33,7 +32,7 @@ export default function CustomColorPicker({
         <ColorPicker
           style={{width: '70%', margin: 'auto'}}
           value={value}
-          
+
           onComplete={onSelectColor}>
           <Preview />
           <Panel1 />

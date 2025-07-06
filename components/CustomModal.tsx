@@ -45,17 +45,4 @@ const CustomModal = (props: CustomModal) => {
   );
 };
 
-const styles = StyleSheet.create({
-  view: {flex: 1, justifyContent: 'center', overflow: 'hidden'},
-  modalBg: {
-    width: '100%',
-    height: '100%',
-  },
-  header: {
-    flex: 0,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-  },
-});
-
 export default CustomModal;

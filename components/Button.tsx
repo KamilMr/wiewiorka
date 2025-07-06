@@ -1,4 +1,4 @@
-import React, {forwardRef} from 'react';
+import {forwardRef} from 'react';
 import {Button, ButtonProps, IconButton, IconButtonProps} from 'react-native-paper';
 import {useIsLoading} from '@/hooks';
 
