@@ -179,7 +179,7 @@ const mainSlice = createSlice({
       .addCase(uploadIncome.rejected, (state, action) => {
         state.snackbar.open = true;
         state.snackbar.type = 'error';
-        state.snackbar.msg = action.error.message || 'Coś poszło nie tak';
+        state.snackbar.msg = action.error.message ?? 'Coś poszło nie tak';
       })
       .addCase(deleteIncome.fulfilled, (state, action) => {
         state.snackbar.open = true;
