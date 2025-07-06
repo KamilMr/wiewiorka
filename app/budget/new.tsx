@@ -144,7 +144,6 @@ const NewBudget = () => {
   const [selectedCategory, setSelectedCategory] = useState<SelectedCategory | null>(null);
   const dispatch = useAppDispatch();
   const t = useAppTheme();
-  console.log(budgetDate);
 
   const groupedByMain = _.groupBy(categories, 'groupName');
 

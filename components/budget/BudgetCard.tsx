@@ -6,7 +6,7 @@ import {sizes, useAppTheme} from '@/constants/theme';
 import {formatPrice} from '@/common';
 import {BudgetCardProps} from '@/utils/types';
 
-export default function BudgetCard({items = []}: BudgetCardProps) {
+export default function BudgetCard({items = [], date}: BudgetCardProps) {
   const t = useAppTheme();
   // three stages of color based of percentage
   const getColor = (percentage: number) => {
@@ -21,12 +21,14 @@ export default function BudgetCard({items = []}: BudgetCardProps) {
     if (Number.isNaN(amount) || Number.isNaN(allocated)) return 0;
     const progress = amount / allocated;
 
-    return Number.isFinite(progress) ? Math.min(progress, 1): 0;
+    return Number.isFinite(progress) ? Math.min(progress, 1) : 0;
   };
+
+  const [yy, mm] = date.split('-');
 
   return (
     <Card>
-      <Card.Title title="Budżety" />
+      <Card.Title title={`Budżet ${mm}-${yy}`} />
       <Card.Content>
         {items.map((item) => (
           <View key={item.id} style={styles.mainContentBox}>
@@ -56,7 +58,7 @@ export default function BudgetCard({items = []}: BudgetCardProps) {
       </Card.Content>
     </Card>
   );
-};
+}
 
 const styles = StyleSheet.create({
   mainContentBox: {

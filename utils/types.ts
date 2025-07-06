@@ -13,6 +13,7 @@ type BudgetCardItem = {
 
 type BudgetCardProps = {
   items: BudgetCardItem[];
+  date: string,
 };
 
 interface BudgetMainSlice {
