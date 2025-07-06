@@ -2,7 +2,7 @@ import {barDataItem, pieDataItem} from 'react-native-gifted-charts';
 
 import {Text} from '@/components';
 
-import {Subcategory} from '@/redux/main/mainSlice';
+import {Subcategory} from '@/types';
 import {decId, sumById} from '@/utils/aggregateData';
 import _ from 'lodash';
 import {formatPrice} from '@/common';
