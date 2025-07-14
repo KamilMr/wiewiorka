@@ -329,7 +329,7 @@ export default function AddNew() {
           {(type === 'expense' ||
             (type === 'income' && newCustomIncome === null)) && (
             <Select
-              items={itemsToSelect}
+              items={itemsToSelect.sort((a, b) => a.label.localeCompare(b.label))}
               onChange={handleSelectCategory}
               value={
                 type === 'income'
