@@ -1,10 +1,10 @@
-import {useState} from 'react';
+import {useState, useRef, useEffect} from 'react';
 import {StyleSheet, View} from 'react-native';
 
-import {Dropdown} from 'react-native-element-dropdown';
+import {Menu, Text, TouchableRipple, TextInput} from 'react-native-paper';
 import AntDesign from '@expo/vector-icons/AntDesign';
 
-import Text from './CustomText';
+import CustomText from './CustomText';
 
 export type Items = Array<{label: string; value: string}>;
 
@@ -26,54 +26,118 @@ const DropdownComponent = ({
   disable = false,
   placeholder = 'Wybierz',
 }: Props) => {
-  const [isFocus, setIsFocus] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const searchInputRef = useRef<any>(null);
+
+  const selectedItem = items.find(item => item.value === value);
+
+  // Filter items based on search query
+  const filteredItems = items.filter(item =>
+    item.label.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Auto-focus search input when menu becomes visible
+  useEffect(() => {
+    if (isVisible && searchInputRef.current) {
+      // Small delay to ensure the menu is fully rendered
+      const timeout = setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 100);
+      return () => clearTimeout(timeout);
+    }
+  }, [isVisible]);
+
+  const handleOnChange = (item: {label: string; value: string}) => {
+    setIsVisible(false);
+    setSearchQuery(''); // Clear search when item is selected
+    onChange(item);
+  };
+
+  const handleMenuDismiss = () => {
+    setIsVisible(false);
+    setSearchQuery(''); // Clear search when menu is dismissed
+  };
 
   const renderLabel = () => {
-    if ((value || isFocus) && title) {
+    if ((value || isVisible) && title) {
       return (
-        <Text style={[styles.label, isFocus && {color: 'blue'}]}>{title}</Text>
+        <CustomText style={[styles.label, isVisible && {color: 'blue'}]}>
+          {title}
+        </CustomText>
       );
     }
     return null;
   };
 
-  const handleOnChange = (item) => {
-    setIsFocus(false);
-    onChange(item);
-  };
-
   return (
     <View style={styles.container}>
       {renderLabel()}
-      <Dropdown
-        style={[styles.dropdown, isFocus && {borderColor: 'blue'}]}
-        placeholderStyle={styles.placeholderStyle}
-        selectedTextStyle={styles.selectedTextStyle}
-        inputSearchStyle={styles.inputSearchStyle}
-        iconStyle={styles.iconStyle}
-        data={items}
-        search
-        disable={disable}
-        maxHeight={300}
-        labelField="label"
-        valueField="value"
-        placeholder={!isFocus ? placeholder : '...'}
-        // keyboardAvoiding
-        // dropdownPosition='top'
-        searchPlaceholder="Szuka..."
-        value={value}
-        onFocus={() => setIsFocus(true)}
-        onBlur={() => setIsFocus(false)}
-        onChange={handleOnChange}
-        renderLeftIcon={() => (
-          <AntDesign
-            style={styles.icon}
-            color={isFocus ? 'blue' : 'black'}
-            name="Safety"
-            size={20}
+      <Menu
+        visible={isVisible}
+        onDismiss={handleMenuDismiss}
+        anchor={
+          <TouchableRipple
+            onPress={() => !disable && setIsVisible(true)}
+            disabled={disable}
+            style={[
+              styles.dropdown,
+              isVisible && {borderColor: 'blue'},
+              disable && styles.disabled,
+            ]}>
+            <View style={styles.dropdownContent}>
+              <View style={styles.dropdownLeft}>
+                <AntDesign
+                  style={styles.icon}
+                  color={isVisible ? 'blue' : 'black'}
+                  name="Safety"
+                  size={20}
+                />
+                <Text style={styles.dropdownText}>
+                  {selectedItem ? selectedItem.label : placeholder}
+                </Text>
+              </View>
+              <AntDesign
+                name={isVisible ? 'up' : 'down'}
+                size={16}
+                color={isVisible ? 'blue' : 'black'}
+              />
+            </View>
+          </TouchableRipple>
+        }>
+        {/* Search TextField */}
+        <View style={styles.searchContainer}>
+          <TextInput
+            ref={searchInputRef}
+            placeholder="Szukaj..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            style={styles.searchInput}
+            mode="outlined"
+            dense
+            left={<TextInput.Icon icon="magnify" />}
+          />
+        </View>
+
+        {/* Filtered items */}
+        {filteredItems.map((item, index) => (
+          <Menu.Item
+            key={index}
+            onPress={() => handleOnChange(item)}
+            title={item.label}
+            leadingIcon={item.value === value ? 'check' : undefined}
+          />
+        ))}
+
+        {/* Show message if no items match search */}
+        {filteredItems.length === 0 && searchQuery.length > 0 && (
+          <Menu.Item
+            title="Brak wyników"
+            disabled
+            titleStyle={styles.noResultsText}
           />
         )}
-      />
+      </Menu>
     </View>
   );
 };
@@ -91,6 +155,25 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderRadius: 8,
     paddingHorizontal: 8,
+    justifyContent: 'center',
+  },
+  dropdownContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flex: 1,
+  },
+  dropdownLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  dropdownText: {
+    fontSize: 16,
+    marginLeft: 5,
+  },
+  disabled: {
+    opacity: 0.5,
   },
   icon: {
     marginRight: 5,
@@ -104,18 +187,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     fontSize: 14,
   },
-  placeholderStyle: {
-    fontSize: 16,
+  searchContainer: {
+    padding: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
   },
-  selectedTextStyle: {
-    fontSize: 16,
+  searchInput: {
+    backgroundColor: 'white',
   },
-  iconStyle: {
-    width: 20,
-    height: 20,
-  },
-  inputSearchStyle: {
-    height: 40,
-    fontSize: 16,
+  noResultsText: {
+    color: '#666',
+    fontStyle: 'italic',
   },
 });
