@@ -76,6 +76,7 @@ const DropdownComponent = ({
       <Menu
         visible={isVisible}
         onDismiss={handleMenuDismiss}
+        style={{backgroundColor: 'white', minWidth: 320}}
         anchor={
           <TouchableRipple
             onPress={() => !disable && setIsVisible(true)}
@@ -146,7 +147,7 @@ export default DropdownComponent;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'white',
+    backgroundColor: 'transparent',
     padding: 16,
   },
   dropdown: {
