@@ -125,6 +125,42 @@ export const selectCategories = createSelector(
   },
 );
 
+export const selectCategoriesByUsage = createSelector(
+  [selectExpensesAll, selectCategories],
+  (expenses, categories) => {
+    if (!expenses.length) {
+      // If no expenses, return categories sorted alphabetically
+      return categories.sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    // Count usage frequency by categoryId
+    const usageCount = expenses.reduce((acc: Record<number, number>, expense) => {
+      acc[expense.categoryId] = (acc[expense.categoryId] || 0) + 1;
+      return acc;
+    }, {});
+
+    // Add usage count to categories and sort
+    const categoriesWithUsage = categories.map(cat => ({
+      ...cat,
+      usageCount: usageCount[cat.id] || 0,
+    }));
+
+    // Sort by usage count (desc) then by name (asc)
+    const sorted = categoriesWithUsage.sort((a, b) => {
+      if (a.usageCount !== b.usageCount) {
+        return b.usageCount - a.usageCount; // Most used first
+      }
+      return a.name.localeCompare(b.name); // Alphabetical for same usage
+    });
+
+    // Take top 3 most used, then rest alphabetically
+    const topThree = sorted.slice(0, 3);
+    const remaining = sorted.slice(3).sort((a, b) => a.name.localeCompare(b.name));
+
+    return [...topThree, ...remaining];
+  },
+);
+
 export const selectCategory = (id: number | null) =>
   createSelector([selectCategories], (categories) => {
     return id ? categories.find((cat) => cat.id === id) : undefined;

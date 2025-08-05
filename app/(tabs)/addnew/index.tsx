@@ -23,6 +23,7 @@ import {deleteExpense, deleteIncome, uploadExpense, uploadIncome} from '@/redux/
 import {useAppDispatch, useAppSelector} from '@/hooks';
 import {
   selectCategories,
+  selectCategoriesByUsage,
   selectExpense,
   selectIncome,
   selectSources,
@@ -66,7 +67,7 @@ const initState = (date = new Date()) => ({
 export default function AddNew() {
   const [type, setType] = useState<string>('expense');
   const [newCustomIncome, setNewCustomIncome] = useState<string | null>(null);
-  const expenseCategories = useAppSelector(selectCategories);
+  const expenseCategories = useAppSelector(selectCategoriesByUsage);
   const {id, type: incomingType = ''} = useLocalSearchParams();
   const incomeCategories = useAppSelector(selectSources) || [];
   const dispatch = useAppDispatch();
@@ -155,7 +156,9 @@ export default function AddNew() {
   const itemsToSelect =
     type === 'expense'
       ? expenseCategories.map((cat) => ({label: cat.name, value: cat.name}))
-      : incomeCategories.map((item: string) => ({label: item, value: item}));
+      : incomeCategories
+          .map((item: string) => ({label: item, value: item}))
+          .sort((a, b) => a.label.localeCompare(b.label));
 
   const handleSelectCategory = (category: {label: string; value: string}) => {
     if (category.value === 'Dodaj nową kategorię') {
@@ -329,7 +332,7 @@ export default function AddNew() {
           {(type === 'expense' ||
             (type === 'income' && newCustomIncome === null)) && (
             <Select
-              items={itemsToSelect.sort((a, b) => a.label.localeCompare(b.label))}
+              items={itemsToSelect}
               onChange={handleSelectCategory}
               value={
                 type === 'income'
