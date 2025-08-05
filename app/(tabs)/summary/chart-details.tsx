@@ -200,6 +200,8 @@ const Summary = () => {
           data={data}
           labelsPosition="onBorder"
           innerRadius={70}
+          strokeWidth={2}
+          strokeColor="white"
           onPress={(item: {label: string; id: string}) => {
             if (axis[0] === '1-1') {
               const dates = filterDates.map((d) => format(d, 'yyyy-MM-dd'));
