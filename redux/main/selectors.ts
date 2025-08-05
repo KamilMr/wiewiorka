@@ -19,7 +19,7 @@ const selectExpensesAll = (state: RootState) => state.main.expenses;
 
 const filterCat = (exp: Expense, f: Array<string>) => {
   if (!f.length) return true;
-  return f.includes(exp.categoryId.toString());
+  return f.includes(exp.category);
 };
 
 const filterTxt = (exp: any, f: string) => {
@@ -68,7 +68,9 @@ export const selectRecords = (number: number, search: Search) =>
         });
 
       tR = tR.filter((record: Expense & Income) => {
-        return filterTxt(record, searchedTxt) && filterCat(record, fc);
+        const passesTextFilter = filterTxt(record, searchedTxt);
+        const passesCategoryFilter = record.exp ? filterCat(record, fc) : true;
+        return passesTextFilter && passesCategoryFilter;
       });
       return _.chain(tR)
         .sortBy(['date'])
