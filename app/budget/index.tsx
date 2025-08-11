@@ -4,7 +4,7 @@ import {useAppSelector} from '@/hooks';
 import {selectBudgets} from '@/redux/main/selectors';
 import {format as formatDate, addMonths, subMonths} from 'date-fns';
 import {Link} from 'expo-router';
-import {View, TouchableOpacity, StyleSheet} from 'react-native';
+import {View, TouchableOpacity, StyleSheet, ScrollView, Dimensions} from 'react-native';
 import {Ionicons} from '@expo/vector-icons';
 import {useState} from 'react';
 
@@ -24,14 +24,19 @@ const BudgetCardWithButton = () => {
   };
 
   return (
-    <View style={{padding: sizes.xl}}>
+    <View style={{padding: sizes.lg}}>
       <View style={styles.navigationContainer}>
         <TouchableOpacity onPress={goToPreviousMonth} style={styles.arrowButton}>
           <Ionicons name="chevron-back" size={24} color="black" />
         </TouchableOpacity>
         
         <View style={styles.budgetContainer}>
-          <BudgetCard items={items} date={date} />
+          <ScrollView 
+            style={{maxHeight: Dimensions.get('window').height * 0.7}}
+            showsVerticalScrollIndicator={true}
+          >
+            <BudgetCard items={items} date={date} />
+          </ScrollView>
         </View>
         
         <TouchableOpacity onPress={goToNextMonth} style={styles.arrowButton}>
@@ -55,7 +60,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   arrowButton: {
-    padding: sizes.sm,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -67,7 +71,7 @@ const styles = StyleSheet.create({
 
 export default function Page({}: BudgetProps) {
   return (
-    <View>
+    <View style={{flex: 1, backgroundColor: 'white'}}>
       <BudgetCardWithButton />
     </View>
   );
