@@ -1,6 +1,7 @@
 import {useEffect, useState} from 'react';
 import {SafeAreaView, ScrollView, TouchableOpacity, View} from 'react-native';
 import {formatDate} from 'date-fns';
+import {router} from 'expo-router';
 import _ from 'lodash';
 
 import {TextInput, ButtonWithStatus as Button, Select, Text, IconButton} from '@/components';
@@ -9,6 +10,7 @@ import {useAppDispatch, useAppSelector} from '@/hooks';
 import {sizes, useAppTheme} from '@/constants/theme';
 import {selectCategories} from '@/redux/main/selectors';
 import {Budget, uploadBudget} from '@/redux/main/thunks';
+import {setSnackbar} from '@/redux/main/mainSlice';
 import {Items} from '@/components/CustomSelect';
 
 interface Category {
@@ -147,7 +149,7 @@ const NewBudget = () => {
 
   const groupedByMain = _.groupBy(categories, 'groupName');
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!amount || !budgetDate) return;
     const isGroup = selectedCategory?.groupId;
     const key = isGroup ? 'groupId' : 'categoryId';
@@ -156,7 +158,17 @@ const NewBudget = () => {
       date: formatDate(budgetDate, 'yyyy-MM-dd'),
       [key]: selectedCategory?.[key],
     };
-    dispatch(uploadBudget(budgetData));
+    
+    try {
+      await dispatch(uploadBudget(budgetData)).unwrap();
+      router.back();
+    } catch (error: any) {
+      let message = 'Wystąpił błąd';
+      if (error?.message === 'budget_exists_for_month') {
+        message = 'Budżet już istnieje';
+      }
+      dispatch(setSnackbar({open: true, msg: message}));
+    }
   };
 
   const handleChangeCategory = ({name, id, type}: {name: string; id: number; type: string}) => {
