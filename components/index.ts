@@ -17,6 +17,7 @@ import Glow from './Glowing';
 import MyTabBar from './CustomTab';
 import NoData from './NoData';
 import PieChartBar from './PieChartBar';
+import PriceAndCategory from './PriceAndCategory';
 import SummaryCard from './SummaryCard';
 
 export {
@@ -42,5 +43,6 @@ export {
   MyTabBar as TabBar,
   NoData,
   PieChartBar,
+  PriceAndCategory,
   SummaryCard,
 };
