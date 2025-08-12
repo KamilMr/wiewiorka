@@ -19,6 +19,8 @@ import {
   Text,
   TextInput,
 } from '@/components';
+import {SelectRadioButtons} from '@/components/addnew/SelectRadioButtons';
+import {RemainingAmountDisplay} from '@/components/addnew/RemainingAmountDisplay';
 import {sizes} from '@/constants/theme';
 import {deleteExpense, deleteIncome, uploadExpense, uploadIncome} from '@/redux/main/thunks';
 import {useAppDispatch, useAppSelector} from '@/hooks';
@@ -30,51 +32,6 @@ import {
   selectSources,
 } from '@/redux/main/selectors';
 
-const SelectRadioButtons = ({
-  items,
-  selected,
-  onSelect,
-  disabled = false,
-}: {
-  items: {label: string; value: string}[];
-  selected: string;
-  disabled?: boolean;
-  onSelect: (value: string) => void;
-}) => {
-  return (
-    <View style={styles.radioButtons}>
-      {items.map((item) => (
-        <View key={item.value} style={styles.radioButton}>
-          <Text>{item.label}</Text>
-          <RadioButton
-            disabled={disabled}
-            value={item.value}
-            status={selected === item.value ? 'checked' : 'unchecked'}
-            onPress={() => onSelect(item.value)}
-          />
-        </View>
-      ))}
-    </View>
-  );
-};
-
-const RemainingAmountDisplay = ({
-  totalPrice,
-  splitItems,
-}: {
-  totalPrice: string;
-  splitItems: Array<{price: string}>;
-}) => {
-  const remainingAmount = (+totalPrice || 0) - splitItems.reduce((sum, item) => sum + (+item.price || 0), 0);
-
-  return (
-    <View>
-      <Text style={{fontSize: 16, fontWeight: 'bold', marginBottom: 12, textAlign: 'center'}}>
-        Pozostało do podziału: {remainingAmount} zł
-      </Text>
-    </View>
-  );
-};
 
 const initState = (date = new Date()) => ({
   description: '',
@@ -513,16 +470,6 @@ const styles = StyleSheet.create({
   input: {
     marginVertical: sizes.lg,
     padding: sizes.lg,
-  },
-  radioButtons: {
-    marginVertical: sizes.xl,
-    flexDirection: 'row',
-  },
-  radioButton: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginVertical: 8,
   },
   splitContainer: {
     marginVertical: sizes.lg,
