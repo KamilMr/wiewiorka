@@ -9,11 +9,12 @@ import {
 } from 'expo-router';
 import {formatDate} from 'date-fns';
 import {View, StyleSheet, ScrollView, SafeAreaView, Alert} from 'react-native';
-import {RadioButton} from 'react-native-paper';
+import {RadioButton, Button, IconButton} from 'react-native-paper';
 
 import {
   ButtonWithStatus,
   DatePicker,
+  PriceAndCategory,
   Select,
   Text,
   TextInput,
@@ -57,6 +58,24 @@ const SelectRadioButtons = ({
   );
 };
 
+const RemainingAmountDisplay = ({
+  totalPrice,
+  splitItems,
+}: {
+  totalPrice: string;
+  splitItems: Array<{price: string}>;
+}) => {
+  const remainingAmount = (+totalPrice || 0) - splitItems.reduce((sum, item) => sum + (+item.price || 0), 0);
+
+  return (
+    <View>
+      <Text style={{fontSize: 16, fontWeight: 'bold', marginBottom: 12, textAlign: 'center'}}>
+        Pozostało do podziału: {remainingAmount} zł
+      </Text>
+    </View>
+  );
+};
+
 const initState = (date = new Date()) => ({
   description: '',
   date,
@@ -64,14 +83,22 @@ const initState = (date = new Date()) => ({
   category: '',
 });
 
+const initSplitItem = () => ({
+  price: '',
+  category: '',
+});
+
 export default function AddNew() {
-  const [type, setType] = useState<string>('expense');
-  const [newCustomIncome, setNewCustomIncome] = useState<string | null>(null);
   const expenseCategories = useAppSelector(selectCategoriesByUsage);
-  const {id, type: incomingType = ''} = useLocalSearchParams();
   const incomeCategories = useAppSelector(selectSources) || [];
+  const {id, type: incomingType = ''} = useLocalSearchParams();
   const dispatch = useAppDispatch();
   const navigation = useNavigation();
+
+  const [type, setType] = useState<string>('expense');
+  const [newCustomIncome, setNewCustomIncome] = useState<string | null>(null);
+  const [isSplit, setIsSplit] = useState<boolean>(false);
+  const [splitItems, setSplitItems] = useState<Array<{price: string; category: string}>>([initSplitItem(), initSplitItem()]);
 
   const focusRef = useRef<HTMLInputElement>(null);
   const dirty = useRef({});
@@ -94,6 +121,8 @@ export default function AddNew() {
     dirty.current = {};
     setNewCustomIncome(null);
     setType('expense');
+    setIsSplit(false);
+    setSplitItems([initSplitItem(), initSplitItem()]);
   };
 
   useFocusEffect(
@@ -176,8 +205,45 @@ export default function AddNew() {
     setForm({...form, category: ''});
   };
 
+  const handleSplitToggle = () => {
+    if (!isSplit && form.price) {
+      const totalPrice = parseFloat(form.price);
+      const halfPrice = (totalPrice / 2).toString();
+      setSplitItems([
+        {price: halfPrice, category: form.category},
+        {price: halfPrice, category: ''}
+      ]);
+    }
+    setIsSplit(!isSplit);
+  };
+
+  const updateSplitItem = (index: number, field: 'price' | 'category', value: string) => {
+    const newSplitItems = [...splitItems];
+    newSplitItems[index] = {...newSplitItems[index], [field]: value};
+    setSplitItems(newSplitItems);
+  };
+
+  const addSplitItem = () => {
+    setSplitItems([...splitItems, initSplitItem()]);
+  };
+
+  const removeSplitItem = (index: number) => {
+    if (splitItems.length > 2) {
+      setSplitItems(splitItems.filter((_, i) => i !== index));
+    }
+  };
+
   const validateForm = () => {
-    // price and category are required
+    if (isSplit && type === 'expense') {
+      // For split items, validate each split item has price and category
+      const hasValidItems = splitItems.every(item => item.price && item.category);
+      // Check if all money is allocated (no remaining amount)
+      const totalSplitPrice = splitItems.reduce((sum, item) => sum + (+item.price || 0), 0);
+      const remainingAmount = (+form.price || 0) - totalSplitPrice;
+      return hasValidItems && remainingAmount === 0;
+    }
+    
+    // For non-split items, price and category are required
     if (!form.price || !form.category) {
       return false;
     }
@@ -191,38 +257,64 @@ export default function AddNew() {
     router.navigate('/(tabs)/records');
   };
 
-  const handleSave = () => {
-    let dataToSave;
-    if (type === 'expense') {
-      const {description, date, price} = form;
-      dataToSave = {
-        id: id ? +id : '',
-        description,
-        date: formatDate(date, 'yyyy-MM-dd'),
-        price: +price,
-        categoryId:
-          expenseCategories.find((cat) => cat.name === form.category)?.id || 0,
-      };
-
-      dataToSave = _.omitBy(dataToSave, (v) => typeof v === 'string' && !v);
-    } else {
-      dataToSave = {
-        id: id ? +id : '',
-        date: formatDate(form.date, 'yyyy-MM-dd'),
-        price: +form.price,
-        source: form.category,
-        vat: 0,
-      };
-      dataToSave = _.omitBy(dataToSave, (v) => typeof v === 'string' && !v);
-    }
-    dispatch(
-      type === 'expense' ? uploadExpense(dataToSave) : uploadIncome(dataToSave),
-    )
-      .unwrap()
-      .then(() => {
-        setForm(initState());
-        router.navigate('/(tabs)/records');
+  const handleSave = async () => {
+    console.log(type, isSplit)
+    if (type === 'expense' && isSplit) {
+      // Handle split expenses - save multiple expenses
+      const savePromises = splitItems.map(item => {
+        const dataToSave = {
+          id: '',
+          date: formatDate(form.date, 'yyyy-MM-dd'),
+          price: +item.price,
+          categoryId: expenseCategories.find((cat) => cat.name === item.category)?.id || 0,
+        };
+        if (form.description) dataToSave.description = form.description;
+        return dispatch(uploadExpense(dataToSave)).unwrap();
       });
+
+      try {
+        await Promise.all(savePromises);
+        setForm(initState());
+        setIsSplit(false);
+        setSplitItems([initSplitItem(), initSplitItem()]);
+        router.navigate('/(tabs)/records');
+      } catch (error) {
+        console.error('Error saving split expenses:', error);
+      }
+    } else {
+      // Handle single expense or income
+      let dataToSave;
+      if (type === 'expense') {
+        const {description, date, price} = form;
+        dataToSave = {
+          id: id ? +id : '',
+          description,
+          date: formatDate(date, 'yyyy-MM-dd'),
+          price: +price,
+          categoryId:
+            expenseCategories.find((cat) => cat.name === form.category)?.id || 0,
+        };
+
+        dataToSave = _.omitBy(dataToSave, (v) => typeof v === 'string' && !v);
+      } else {
+        dataToSave = {
+          id: id ? +id : '',
+          date: formatDate(form.date, 'yyyy-MM-dd'),
+          price: +form.price,
+          source: form.category,
+          vat: 0,
+        };
+        dataToSave = _.omitBy(dataToSave, (v) => typeof v === 'string' && !v);
+      }
+      dispatch(
+        type === 'expense' ? uploadExpense(dataToSave) : uploadIncome(dataToSave),
+      )
+        .unwrap()
+        .then(() => {
+          setForm(initState());
+          router.navigate('/(tabs)/records');
+        });
+    }
   };
 
   const handleDelete = () => {
@@ -258,7 +350,7 @@ export default function AddNew() {
   };
 
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={styles.root}>
       <ScrollView
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{
@@ -280,15 +372,6 @@ export default function AddNew() {
               value={form.date}
             />
           </View>
-
-          <TextInput
-            ref={focusRef}
-            style={styles.input}
-            label="Cena"
-            keyboardType="numeric"
-            onChangeText={(text) => setForm({...form, price: text})}
-            value={form.price}
-          />
 
           <SelectRadioButtons
             disabled={isPasRecord}
@@ -329,22 +412,77 @@ export default function AddNew() {
             />
           )}
 
-          {(type === 'expense' ||
-            (type === 'income' && newCustomIncome === null)) && (
-            <Select
-              items={itemsToSelect}
-              onChange={handleSelectCategory}
-              value={
-                type === 'income'
-                  ? form.category
-                  : expenseCategories.find((cat) => cat.name === form.category)
-                      ?.name
-              }
-            />
+          {type === 'expense' && !isPasRecord && (
+            <View style={{flexDirection: 'row',  marginVertical: 8}}>
+              <TextInput
+                ref={focusRef}
+                label="Cena"
+                style={{flex: 2}}
+                keyboardType="numeric"
+                disabled={isSplit}
+                onChangeText={(text) => setForm({...form, price: text})}
+                value={form.price}
+              />
+              <IconButton
+                icon={isSplit ? 'call-merge' : "call-split"}
+                onPress={handleSplitToggle}
+                disabled={!form.price && !isSplit}
+                size={20}
+                style={{margin: 0, padding: 0, marginBottom: -20}}
+              />
+            </View>
+          )}
+
+          {!isSplit && (
+            <View style={styles.splitIconRow}>
+              {(type === 'expense' || (type === 'income' && newCustomIncome === null)) && (
+                <View style={{flex: 1}}>
+                  <Select
+                    items={itemsToSelect}
+                    onChange={handleSelectCategory}
+                    style={{root: {marginTop: 4}}}
+                    value={
+                      type === 'income'
+                        ? form.category
+                        : expenseCategories.find((cat) => cat.name === form.category)
+                            ?.name
+                    }
+                  />
+                </View>
+              )}
+            </View>
+          )}
+
+          {isSplit && type === 'expense' && (
+            <View style={styles.splitContainer}>
+              <RemainingAmountDisplay
+                totalPrice={form.price}
+                splitItems={splitItems}
+              />
+              {splitItems.map((item, index) => (
+                <PriceAndCategory
+                  key={index}
+                  item={item}
+                  index={index}
+                  expenseCategories={expenseCategories}
+                  onUpdateItem={updateSplitItem}
+                  onRemoveItem={removeSplitItem}
+                  canRemove={splitItems.length > 2}
+                />
+              ))}
+              <Button
+                mode="outlined"
+                onPress={addSplitItem}
+                style={{marginTop: 8}}
+                icon="plus"
+              >
+                Dodaj pozycję
+              </Button>
+            </View>
           )}
 
         </View>
-        <View style={styles.buttons}>
+        <View>
           {+id ? (<ButtonWithStatus
             textColor="red"
             onPress={handleDelete}>
@@ -359,7 +497,7 @@ export default function AddNew() {
             mode="contained"
             disabled={!validateForm() || isDataTheSame()}
             onPress={handleSave}>
-            {isPasRecord ? 'Zapisz zmiany' : 'Zapisz'}
+            {isPasRecord ? 'Zapisz zmiany' : 'Zapisz'} 
           </ButtonWithStatus>
         </View>
       </ScrollView>
@@ -368,19 +506,16 @@ export default function AddNew() {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  root: {
     flex: 1,
-    padding: 16,
+    backgroundColor: 'white',
   },
   input: {
-    marginVertical: 8,
-    padding: 8,
-  },
-  buttons: {
-    // flex: 1,
+    marginVertical: sizes.lg,
+    padding: sizes.lg,
   },
   radioButtons: {
-    marginVertical: 16,
+    marginVertical: sizes.xl,
     flexDirection: 'row',
   },
   radioButton: {
@@ -388,5 +523,18 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginVertical: 8,
+  },
+  splitContainer: {
+    marginVertical: sizes.lg,
+    padding: sizes.md,
+    // backgroundColor: '#f5f5f5',
+    borderRadius: sizes.lg,
+  },
+  splitIconRow: {
+    marginVertical: sizes.lg,
+  },
+  splitCancelSection: {
+    marginVertical: sizes.lg,
+    alignItems: 'center',
   },
 });
