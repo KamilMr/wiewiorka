@@ -5,13 +5,14 @@ import {Menu, Text, TouchableRipple, TextInput} from 'react-native-paper';
 import AntDesign from '@expo/vector-icons/AntDesign';
 
 import CustomText from './CustomText';
+import {sizes} from '@/constants/theme';
 
 export type Items = Array<{label: string; value: string}>;
 
 export interface Props {
   onChange: (data: any) => any;
   value: any;
-  styles?: Object;
+  style?: Object;
   items: Items;
   title?: string;
   disable?: boolean;
@@ -25,6 +26,7 @@ const DropdownComponent = ({
   title = '',
   disable = false,
   placeholder = 'Wybierz',
+  style = {},
 }: Props) => {
   const [isVisible, setIsVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -71,7 +73,7 @@ const DropdownComponent = ({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.root, style.root]}>
       {renderLabel()}
       <Menu
         visible={isVisible}
@@ -146,9 +148,9 @@ const DropdownComponent = ({
 export default DropdownComponent;
 
 const styles = StyleSheet.create({
-  container: {
+  root: {
     backgroundColor: 'transparent',
-    padding: 16,
+    paddingHorizontal: sizes.md,
   },
   dropdown: {
     height: 50,
