@@ -388,11 +388,8 @@ export default function AddNew() {
             <View
               style={{
                 flexDirection: 'row',
-                marginVertical: 8,
-                alignContent: 'center',
-                justifyContent: 'center',
+                // marginVertical: 8,
                 alignItems: 'center',
-                alignSelf: 'center',
               }}
             >
               <TextInput
@@ -409,7 +406,7 @@ export default function AddNew() {
                 onPress={handleSplitToggle}
                 disabled={!form.price && !isSplit}
                 size={20}
-                style={{margin: 0, padding: 0, marginBottom: -20}}
+                style={{margin: 0, padding: 0, width: 60}}
               />
             </View>
           )}

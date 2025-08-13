@@ -23,7 +23,6 @@ const CustomTextInput = forwardRef<typeof TextInput, TextInputProps>(
 
 const styles = StyleSheet.create({
   root: {
-    paddingHorizontal: sizes.sm,
   },
 });
 
