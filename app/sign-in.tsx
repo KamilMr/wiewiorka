@@ -24,7 +24,7 @@ const Login = () => {
   const handleCheckbox = () => setRememberUser(!rememberUser);
 
   const handleData = (field: string) => (text: string) => {
-    setData((data) => ({...data, [field]: text}));
+    setData(data => ({...data, [field]: text}));
   };
 
   const handleForgotPassword = () => {
@@ -66,7 +66,8 @@ const Login = () => {
         onPress={handleSave}
         disabled={!isFormReady}
         mode="contained"
-        style={{width: '80%', marginBottom: 8 * 2}}>
+        style={{width: '80%', marginBottom: 8 * 2}}
+      >
         <Text style={{color: t.colors.white}}>Zaloguj się</Text>
       </Button>
       <View style={{flexDirection: 'row', marginBottom: 4 * 2}}>
@@ -76,7 +77,8 @@ const Login = () => {
             style={{
               color: t.colors.primary,
               textDecorationLine: 'underline',
-            }}>
+            }}
+          >
             Zarejestruj się
           </Text>
         </Link>

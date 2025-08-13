@@ -23,7 +23,7 @@ const CustomMenu = ({
   return (
     <View>
       <Menu visible={visible} onDismiss={closeMenu} anchor={anchor}>
-        {items.map((item) => (
+        {items.map(item => (
           <Menu.Item
             key={item.title}
             onPress={item.onPress}

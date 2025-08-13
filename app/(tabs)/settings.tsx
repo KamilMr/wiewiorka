@@ -14,27 +14,30 @@ const Settings = () => {
   };
   return (
     <View style={[styles.root, {backgroundColor: t.colors.white}]}>
-    <Button
+      <Button
         mode="contained"
         onPress={() => {
           router.navigate('/budget');
         }}
-        style={{marginBottom: 40}}>
+        style={{marginBottom: 40}}
+      >
         Budżet
-        </Button>
+      </Button>
       <Button
         mode="contained"
         onPress={() => {
           router.navigate('/categories');
         }}
-        style={{marginBottom: 40}}>
+        style={{marginBottom: 40}}
+      >
         Kategorie
       </Button>
       <Button
         icon="logout"
         mode="contained"
         onPress={handleLogout}
-        style={{marginBottom: 40}}>
+        style={{marginBottom: 40}}
+      >
         Wyloguj się
       </Button>
       <View style={{height: 80}} />

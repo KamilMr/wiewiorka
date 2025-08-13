@@ -30,14 +30,14 @@ const Signup = () => {
   const isFormReady = data.password && data.email;
 
   const handleData = (field: string) => (text: string) => {
-    setData((data) => ({...data, [field]: text}));
+    setData(data => ({...data, [field]: text}));
   };
 
   const handleSave = () => {
     dispatch(signup(data))
       .unwrap()
       .then(() => router.replace('/sign-in'))
-      .catch((err) => console.log(err));
+      .catch(err => console.log(err));
   };
 
   return (
@@ -56,14 +56,14 @@ const Signup = () => {
         <TextInput
           label="Email"
           value={data.email}
-          keyboardType='email-address'
+          keyboardType="email-address"
           onChangeText={handleData('email')}
           style={[styles.textInput, {marginBottom: 4 * 2}]}
         />
         <TextInput
           label="Hasło"
           value={data.password}
-          keyboardType='visible-password'
+          keyboardType="visible-password"
           onChangeText={handleData('password')}
           style={styles.textInput}
         />
@@ -72,7 +72,8 @@ const Signup = () => {
         onPress={handleSave}
         disabled={!isFormReady}
         mode="contained"
-        style={{width: '80%', marginBottom: 8 * 2}}>
+        style={{width: '80%', marginBottom: 8 * 2}}
+      >
         Zarejestruj się
       </Button>
       <View style={{flexDirection: 'row', marginBottom: 4 * 2}}>
@@ -82,7 +83,8 @@ const Signup = () => {
             style={{
               color: t.colors.primary,
               textDecorationLine: 'underline',
-            }}>
+            }}
+          >
             Zaloguj się
           </Text>
         </Link>

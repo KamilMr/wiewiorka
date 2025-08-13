@@ -54,7 +54,7 @@ export default function OneCategory() {
     id: catId,
     name,
     groupName:
-      groupName || categories.find((k) => +k[1] === +incomingGrId)?.[0] || '',
+      groupName || categories.find(k => +k[1] === +incomingGrId)?.[0] || '',
     groupId: groupId || +incomingGrId,
     color,
   });
@@ -139,13 +139,15 @@ export default function OneCategory() {
           marginTop: sizes.xxl,
           height: '100%',
           backgroundColor: t.colors.white,
-        }}>
+        }}
+      >
         <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
-          }}>
+          }}
+        >
           <TouchableRipple onPress={handleTogglePicker}>
             <View
               style={{
@@ -162,14 +164,16 @@ export default function OneCategory() {
             style={{width: '80%'}}
             value={state?.name}
             onChangeText={handleSubCatChange}
-            label={'Wpisz podkategorię'}></TextInput>
+            label={'Wpisz podkategorię'}
+          ></TextInput>
         </View>
         <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
             marginVertical: sizes.xl,
-          }}></View>
+          }}
+        ></View>
 
         <Select
           title="Główna Kategoria"

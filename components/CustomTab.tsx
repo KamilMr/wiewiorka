@@ -26,7 +26,7 @@ const MyTabBar = ({
   state,
   descriptors,
   showLabel = false,
-  navigation
+  navigation,
 }: BottomTabBarProps & {showLabel?: boolean}) => {
   const icons: {[key: string]: (props: IconProp) => JSX.Element} = {
     index: (props: IconProp) => (
@@ -51,7 +51,6 @@ const MyTabBar = ({
       />
     ),
   };
-
 
   const [visible, setVisible] = useState<boolean[]>([]);
 
@@ -120,7 +119,8 @@ const MyTabBar = ({
                   accessibilityLabel={options.tabBarAccessibilityLabel}
                   testID={options.tabBarTestID}
                   onPress={onPress}
-                  onLongPress={onLongPress(index)}>
+                  onLongPress={onLongPress(index)}
+                >
                   {icons[route.name]?.({
                     color: isFocused ? '#673ab7' : '#222',
                     isFocus: isFocused,

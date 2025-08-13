@@ -26,7 +26,7 @@ const generateColor = (str: string) => {
   // Convert to hex color
   let color = '#';
   for (let i = 0; i < 3; i++) {
-    const value = (hash >> (i * 8)) & 0xFF;
+    const value = (hash >> (i * 8)) & 0xff;
     color += ('00' + value.toString(16)).slice(-2);
   }
 
@@ -90,7 +90,7 @@ const normalize = (str: string): string => {
   const map = 'ąćęłńóśźż';
   const norm = 'acelnoszz';
 
-  return str.replace(/./g, (c) => {
+  return str.replace(/./g, c => {
     const isUpper = c === c.toUpperCase();
     const idx = map.indexOf(c.toLowerCase());
 

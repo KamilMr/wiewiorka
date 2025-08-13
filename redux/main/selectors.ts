@@ -76,7 +76,7 @@ export const selectRecords = (number: number, search: Search) =>
         .sortBy(['date'])
         .reverse()
         .slice(0, number)
-        .map((obj) => ({
+        .map(obj => ({
           ...obj,
           date: format(new Date(obj.date), 'dd/MM/yyyy'),
         }))
@@ -88,9 +88,9 @@ export const selectRecords = (number: number, search: Search) =>
 export const selectIncomes = (state: RootState) => state.main.incomes;
 export const selectExpense = (id: number) =>
   createSelector([selectCategories, selectExpensesAll], (cat, exp) => {
-    const expense = exp.find((ex) => ex.id === +id);
+    const expense = exp.find(ex => ex.id === +id);
     if (!expense) return;
-    const categoryObj = cat.find((obj) => obj.id === expense.categoryId);
+    const categoryObj = cat.find(obj => obj.id === expense.categoryId);
     return {
       ...expense,
       category: categoryObj.name,
@@ -100,20 +100,20 @@ export const selectExpense = (id: number) =>
   });
 
 export const selectIncome = (id: string | number) =>
-  createSelector([selectIncomes], (inc) => {
-    const income = inc.find((inc) => inc.id === +id);
+  createSelector([selectIncomes], inc => {
+    const income = inc.find(inc => inc.id === +id);
     if (!income) return;
     return income;
   });
 
 export const selectCategories = createSelector(
-  [(state) => state.main.categories],
-  (cat) => {
+  [state => state.main.categories],
+  cat => {
     const arr = Object.entries(cat);
     return arr.reduce((pv: Array<Subcategory>, [key, cv]: [string, any]) => {
       if (!cv.subcategories) cv.subcategories = [];
       const subcategories: Array<Subcategory> = [...cv.subcategories].map(
-        (obj) => ({
+        obj => ({
           ...obj,
           groupName: cv.name,
           color: `#${obj.color || '#FFFFFF'}`,
@@ -134,10 +134,13 @@ export const selectCategoriesByUsage = createSelector(
     }
 
     // Count usage frequency by categoryId
-    const usageCount = expenses.reduce((acc: Record<number, number>, expense) => {
-      acc[expense.categoryId] = (acc[expense.categoryId] || 0) + 1;
-      return acc;
-    }, {});
+    const usageCount = expenses.reduce(
+      (acc: Record<number, number>, expense) => {
+        acc[expense.categoryId] = (acc[expense.categoryId] || 0) + 1;
+        return acc;
+      },
+      {},
+    );
 
     // Add usage count to categories and sort
     const categoriesWithUsage = categories.map(cat => ({
@@ -155,19 +158,21 @@ export const selectCategoriesByUsage = createSelector(
 
     // Take top 3 most used, then rest alphabetically
     const topThree = sorted.slice(0, 3);
-    const remaining = sorted.slice(3).sort((a, b) => a.name.localeCompare(b.name));
+    const remaining = sorted
+      .slice(3)
+      .sort((a, b) => a.name.localeCompare(b.name));
 
     return [...topThree, ...remaining];
   },
 );
 
 export const selectCategory = (id: number | null) =>
-  createSelector([selectCategories], (categories) => {
-    return id ? categories.find((cat) => cat.id === id) : undefined;
+  createSelector([selectCategories], categories => {
+    return id ? categories.find(cat => cat.id === id) : undefined;
   });
 
 export const selectMainCategories = createSelector(
-  [(state) => state.main.categories],
+  [state => state.main.categories],
   (cat: Record<string, Category>) => {
     const arr = Object.entries(cat);
     return arr.reduce(
@@ -182,46 +187,49 @@ export const selectMainCategories = createSelector(
 );
 
 export const selectComparison = (number1or12: number | string) =>
-  createSelector([selectIncomes, selectExpensesAll], (income, expenses): SummaryCardProps[] => {
-    const pattern: string = +number1or12 === 1 ? 'MM/yyyy' : 'yyyy';
-    const calPrice = (price: number, vat: number = 0): number =>
-      price - price * (vat / 100);
+  createSelector(
+    [selectIncomes, selectExpensesAll],
+    (income, expenses): SummaryCardProps[] => {
+      const pattern: string = +number1or12 === 1 ? 'MM/yyyy' : 'yyyy';
+      const calPrice = (price: number, vat: number = 0): number =>
+        price - price * (vat / 100);
 
-    /** {
+      /** {
       2023: {income, date, outcome}
       11/2023: {income, date, outcome}
      }*/
-    const tR: any = {};
-    income.forEach((obj) => {
-      const {date, price, vat} = obj;
-      const fd: string = format(new Date(date), pattern);
-      if (!tR[fd]) tR[fd] = {income: 0, date: fd, outcome: 0, costs: {}};
+      const tR: any = {};
+      income.forEach(obj => {
+        const {date, price, vat} = obj;
+        const fd: string = format(new Date(date), pattern);
+        if (!tR[fd]) tR[fd] = {income: 0, date: fd, outcome: 0, costs: {}};
 
-      tR[fd].income += calPrice(price, vat);
-      tR[fd].month = +fd.split('/')[0];
-      tR[fd].year = +fd.split('/')[1];
-    });
+        tR[fd].income += calPrice(price, vat);
+        tR[fd].month = +fd.split('/')[0];
+        tR[fd].year = +fd.split('/')[1];
+      });
 
-    expenses.forEach(({date, price, owner, categoryId}) => {
-      const fd = format(new Date(date), pattern);
-      if (!tR[fd]) tR[fd] = {income: 0, date: fd, outcome: 0, costs: {}};
-      tR[fd].outcome += price;
-      tR[fd].costs[owner] ??= 0;
-      tR[fd].costs[owner] += EXCLUDED_CAT.includes(categoryId) ? price : 0;
-    });
+      expenses.forEach(({date, price, owner, categoryId}) => {
+        const fd = format(new Date(date), pattern);
+        if (!tR[fd]) tR[fd] = {income: 0, date: fd, outcome: 0, costs: {}};
+        tR[fd].outcome += price;
+        tR[fd].costs[owner] ??= 0;
+        tR[fd].costs[owner] += EXCLUDED_CAT.includes(categoryId) ? price : 0;
+      });
 
-    const arr = Object.values(tR);
-    const ids = makeNewIdArr(arr.length);
-    arr.forEach((object, idx) => (object.id = ids[idx]));
-    return _.orderBy(arr, ['year', 'month'], ['desc', 'desc']);
-  });
+      const arr = Object.values(tR);
+      const ids = makeNewIdArr(arr.length);
+      arr.forEach((object, idx) => (object.id = ids[idx]));
+      return _.orderBy(arr, ['year', 'month'], ['desc', 'desc']);
+    },
+  );
 
 export const selectSources = (state: RootState) => {
   return state.main.sources[state.auth.name];
 };
 
 export const selectByTimeRange = (dates: [Date, Date]) => {
-  return createSelector([(state) => state.main._aggregated], (data) => {
+  return createSelector([state => state.main._aggregated], data => {
     if (dates?.length === 2)
       return _.pickBy(data, (_, date) =>
         dh.isBetweenDates(new Date(date), dates[0], dates[1]),
@@ -237,7 +245,7 @@ export const selectBudgets = (
 ) =>
   createSelector(
     [
-      (state) => state.main.budgets,
+      state => state.main.budgets,
       selectCategories,
       selectExpensesAll,
       selectMainCategories,
@@ -251,14 +259,14 @@ export const selectBudgets = (
       });
 
       const tR: BudgetCardItem[] = (budgets.length ? budgets : [])
-        .filter((b) => {
+        .filter(b => {
           const {yearMonth} = b;
           const [budgetYear, budgetMonth] = yearMonth.split('-');
           if (year !== budgetYear || month !== budgetMonth) return;
 
           return true;
         })
-        .map((budget) => {
+        .map(budget => {
           const {categoryId, amount, groupId, yearMonth} = budget;
           const isGroup = groupId !== null;
           const item: BudgetCardItem = {
@@ -272,7 +280,6 @@ export const selectBudgets = (
             allocated: +amount,
             amount: filteredExpense.reduce(
               (prevExp: number, currExp: Expense) => {
-
                 if (isGroup) {
                   const cat = categories.find(
                     (cat: Subcategory) => cat.id === currExp.categoryId,

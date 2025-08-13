@@ -34,28 +34,27 @@ const CustomDatePicker = ({
   };
 
   return (
-      <DatePickerInput
-        inputMode="start"
-        mode='outlined'
-        theme={{
-          colors: {
-          },
-        }}
-        editable={editable}
-        disabled={disabled}
-        readOnly={readOnly}
-        keyboardType="numeric"
-        locale="pl"
-        label={label}
-        value={value || defaultValue}
-        onChange={handleOnConfirm}
-        style={[
-          {
-            underlineColorAndroid: 'transparent',
-          },
-          style,
-        ]}
-      />
+    <DatePickerInput
+      inputMode="start"
+      mode="outlined"
+      theme={{
+        colors: {},
+      }}
+      editable={editable}
+      disabled={disabled}
+      readOnly={readOnly}
+      keyboardType="numeric"
+      locale="pl"
+      label={label}
+      value={value || defaultValue}
+      onChange={handleOnConfirm}
+      style={[
+        {
+          underlineColorAndroid: 'transparent',
+        },
+        style,
+      ]}
+    />
   );
 };
 

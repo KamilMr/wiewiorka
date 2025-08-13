@@ -44,7 +44,8 @@ const Glow = ({
         {
           transform: [{scale: glowAnim}],
         },
-      ]}>
+      ]}
+    >
       {children}
     </Animated.View>
   );

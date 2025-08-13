@@ -11,7 +11,9 @@ export const RemainingAmountDisplay = ({
   totalPrice,
   splitItems,
 }: RemainingAmountDisplayProps) => {
-  const remainingAmount = (+totalPrice || 0) - splitItems.reduce((sum, item) => sum + (+item.price || 0), 0);
+  const remainingAmount =
+    (+totalPrice || 0) -
+    splitItems.reduce((sum, item) => sum + (+item.price || 0), 0);
 
   return (
     <View>

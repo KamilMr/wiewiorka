@@ -18,7 +18,8 @@ const Home = () => {
           height: '100%',
           alignItems: 'center',
           backgroundColor: t.colors.white,
-        }}>
+        }}
+      >
         <View style={{width: '90%', gap: 16}}>
           <FinancialQuote />
           <SummaryCard_v2 />
@@ -30,4 +31,3 @@ const Home = () => {
 };
 
 export default Home;
-

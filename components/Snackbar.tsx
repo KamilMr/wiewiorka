@@ -40,7 +40,8 @@ const CustomSnackBar = () => {
         onPress: () => {
           onDismissSnackBar();
         },
-      }}>
+      }}
+    >
       {msg}
     </Snackbar>
   );

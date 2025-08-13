@@ -77,7 +77,7 @@ const GroupedItemsList = ({
         groupId: +groupId,
         color: '#FFFFFF',
       }),
-    ).then((res) => console.log('ok'));
+    ).then(res => console.log('ok'));
   };
 
   return (
@@ -103,13 +103,14 @@ const GroupedItemsList = ({
             <View style={{width: WIDTH_ICON_VIEW}} />
           )}
           <Text
-            style={{width: '70%'}}>{`${nameOfGroup} (${items.length})`}</Text>
+            style={{width: '70%'}}
+          >{`${nameOfGroup} (${items.length})`}</Text>
           <IconButton icon={expanded ? 'chevron-down' : 'chevron-right'} />
         </View>
       </TouchableOpacity>
       {expanded && (
         <View style={styles.expandedContent}>
-          {items.map((item) => (
+          {items.map(item => (
             <GroupedItem
               key={item.id}
               item={item}
@@ -125,7 +126,8 @@ const GroupedItemsList = ({
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'center',
-              }}>
+              }}
+            >
               <IconButton
                 icon="plus"
                 onPress={() =>

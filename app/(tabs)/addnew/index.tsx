@@ -21,7 +21,12 @@ import {
 import {SelectRadioButtons} from '@/components/addnew/SelectRadioButtons';
 import {RemainingAmountDisplay} from '@/components/addnew/RemainingAmountDisplay';
 import {sizes} from '@/constants/theme';
-import {deleteExpense, deleteIncome, uploadExpense, uploadIncome} from '@/redux/main/thunks';
+import {
+  deleteExpense,
+  deleteIncome,
+  uploadExpense,
+  uploadIncome,
+} from '@/redux/main/thunks';
 import {useAppDispatch, useAppSelector} from '@/hooks';
 import {
   selectCategoriesByUsage,
@@ -29,7 +34,6 @@ import {
   selectIncome,
   selectSources,
 } from '@/redux/main/selectors';
-
 
 const initState = (date = new Date()) => ({
   description: '',
@@ -53,7 +57,9 @@ export default function AddNew() {
   const [type, setType] = useState<string>('expense');
   const [newCustomIncome, setNewCustomIncome] = useState<string | null>(null);
   const [isSplit, setIsSplit] = useState<boolean>(false);
-  const [splitItems, setSplitItems] = useState<Array<{price: string; category: string}>>([initSplitItem(), initSplitItem()]);
+  const [splitItems, setSplitItems] = useState<
+    Array<{price: string; category: string}>
+  >([initSplitItem(), initSplitItem()]);
 
   const focusRef = useRef<HTMLInputElement>(null);
   const dirty = useRef({});
@@ -62,8 +68,10 @@ export default function AddNew() {
   const isPasRecord = isNaN(+id) ? false : true;
 
   // logic when editing an existing record
-  const record = useAppSelector((state) =>
-    incomingType === 'expense' ? selectExpense(+id)(state) : selectIncome(+id)(state),
+  const record = useAppSelector(state =>
+    incomingType === 'expense'
+      ? selectExpense(+id)(state)
+      : selectIncome(+id)(state),
   );
   const [form, setForm] = useState(initState());
 
@@ -139,7 +147,7 @@ export default function AddNew() {
 
   const itemsToSelect =
     type === 'expense'
-      ? expenseCategories.map((cat) => ({label: cat.name, value: cat.name}))
+      ? expenseCategories.map(cat => ({label: cat.name, value: cat.name}))
       : incomeCategories
           .map((item: string) => ({label: item, value: item}))
           .sort((a, b) => a.label.localeCompare(b.label));
@@ -166,13 +174,17 @@ export default function AddNew() {
       const halfPrice = (totalPrice / 2).toString();
       setSplitItems([
         {price: halfPrice, category: form.category},
-        {price: halfPrice, category: ''}
+        {price: halfPrice, category: ''},
       ]);
     }
     setIsSplit(!isSplit);
   };
 
-  const updateSplitItem = (index: number, field: 'price' | 'category', value: string) => {
+  const updateSplitItem = (
+    index: number,
+    field: 'price' | 'category',
+    value: string,
+  ) => {
     const newSplitItems = [...splitItems];
     newSplitItems[index] = {...newSplitItems[index], [field]: value};
     setSplitItems(newSplitItems);
@@ -191,9 +203,14 @@ export default function AddNew() {
   const validateForm = () => {
     if (isSplit && type === 'expense') {
       // For split items, validate each split item has price and category
-      const hasValidItems = splitItems.every(item => item.price && item.category);
+      const hasValidItems = splitItems.every(
+        item => item.price && item.category,
+      );
       // Check if all money is allocated (no remaining amount)
-      const totalSplitPrice = splitItems.reduce((sum, item) => sum + (+item.price || 0), 0);
+      const totalSplitPrice = splitItems.reduce(
+        (sum, item) => sum + (+item.price || 0),
+        0,
+      );
       const remainingAmount = (+form.price || 0) - totalSplitPrice;
       return hasValidItems && remainingAmount === 0;
     }
@@ -213,7 +230,7 @@ export default function AddNew() {
   };
 
   const handleSave = async () => {
-    console.log(type, isSplit)
+    console.log(type, isSplit);
     if (type === 'expense' && isSplit) {
       // Handle split expenses - save multiple expenses
       const savePromises = splitItems.map(item => {
@@ -221,7 +238,8 @@ export default function AddNew() {
           id: '',
           date: formatDate(form.date, 'yyyy-MM-dd'),
           price: +item.price,
-          categoryId: expenseCategories.find((cat) => cat.name === item.category)?.id || 0,
+          categoryId:
+            expenseCategories.find(cat => cat.name === item.category)?.id || 0,
         };
         if (form.description) dataToSave.description = form.description;
         return dispatch(uploadExpense(dataToSave)).unwrap();
@@ -247,10 +265,10 @@ export default function AddNew() {
           date: formatDate(date, 'yyyy-MM-dd'),
           price: +price,
           categoryId:
-            expenseCategories.find((cat) => cat.name === form.category)?.id || 0,
+            expenseCategories.find(cat => cat.name === form.category)?.id || 0,
         };
 
-        dataToSave = _.omitBy(dataToSave, (v) => typeof v === 'string' && !v);
+        dataToSave = _.omitBy(dataToSave, v => typeof v === 'string' && !v);
       } else {
         dataToSave = {
           id: id ? +id : '',
@@ -259,10 +277,12 @@ export default function AddNew() {
           source: form.category,
           vat: 0,
         };
-        dataToSave = _.omitBy(dataToSave, (v) => typeof v === 'string' && !v);
+        dataToSave = _.omitBy(dataToSave, v => typeof v === 'string' && !v);
       }
       dispatch(
-        type === 'expense' ? uploadExpense(dataToSave) : uploadIncome(dataToSave),
+        type === 'expense'
+          ? uploadExpense(dataToSave)
+          : uploadIncome(dataToSave),
       )
         .unwrap()
         .then(() => {
@@ -273,35 +293,31 @@ export default function AddNew() {
   };
 
   const handleDelete = () => {
-    Alert.alert(
-      'Potwierdź usunięcie',
-      'Czy na pewno chcesz usunąć ten wpis?',
-      [
-        {
-          text: 'Anuluj',
-          style: 'cancel',
+    Alert.alert('Potwierdź usunięcie', 'Czy na pewno chcesz usunąć ten wpis?', [
+      {
+        text: 'Anuluj',
+        style: 'cancel',
+      },
+      {
+        text: 'Usuń',
+        style: 'destructive',
+        onPress: () => {
+          if (type === 'expense') {
+            dispatch(deleteExpense(id as string))
+              .unwrap()
+              .then(() => {
+                router.navigate('/(tabs)/records');
+              });
+          } else {
+            dispatch(deleteIncome(id as string))
+              .unwrap()
+              .then(() => {
+                router.navigate('/(tabs)/records');
+              });
+          }
         },
-        {
-          text: 'Usuń',
-          style: 'destructive',
-          onPress: () => {
-            if (type === 'expense') {
-              dispatch(deleteExpense(id as string))
-                .unwrap()
-                .then(() => {
-                  router.navigate('/(tabs)/records');
-                });
-            } else {
-              dispatch(deleteIncome(id as string))
-                .unwrap()
-                .then(() => {
-                  router.navigate('/(tabs)/records');
-                });
-            }
-          },
-        },
-      ],
-    );
+      },
+    ]);
   };
 
   return (
@@ -311,19 +327,20 @@ export default function AddNew() {
         contentContainerStyle={{
           flexGrow: 1,
           padding: sizes.lg,
-        }}>
+        }}
+      >
         <View style={{flex: 1}}>
           <TextInput
             style={styles.input}
             label={'Opis'}
-            onChangeText={(text) => setForm({...form, description: text})}
+            onChangeText={text => setForm({...form, description: text})}
             value={form.description}
           />
 
           <View style={[styles.input, {padding: 0, marginVertical: 24}]}>
             <DatePicker
               label="Wybierz Datę"
-              onChange={(date) => date && setForm({...form, date})}
+              onChange={date => date && setForm({...form, date})}
               value={form.date}
             />
           </View>
@@ -345,7 +362,7 @@ export default function AddNew() {
                 {label: 'Dodaj nową kategorię', value: 'new'},
                 {label: 'Wybierz z listy', value: 'list'},
               ]}
-              onSelect={(value) => {
+              onSelect={value => {
                 if (value === 'new') {
                   setNewCustomIncome('');
                 } else {
@@ -362,24 +379,33 @@ export default function AddNew() {
             <TextInput
               style={styles.input}
               label="Nowy rodzaj wpływu"
-              onChangeText={(text) => setForm({...form, category: text})}
+              onChangeText={text => setForm({...form, category: text})}
               value={form.category}
             />
           )}
 
           {type === 'expense' && !isPasRecord && (
-            <View style={{flexDirection: 'row',  marginVertical: 8, alignContent: 'center', justifyContent: 'center', alignItems: 'center', alignSelf: 'center'}}>
+            <View
+              style={{
+                flexDirection: 'row',
+                marginVertical: 8,
+                alignContent: 'center',
+                justifyContent: 'center',
+                alignItems: 'center',
+                alignSelf: 'center',
+              }}
+            >
               <TextInput
                 ref={focusRef}
                 label="Cena"
                 style={{flex: 2}}
                 keyboardType="numeric"
                 disabled={isSplit}
-                onChangeText={(text) => setForm({...form, price: text})}
+                onChangeText={text => setForm({...form, price: text})}
                 value={form.price}
               />
               <IconButton
-                icon={isSplit ? 'call-merge' : "call-split"}
+                icon={isSplit ? 'call-merge' : 'call-split'}
                 onPress={handleSplitToggle}
                 disabled={!form.price && !isSplit}
                 size={20}
@@ -390,7 +416,8 @@ export default function AddNew() {
 
           {!isSplit && (
             <View style={styles.splitIconRow}>
-              {(type === 'expense' || (type === 'income' && newCustomIncome === null)) && (
+              {(type === 'expense' ||
+                (type === 'income' && newCustomIncome === null)) && (
                 <View style={{flex: 1}}>
                   <Select
                     items={itemsToSelect}
@@ -399,8 +426,9 @@ export default function AddNew() {
                     value={
                       type === 'income'
                         ? form.category
-                        : expenseCategories.find((cat) => cat.name === form.category)
-                            ?.name
+                        : expenseCategories.find(
+                            cat => cat.name === form.category,
+                          )?.name
                     }
                   />
                 </View>
@@ -435,14 +463,13 @@ export default function AddNew() {
               </Button>
             </View>
           )}
-
         </View>
         <View>
-          {+id ? (<ButtonWithStatus
-            textColor="red"
-            onPress={handleDelete}>
-            Usuń
-          </ButtonWithStatus>) : null}
+          {+id ? (
+            <ButtonWithStatus textColor="red" onPress={handleDelete}>
+              Usuń
+            </ButtonWithStatus>
+          ) : null}
           <ButtonWithStatus onPress={handleNavigateBack}>
             Przerwij
           </ButtonWithStatus>
@@ -451,7 +478,8 @@ export default function AddNew() {
             showLoading
             mode="contained"
             disabled={!validateForm() || isDataTheSame()}
-            onPress={handleSave}>
+            onPress={handleSave}
+          >
             {isPasRecord ? 'Zapisz zmiany' : 'Zapisz'}
           </ButtonWithStatus>
         </View>

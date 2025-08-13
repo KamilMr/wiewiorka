@@ -1,5 +1,10 @@
 import {forwardRef} from 'react';
-import {Button, ButtonProps, IconButton, IconButtonProps} from 'react-native-paper';
+import {
+  Button,
+  ButtonProps,
+  IconButton,
+  IconButtonProps,
+} from 'react-native-paper';
 import {useIsLoading} from '@/hooks';
 
 export default function CustomButton(props: ButtonProps) {
@@ -7,7 +12,10 @@ export default function CustomButton(props: ButtonProps) {
   return <Button {...pr}>{children}</Button>;
 }
 
-export const ButtonWithStatus = forwardRef<typeof Button, ButtonProps & {showLoading?: boolean}>((props, ref) => {
+export const ButtonWithStatus = forwardRef<
+  typeof Button,
+  ButtonProps & {showLoading?: boolean}
+>((props, ref) => {
   const isLoading = useIsLoading();
   const {children, ...pr} = props;
   return (
@@ -15,13 +23,16 @@ export const ButtonWithStatus = forwardRef<typeof Button, ButtonProps & {showLoa
       ref={ref}
       {...pr}
       disabled={isLoading || pr.disabled}
-      loading={(props.showLoading && isLoading) || pr.loading}>
+      loading={(props.showLoading && isLoading) || pr.loading}
+    >
       {children}
     </Button>
   );
 });
 
-export function IconButtonWithStatus(props: IconButtonProps & {showLoading?: boolean}) {
+export function IconButtonWithStatus(
+  props: IconButtonProps & {showLoading?: boolean},
+) {
   const isLoading = useIsLoading();
 
   return (

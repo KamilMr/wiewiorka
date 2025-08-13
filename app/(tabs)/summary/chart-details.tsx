@@ -9,7 +9,12 @@ import _ from 'lodash';
 import {selectByTimeRange, selectCategories} from '@/redux/main/selectors';
 import {useAppSelector} from '@/hooks';
 import {BarChart, Chip, DatePicker, PieChartBar, Text} from '@/components';
-import {EXCLUDED_CAT, formatPrice, printJsonIndent, shortenText} from '@/common';
+import {
+  EXCLUDED_CAT,
+  formatPrice,
+  printJsonIndent,
+  shortenText,
+} from '@/common';
 import {Axis, PickFilter, decId, groupBy} from '@/utils/aggregateData';
 import {Category, Subcategory} from '@/redux/main/mainSlice';
 import {useAppTheme} from '@/constants/theme';
@@ -39,7 +44,8 @@ const GroupCategory = ({
           color: !isCat ? 'blue' : undefined,
           fontSize: 12,
         }}
-        onPress={handleOnPress('1-0')}>
+        onPress={handleOnPress('1-0')}
+      >
         Kategorie
       </Button>
       <Button
@@ -49,7 +55,8 @@ const GroupCategory = ({
           color: isCat ? 'blue' : undefined,
           fontSize: 12,
         }}
-        onPress={handleOnPress('1-1')}>
+        onPress={handleOnPress('1-1')}
+      >
         Podkategorie
       </Button>
     </View>
@@ -76,7 +83,7 @@ const Summary = () => {
 
   const getCategoryById = (id: number, isSubcategory: boolean = false) => {
     const idField = isSubcategory ? 'id' : 'groupId';
-    return stateCategories.find((cat) => +cat[idField] === id);
+    return stateCategories.find(cat => +cat[idField] === id);
   };
 
   useEffect(() => {
@@ -91,7 +98,7 @@ const Summary = () => {
   const idsOfCategories: string[] = [
     ...new Set(
       _.values(grouped)
-        .map((o) => _.entries(o))
+        .map(o => _.entries(o))
         .flat()
         .sort(([, va], [, vb]) => vb[0] - va[0])
         .map(([id, val]) => id),
@@ -141,14 +148,14 @@ const Summary = () => {
       : buildBarChart(grouped, setCat, stateCategories);
 
   const handleFilters = (catId: number) => () => {
-    const categoryToAdd = currentGroupOrCategory.find((f) => f.id === catId);
+    const categoryToAdd = currentGroupOrCategory.find(f => f.id === catId);
     if (!categoryToAdd) {
       return;
     }
-    const isThere = filters.findIndex((f) => f.id === catId);
+    const isThere = filters.findIndex(f => f.id === catId);
     const newState =
       isThere > -1
-        ? filters.filter((f) => f.id !== catId)
+        ? filters.filter(f => f.id !== catId)
         : [...filters, categoryToAdd];
     setFilters(newState);
   };
@@ -182,7 +189,8 @@ const Summary = () => {
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-          }}>
+          }}
+        >
           <IconButton
             icon="chart-donut"
             onPress={handlePieChange('pie')}
@@ -204,7 +212,7 @@ const Summary = () => {
           strokeColor="white"
           onPress={(item: {label: string; id: string}) => {
             if (axis[0] === '1-1') {
-              const dates = filterDates.map((d) => format(d, 'yyyy-MM-dd'));
+              const dates = filterDates.map(d => format(d, 'yyyy-MM-dd'));
               let category: string | undefined;
               const cat: Category | undefined = getCategoryName(
                 +decId(item.id)[1],
@@ -229,7 +237,8 @@ const Summary = () => {
             return (
               <View style={{justifyContent: 'center', alignItems: 'center'}}>
                 <Text
-                  style={{fontSize: 12, color: 'black', fontWeight: 'bold'}}>
+                  style={{fontSize: 12, color: 'black', fontWeight: 'bold'}}
+                >
                   {formatPrice(_.sumBy(data, 'value'))}
                 </Text>
                 {data.slice(0, 4).map(({label, value}) => (
@@ -238,7 +247,8 @@ const Summary = () => {
                     style={{
                       fontSize: 10,
                       color: 'black',
-                    }}>{`${shortenText(label)}(${formatPrice(value)})`}</Text>
+                    }}
+                  >{`${shortenText(label)}(${formatPrice(value)})`}</Text>
                 ))}
                 <Text style={{fontSize: 10, color: 'black'}}>...więcej</Text>
               </View>
@@ -250,7 +260,7 @@ const Summary = () => {
           barData={data}
           onPress={(item: {label: string; id: string}) => {
             if (axis[0] === '1-1') {
-              const dates = filterDates.map((d) => format(d, 'yyyy-MM-dd'));
+              const dates = filterDates.map(d => format(d, 'yyyy-MM-dd'));
               let category: string | undefined;
               const cat: Category | undefined = getCategoryName(
                 +decId(item.id)[1],
@@ -286,14 +296,15 @@ const Summary = () => {
           marginTop: 48,
           flexDirection: 'row',
           flexWrap: 'wrap',
-        }}>
-        {currentGroupOrCategory.map((c) => {
-          const isSelected = !!filters.find((f) => f.name === c.name);
+        }}
+      >
+        {currentGroupOrCategory.map(c => {
+          const isSelected = !!filters.find(f => f.name === c.name);
           return (
             <Chip
               key={c.id}
               selectedColor={
-                filters.find((f) => f.name === c.name)?.color || '#a6a6a6'
+                filters.find(f => f.name === c.name)?.color || '#a6a6a6'
               }
               // rippleColor={c.color}
               mode="outlined"
@@ -301,15 +312,17 @@ const Summary = () => {
               icon={undefined}
               style={{margin: 2, maxWidth: '50%'}}
               selected={isSelected}
-              onPress={handleFilters(c.id)}>
+              onPress={handleFilters(c.id)}
+            >
               <Text
                 style={{
                   fontSize: 14,
                   fontWeight: isSelected ? 600 : 400,
                   color:
-                    filters.find((f) => f.name === c.name)?.color || '#a6a6a6',
+                    filters.find(f => f.name === c.name)?.color || '#a6a6a6',
                   textDecorationLine: isSelected ? undefined : 'line-through',
-                }}>
+                }}
+              >
                 {c.name}
               </Text>
             </Chip>
@@ -317,7 +330,8 @@ const Summary = () => {
         })}
       </View>
       <Button
-        onPress={filters.length > 0 ? handleRemoveFilters : handleResetFilters}>
+        onPress={filters.length > 0 ? handleRemoveFilters : handleResetFilters}
+      >
         {filters.length > 0 ? 'Usuń filtry' : 'Zaznacz wszystkie'}
       </Button>
       <View style={{height: 80}} />

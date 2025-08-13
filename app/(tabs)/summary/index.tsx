@@ -25,22 +25,24 @@ const Config: React.FC<{
 
   const handleChange = (f: string) => {
     onChange?.(f);
-    setActive(selection.map((el) => el[0]).findIndex((n) => n === +f));
+    setActive(selection.map(el => el[0]).findIndex(n => n === +f));
   };
 
   return (
     <View style={{alignItems: 'center', marginBottom: 16}}>
       {title && <Text variant="titleLarge">{title}</Text>}
       <RadioButton.Group
-        onValueChange={(value) => handleChange(value)}
-        value={selection[active][0].toString()}>
+        onValueChange={value => handleChange(value)}
+        value={selection[active][0].toString()}
+      >
         <View style={{flexDirection: 'row'}}>
           {selection.map(([f, name], idx) => (
             <Button
               key={f}
               style={{marginRight: 4}}
               mode={idx === active ? 'contained' : 'outlined'}
-              onPress={() => handleChange(f.toString())}>
+              onPress={() => handleChange(f.toString())}
+            >
               {name}
             </Button>
           ))}
@@ -64,7 +66,8 @@ const Summary = () => {
           backgroundColor: t.colors.white,
           height: '100%',
           marginTop: 4 * 4,
-        }}>
+        }}
+      >
         <Config
           selection={[
             [MONTH, MONTH_LABEL],

@@ -8,10 +8,7 @@ const DIFFERED = 0;
 
 export const fetchIni = createAsyncThunk<any, void, {state: RootState}>(
   'ini/fetchIni',
-  async (
-    _,
-    thunkAPI,
-  ) => {
+  async (_, thunkAPI) => {
     const token = thunkAPI.getState().auth.token;
     let data;
     let resp = await fetch(getURL('ini'), {
@@ -33,261 +30,240 @@ export interface Budget {
   groupId?: number;
 }
 
-export const uploadExpense = createAsyncThunk<any, {id?: string; rest: Expense}, {state: RootState}>(
-  'expense/add',
-  async (
-    {id, ...rest},
-    thunkAPI,
-  ) => {
-    const token = thunkAPI.getState().auth.token;
-    let data;
-    const path = 'expenses' + (id ? `/${id}` : '');
-    let resp = await fetch(getURL(path), {
-      method: id ? 'PUT' : 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-type': 'application/json',
-      },
-      body: JSON.stringify(rest),
-    });
-    data = await resp.json();
-    if (data.err) throw data.err;
-    // deffered fetch
-    setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
+export const uploadExpense = createAsyncThunk<
+  any,
+  {id?: string; rest: Expense},
+  {state: RootState}
+>('expense/add', async ({id, ...rest}, thunkAPI) => {
+  const token = thunkAPI.getState().auth.token;
+  let data;
+  const path = 'expenses' + (id ? `/${id}` : '');
+  let resp = await fetch(getURL(path), {
+    method: id ? 'PUT' : 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-type': 'application/json',
+    },
+    body: JSON.stringify(rest),
+  });
+  data = await resp.json();
+  if (data.err) throw data.err;
+  // deffered fetch
+  setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
+});
+
+export const uploadIncome = createAsyncThunk<
+  any,
+  {id?: string; rest: Income},
+  {state: RootState}
+>('income/add', async ({id, ...rest}, thunkAPI) => {
+  const token = thunkAPI.getState().auth.token;
+
+  let data;
+  const path = 'income' + (id ? `/${id}` : '');
+  let resp = await fetch(getURL(path), {
+    method: id ? 'PATCH' : 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-type': 'application/json',
+    },
+    body: JSON.stringify(rest),
+  });
+  data = await resp.json();
+  if (data.err) throw data.err;
+
+  // deffered fetch
+  setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
+});
+
+export const handleCategory = createAsyncThunk<
+  any,
+  {
+    method?: string;
+    id?: string;
+    name?: string;
+    color?: string;
+    groupId?: number;
   },
-);
+  {state: RootState}
+>('category/upsert', async (payload, thunkAPI) => {
+  const {token} = thunkAPI.getState().auth;
 
-export const uploadIncome = createAsyncThunk<any, {id?: string; rest: Income}, {state: RootState}>(
-  'income/add',
-  async (
-    {id, ...rest},
-    thunkAPI,
-  ) => {
-    const token = thunkAPI.getState().auth.token;
+  if (!Object.keys(payload).length) return;
 
-    let data;
-    const path = 'income' + (id ? `/${id}` : '');
-    let resp = await fetch(getURL(path), {
-      method: id ? 'PATCH' : 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-type': 'application/json',
-      },
-      body: JSON.stringify(rest),
-    });
-    data = await resp.json();
-    if (data.err) throw data.err;
+  const {method, id, ...rest} = payload;
+  let q = 'category' + (method === 'PUT' ? `/${id}` : '');
+  let data;
 
-    // deffered fetch
-    setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
-  },
-);
+  const {name, color, groupId} = rest;
+  let resp = await fetch(getURL(q), {
+    method,
+    headers: {
+      'content-type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({name, color: color?.split('#')[1] || '', groupId}),
+  });
+  data = await resp.json();
+  if (data.err) throw data.err;
+  // differed fetch
+  setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
+  return data.d;
+});
 
-export const handleCategory = createAsyncThunk<any, {
-  method?: string;
-  id?: string;
-  name?: string;
-  color?: string;
-  groupId?: number;
-}, {state: RootState}>(
-  'category/upsert',
-  async (
-    payload,
-    thunkAPI,
-  ) => {
-    const {token} = thunkAPI.getState().auth;
+export const handleDeleteCategory = createAsyncThunk<
+  any,
+  {id?: string},
+  {state: RootState}
+>('category/delete', async (payload, thunkAPI) => {
+  const {token} = thunkAPI.getState().auth;
 
-    if (!Object.keys(payload).length) return;
+  if (!Object.keys(payload).length) return;
 
-    const {method, id, ...rest} = payload;
-    let q = 'category' + (method === 'PUT' ? `/${id}` : '');
-    let data;
+  const {id} = payload;
+  let q = `category/${id}`;
+  let data;
 
-    const {name, color, groupId} = rest;
-    let resp = await fetch(getURL(q), {
-      method,
-      headers: {
-        'content-type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({name, color: color?.split('#')[1] || '', groupId}),
-    });
-    data = await resp.json();
-    if (data.err) throw data.err;
-    // differed fetch
-    setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
-    return data.d;
-  },
-);
+  let resp = await fetch(getURL(q), {
+    method: 'DELETE',
+    headers: {
+      'content-type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  data = await resp.json();
+  if (data.err) throw data.err;
+  // deffered fetch
+  setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
+  return data.d;
+});
 
-export const handleDeleteCategory = createAsyncThunk<any, {id?: string}, {state: RootState}>(
-  'category/delete',
-  async (
-    payload,
-    thunkAPI,
-  ) => {
-    const {token} = thunkAPI.getState().auth;
+export const handleDeleteGroupCategory = createAsyncThunk<
+  any,
+  {id?: string},
+  {state: RootState}
+>('categoryGroup/delete', async (payload, thunkAPI) => {
+  const {token} = thunkAPI.getState().auth;
 
-    if (!Object.keys(payload).length) return;
+  if (!Object.keys(payload).length) return;
 
-    const {id} = payload;
-    let q = `category/${id}`;
-    let data;
+  const {id} = payload;
+  let q = `category/group/${id}`;
+  let data;
 
-    let resp = await fetch(getURL(q), {
-      method: 'DELETE',
-      headers: {
-        'content-type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    data = await resp.json();
-    if (data.err) throw data.err;
-    // deffered fetch
-    setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
-    return data.d;
-  },
-);
+  let resp = await fetch(getURL(q), {
+    method: 'DELETE',
+    headers: {
+      'content-type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  data = await resp.json();
+  if (data.err) throw data.err;
+  // differed fetch
+  setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
+  return data.d;
+});
 
-export const handleDeleteGroupCategory = createAsyncThunk<any, {id?: string}, {state: RootState}>(
-  'categoryGroup/delete',
-  async (
-    payload,
-    thunkAPI,
-  ) => {
-    const {token} = thunkAPI.getState().auth;
+export const handleGroupCategory = createAsyncThunk<
+  any,
+  {method?: string; id?: string; name?: string; color?: string},
+  {state: RootState}
+>('categoryGroup/upsert', async (payload, thunkAPI) => {
+  const {token} = thunkAPI.getState().auth;
 
-    if (!Object.keys(payload).length) return;
+  if (!Object.keys(payload).length) return;
 
-    const {id} = payload;
-    let q = `category/group/${id}`;
-    let data;
+  const {method = '', id, ...rest} = payload;
+  let q = 'category/group' + (method === 'PUT' ? `/${id}` : '');
+  let data;
 
-    let resp = await fetch(getURL(q), {
-      method: 'DELETE',
-      headers: {
-        'content-type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    data = await resp.json();
-    if (data.err) throw data.err;
-    // differed fetch
-    setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
-    return data.d;
-  },
-);
+  const {name, color = '#FFFFFF'} = rest;
+  let resp = await fetch(getURL(q), {
+    method,
+    headers: {
+      'content-type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({name, color: color?.split('#')[1] || ''}),
+  });
+  data = await resp.json();
+  if (data.err) throw data.err;
+  // differed fetch
+  setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
+  return data.d;
+});
 
-export const handleGroupCategory = createAsyncThunk<any, {method?: string; id?: string; name?: string; color?: string}, {state: RootState}>(
-  'categoryGroup/upsert',
-  async (
-    payload,
-    thunkAPI,
-  ) => {
-    const {token} = thunkAPI.getState().auth;
+export const uploadFile = createAsyncThunk<
+  any,
+  {file: any},
+  {state: RootState}
+>('expense/image', async ({file}: {file: any}, thunkAPI) => {
+  const token = thunkAPI.getState().auth.token;
+  let data;
+  const path = 'expenses/image';
+  let resp = await fetch(getURL(path), {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: file,
+  });
+  data = await resp.json();
 
-    if (!Object.keys(payload).length) return;
+  if (data.err) throw data;
+  // deffered fetch
+  setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
+  return data.d;
+});
 
-    const {method = '', id, ...rest} = payload;
-    let q = 'category/group' + (method === 'PUT' ? `/${id}` : '');
-    let data;
+export const deleteExpense = createAsyncThunk<
+  any,
+  {id?: string},
+  {state: RootState}
+>('expense/delete', async (id, thunkAPI) => {
+  const token = thunkAPI.getState().auth.token;
 
-    const {name, color = '#FFFFFF'} = rest;
-    let resp = await fetch(getURL(q), {
-      method,
-      headers: {
-        'content-type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({name, color: color?.split('#')[1] || ''}),
-    });
-    data = await resp.json();
-    if (data.err) throw data.err;
-    // differed fetch
-    setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
-    return data.d;
-  },
-);
+  let data;
+  const path = 'expenses' + (id ? `/${id}` : '');
+  let resp = await fetch(getURL(path), {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  data = await resp.json();
+  if (data.err) throw data.err;
 
-export const uploadFile = createAsyncThunk<any, {file: any}, {state: RootState}>(
-  'expense/image',
-  async (
-    {file}: {file: any},
-    thunkAPI,
-  ) => {
-    const token = thunkAPI.getState().auth.token;
-    let data;
-    const path = 'expenses/image';
-    let resp = await fetch(getURL(path), {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: file,
-    });
-    data = await resp.json();
+  // differed fetch
+  setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
+});
 
-    if (data.err) throw data;
-    // deffered fetch
-    setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
-    return data.d;
-  },
-);
+export const deleteIncome = createAsyncThunk<
+  any,
+  {id?: string},
+  {state: RootState}
+>('income/delete', async (id, thunkAPI) => {
+  const token = thunkAPI.getState().auth.token;
 
-export const deleteExpense = createAsyncThunk<any, {id?: string}, {state: RootState}>(
-  'expense/delete',
-  async (
-    id,
-    thunkAPI,
-  ) => {
-    const token = thunkAPI.getState().auth.token;
+  let data;
+  const path = 'income' + (id ? `/${id}` : '');
+  let resp = await fetch(getURL(path), {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  data = await resp.json();
+  if (data.err) throw data.err;
 
-    let data;
-    const path = 'expenses' + (id ? `/${id}` : '');
-    let resp = await fetch(getURL(path), {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    data = await resp.json();
-    if (data.err) throw data.err;
-
-    // differed fetch
-    setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
-  },
-);
-
-export const deleteIncome = createAsyncThunk<any, {id?: string}, {state: RootState}>(
-  'income/delete',
-  async (
-    id,
-    thunkAPI,
-  ) => {
-    const token = thunkAPI.getState().auth.token;
-
-    let data;
-    const path = 'income' + (id ? `/${id}` : '');
-    let resp = await fetch(getURL(path), {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    data = await resp.json();
-    if (data.err) throw data.err;
-
-    // differed fetch
-    setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
-  },
-);
+  // differed fetch
+  setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
+});
 
 export const uploadBudget = createAsyncThunk<any, Budget, {state: RootState}>(
   'budget/upload',
-  async (
-    {id, ...rest}: Budget,
-    thunkAPI,
-  ): Promise<void> => {
+  async ({id, ...rest}: Budget, thunkAPI): Promise<void> => {
     const token = thunkAPI.getState().auth.token;
 
     let data;

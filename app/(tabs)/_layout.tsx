@@ -44,7 +44,8 @@ export default function TabLayout() {
             <ActivityIndicator />
           );
         },
-      }}>
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{

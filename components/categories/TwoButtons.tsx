@@ -23,17 +23,15 @@ export const TwoButtons: React.FC<TwoButtonsProps> = ({
   if (!visible) return null;
   return (
     <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
-      <Button
-        mode="outlined"
-        onPress={handleCancel}
-        disabled={disableOk}>
+      <Button mode="outlined" onPress={handleCancel} disabled={disableOk}>
         {cancelTxt}
       </Button>
       <Button
         mode="contained"
         showLoading
         onPress={handleOk}
-        disabled={disableOk}>
+        disabled={disableOk}
+      >
         {okTxt}
       </Button>
     </View>

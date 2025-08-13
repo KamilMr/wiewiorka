@@ -19,7 +19,7 @@ export const SelectRadioButtons = ({
 }: SelectRadioButtonsProps) => {
   return (
     <View style={styles.radioButtons}>
-      {items.map((item) => (
+      {items.map(item => (
         <View key={item.value} style={styles.radioButton}>
           <Text>{item.label}</Text>
           <RadioButton

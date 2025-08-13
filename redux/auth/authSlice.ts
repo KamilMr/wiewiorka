@@ -17,7 +17,7 @@ export const authSlice = createSlice({
   reducers: {
     dropMe: () => emptyState(),
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
       .addCase(signIn.fulfilled, (state, action: PayloadAction<AuthSlice>) => {
         const {name = '', email, token} = action.payload;

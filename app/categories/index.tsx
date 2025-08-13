@@ -4,7 +4,13 @@ import {ScrollView, View} from 'react-native';
 
 import _ from 'lodash';
 
-import {Glow, Modal, NoData, TextInput, IconButtonWithStatus as IconButton} from '@/components';
+import {
+  Glow,
+  Modal,
+  NoData,
+  TextInput,
+  IconButtonWithStatus as IconButton,
+} from '@/components';
 import {CustomModal} from '@/components/CustomModal';
 import {useAppTheme} from '@/constants/theme';
 import {useAppDispatch, useAppSelector} from '@/hooks';
@@ -118,7 +124,7 @@ export default function MainView() {
               mode="outlined"
               style={{width: '80%'}}
               value={newGroup.name}
-              onChangeText={(text) => {
+              onChangeText={text => {
                 setNewGroup({name: text});
               }}
             />

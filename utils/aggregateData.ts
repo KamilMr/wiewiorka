@@ -83,7 +83,7 @@ const aggregateData = (
 const sumById = (data: AggregatedData) => {
   const tR: {[key: string]: [number]} = {};
   const values = _.values(data); // [{12:13: [2], 12-14: [2]}]
-  values.forEach((obj) => {
+  values.forEach(obj => {
     const catAndValue = _.entries(obj); // [[12-11, [10]]]
     catAndValue.forEach(([id, valueArr]) => {
       tR[id] ??= [0];

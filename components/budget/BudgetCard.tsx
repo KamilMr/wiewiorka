@@ -30,7 +30,7 @@ export default function BudgetCard({items = [], date}: BudgetCardProps) {
     <Card>
       <Card.Title title={`Budżet ${mm}-${yy}`} />
       <Card.Content>
-        {items.map((item) => (
+        {items.map(item => (
           <View key={item.id} style={styles.mainContentBox}>
             {/* Top box */}
             <View style={styles.mainInnerBox}>
@@ -50,7 +50,9 @@ export default function BudgetCard({items = [], date}: BudgetCardProps) {
             <View>
               <ProgressBar
                 progress={calculateProgress(+item.amount, +item.allocated || 0)}
-                color={getColor(calculateProgress(+item.amount, +item.allocated || 0))}
+                color={getColor(
+                  calculateProgress(+item.amount, +item.allocated || 0),
+                )}
               />
             </View>
           </View>

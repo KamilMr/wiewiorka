@@ -56,7 +56,8 @@ const UploadButton = ({
     <TouchableRipple
       onPress={onPress}
       style={styles.updBtn}
-      disabled={disabled}>
+      disabled={disabled}
+    >
       {disabled ? (
         <ActivityIndicator size={40} animating color="blue" />
       ) : (
@@ -111,7 +112,7 @@ const CustomImage = ({
 
     dispatch(uploadFile({file: data}))
       .unwrap()
-      .then((resp) => {
+      .then(resp => {
         setImage(initState(resp.url));
         setIsSaving(false);
         onChange(resp.url);
@@ -137,7 +138,8 @@ const CustomImage = ({
           ) : (
             <UploadButton onPress={handleOpenMenu(true)} disabled={isSaving} />
           )
-        }>
+        }
+      >
         {image.url && (
           <Menu.Item
             onPress={handleViewImage(true)}

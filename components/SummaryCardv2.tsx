@@ -18,7 +18,7 @@ const SummaryCard_v2 = (props: SummaryCard_v2Props) => {
     ? format(new Date(props.date), 'MM/yyyy')
     : format(new Date(), 'MM/yyyy');
 
-  const filteredSummary = summary.find((item) => item.date === date) || {
+  const filteredSummary = summary.find(item => item.date === date) || {
     income: 0,
     outcome: 0,
   };
@@ -35,8 +35,14 @@ const SummaryCard_v2 = (props: SummaryCard_v2Props) => {
                 params: {date: date.split('/').reverse().join('-') + '-01'},
               });
             }}
-            style={styles.buttonContainer}>
-            <View style={[styles.buttonContent, {backgroundColor: 'rgba(0, 255, 0, 0.1)'}]}>
+            style={styles.buttonContainer}
+          >
+            <View
+              style={[
+                styles.buttonContent,
+                {backgroundColor: 'rgba(0, 255, 0, 0.1)'},
+              ]}
+            >
               <IconButton icon="arrow-down" iconColor="green" />
               <View>
                 <Text>Wpłynęło</Text>
@@ -52,8 +58,14 @@ const SummaryCard_v2 = (props: SummaryCard_v2Props) => {
                 params: {date: date.split('/').reverse().join('-') + '-01'},
               });
             }}
-            style={styles.buttonContainer}>
-            <View style={[styles.buttonContent, {backgroundColor: 'rgba(255, 0, 0, 0.1)'}]}>
+            style={styles.buttonContainer}
+          >
+            <View
+              style={[
+                styles.buttonContent,
+                {backgroundColor: 'rgba(255, 0, 0, 0.1)'},
+              ]}
+            >
               <IconButton icon="arrow-up" iconColor="red" />
               <View>
                 <Text>Wydano</Text>

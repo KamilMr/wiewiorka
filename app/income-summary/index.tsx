@@ -92,14 +92,14 @@ const IncomeSummary = () => {
                   />
                   <View style={styles.legendTextContainer}>
                     <Text
-                      style={
-                        styles.legendText
-                      }>{`${item.label} - ${item.owner}`}</Text>
+                      style={styles.legendText}
+                    >{`${item.label} - ${item.owner}`}</Text>
                     <Tooltip
                       title={`${formatPrice(item.value)}`}
                       enterTouchDelay={0}
                       leaveTouchDelay={500}
-                      theme={{colors: {background: t.colors.background}}}>
+                      theme={{colors: {background: t.colors.background}}}
+                    >
                       <IconButton
                         icon="information-outline"
                         size={16}
@@ -127,7 +127,8 @@ const IncomeSummary = () => {
                 style={[
                   styles.listItem,
                   isCurrentUser(item.owner) && styles.currentUserItem,
-                ]}>
+                ]}
+              >
                 <Text>{`${item.date}: ${item.source} - ${
                   item.owner
                 }: ${formatPrice(item.price)}`}</Text>
@@ -141,7 +142,8 @@ const IncomeSummary = () => {
             variant="titleMedium"
             style={{
               textAlign: 'center',
-            }}>
+            }}
+          >
             Brak wpływów
           </Text>
         </View>

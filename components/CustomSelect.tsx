@@ -36,7 +36,7 @@ const DropdownComponent = ({
 
   // Filter items based on search query
   const filteredItems = items.filter(item =>
-    item.label.toLowerCase().includes(searchQuery.toLowerCase())
+    item.label.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   // Auto-focus search input when menu becomes visible
@@ -87,7 +87,8 @@ const DropdownComponent = ({
               styles.dropdown,
               isVisible && {borderColor: 'blue'},
               disable && styles.disabled,
-            ]}>
+            ]}
+          >
             <View style={styles.dropdownContent}>
               <View style={styles.dropdownLeft}>
                 <AntDesign
@@ -107,7 +108,8 @@ const DropdownComponent = ({
               />
             </View>
           </TouchableRipple>
-        }>
+        }
+      >
         {/* Search TextField */}
         <View style={styles.searchContainer}>
           <TextInput

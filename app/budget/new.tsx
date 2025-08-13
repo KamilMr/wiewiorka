@@ -4,7 +4,13 @@ import {formatDate} from 'date-fns';
 import {router} from 'expo-router';
 import _ from 'lodash';
 
-import {TextInput, ButtonWithStatus as Button, Select, Text, IconButton} from '@/components';
+import {
+  TextInput,
+  ButtonWithStatus as Button,
+  Select,
+  Text,
+  IconButton,
+} from '@/components';
 
 import {useAppDispatch, useAppSelector} from '@/hooks';
 import {sizes, useAppTheme} from '@/constants/theme';
@@ -35,15 +41,25 @@ const monthAndYearSliders: Items = [
   },
   // + 1 month
   {
-    label: new Date(new Date().setMonth(new Date().getMonth() + 1)).toLocaleString('pl', {month: 'long'}),
-    value: new Date(new Date().setMonth(new Date().getMonth() + 1)).toLocaleString('pl', {month: '2-digit'}),
+    label: new Date(
+      new Date().setMonth(new Date().getMonth() + 1),
+    ).toLocaleString('pl', {month: 'long'}),
+    value: new Date(
+      new Date().setMonth(new Date().getMonth() + 1),
+    ).toLocaleString('pl', {month: '2-digit'}),
   },
 ];
 
 const yearSliders = [{label: '2025', value: '2025'}];
 
-const SelectMonthAndYear = ({onChange}: {onChange: (month: number, year: number) => void}) => {
-  const [month, setMonth] = useState(new Date().toLocaleString('pl', {month: '2-digit'}));
+const SelectMonthAndYear = ({
+  onChange,
+}: {
+  onChange: (month: number, year: number) => void;
+}) => {
+  const [month, setMonth] = useState(
+    new Date().toLocaleString('pl', {month: '2-digit'}),
+  );
   const [year, setYear] = useState(new Date().getFullYear().toString());
 
   useEffect(() => {
@@ -97,7 +113,7 @@ const ExtendablesCategories = ({
   const [expand, setExpand] = useState(_.keys(categories).map(() => false));
 
   const handleExpand = (index: number) => {
-    setExpand((prev) => prev.map((_, i) => (i === index ? !prev[i] : prev[i])));
+    setExpand(prev => prev.map((_, i) => (i === index ? !prev[i] : prev[i])));
   };
 
   return (
@@ -109,7 +125,8 @@ const ExtendablesCategories = ({
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'space-between',
-            }}>
+            }}
+          >
             <TouchableOpacity
               onPress={() =>
                 onChange?.({
@@ -117,17 +134,27 @@ const ExtendablesCategories = ({
                   id: items[0].groupId,
                   type: 'group',
                 })
-              }>
+              }
+            >
               <Text variant="titleMedium">{groupName}</Text>
             </TouchableOpacity>
-            <IconButton icon={expand[index] ? 'chevron-down' : 'chevron-right'} onPress={() => handleExpand(index)} />
+            <IconButton
+              icon={expand[index] ? 'chevron-down' : 'chevron-right'}
+              onPress={() => handleExpand(index)}
+            />
           </View>
           {expand[index] &&
-            items.map((item) => (
+            items.map(item => (
               <TouchableOpacity
                 key={item.id}
-                onPress={() => onChange?.({name: item.name, id: item.id, type: 'category'})}>
-                <Text key={item.id} style={{marginLeft: sizes.xl, marginVertical: sizes.md}}>
+                onPress={() =>
+                  onChange?.({name: item.name, id: item.id, type: 'category'})
+                }
+              >
+                <Text
+                  key={item.id}
+                  style={{marginLeft: sizes.xl, marginVertical: sizes.md}}
+                >
                   {item.name}
                 </Text>
               </TouchableOpacity>
@@ -143,7 +170,8 @@ const NewBudget = () => {
   const [amount, setAmount] = useState<string>('');
   const [budgetDate, setBudgetDate] = useState<string | null>(null);
   const [showCategories, setShowCategories] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<SelectedCategory | null>(null);
+  const [selectedCategory, setSelectedCategory] =
+    useState<SelectedCategory | null>(null);
   const dispatch = useAppDispatch();
   const t = useAppTheme();
 
@@ -158,7 +186,7 @@ const NewBudget = () => {
       date: formatDate(budgetDate, 'yyyy-MM-dd'),
       [key]: selectedCategory?.[key],
     };
-    
+
     try {
       await dispatch(uploadBudget(budgetData)).unwrap();
       router.back();
@@ -171,7 +199,15 @@ const NewBudget = () => {
     }
   };
 
-  const handleChangeCategory = ({name, id, type}: {name: string; id: number; type: string}) => {
+  const handleChangeCategory = ({
+    name,
+    id,
+    type,
+  }: {
+    name: string;
+    id: number;
+    type: string;
+  }) => {
     setSelectedCategory({name, id, [`${type}Id`]: id});
     setShowCategories(false);
   };
@@ -183,29 +219,46 @@ const NewBudget = () => {
   return (
     <SafeAreaView>
       <ScrollView style={{padding: sizes.xl}}>
-        <View style={{marginTop: sizes.xl * 3, backgroundColor: t.colors.white}}>
+        <View
+          style={{marginTop: sizes.xl * 3, backgroundColor: t.colors.white}}
+        >
           <SelectMonthAndYear onChange={handleSelectMonthAndYear} />
         </View>
-        <TextInput label="Kwota" value={amount} keyboardType="numeric" onChangeText={(text) => setAmount(text)} />
+        <TextInput
+          label="Kwota"
+          value={amount}
+          keyboardType="numeric"
+          onChangeText={text => setAmount(text)}
+        />
         <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
-          }}>
-          <Text variant={selectedCategory?.name ? 'titleMedium' : 'bodySmall'} style={{color: t.colors.secondary}}>
+          }}
+        >
+          <Text
+            variant={selectedCategory?.name ? 'titleMedium' : 'bodySmall'}
+            style={{color: t.colors.secondary}}
+          >
             {selectedCategory?.name ?? 'Nie wybrano kategorii'}
           </Text>
           <Button onPress={() => setShowCategories(!showCategories)}>
             {showCategories ? 'Ukryj kategorie' : 'Pokaż kategorie'}
           </Button>
         </View>
-        {showCategories && <ExtendablesCategories categories={groupedByMain} onChange={handleChangeCategory} />}
+        {showCategories && (
+          <ExtendablesCategories
+            categories={groupedByMain}
+            onChange={handleChangeCategory}
+          />
+        )}
         <Button
           mode="contained"
           onPress={handleSave}
           disabled={!amount || !budgetDate || !selectedCategory?.name}
-          style={{marginTop: sizes.lg, alignSelf: 'center'}}>
+          style={{marginTop: sizes.lg, alignSelf: 'center'}}
+        >
           Dodaj budżet
         </Button>
       </ScrollView>

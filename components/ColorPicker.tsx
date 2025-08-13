@@ -32,8 +32,8 @@ export default function CustomColorPicker({
         <ColorPicker
           style={{width: '70%', margin: 'auto'}}
           value={value}
-
-          onComplete={onSelectColor}>
+          onComplete={onSelectColor}
+        >
           <Preview />
           <Panel1 />
           <HueSlider />
@@ -44,7 +44,8 @@ export default function CustomColorPicker({
         <Button
           style={{alignSelf: 'center'}}
           mode="contained"
-          onPress={closeModal}>
+          onPress={closeModal}
+        >
           Ok
         </Button>
       </Modal>

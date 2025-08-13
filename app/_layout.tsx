@@ -34,13 +34,16 @@ const RootLayout = () => {
     <Provider store={store}>
       <PersistGate persistor={persistor}>
         <PaperProvider theme={paperTheme}>
-          <Stack initialRouteName='(tabs)' >
+          <Stack initialRouteName="(tabs)">
             <Stack.Screen name="sign-in" options={{headerShown: false}} />
             <Stack.Screen name="sign-up" options={{headerShown: false}} />
             <Stack.Screen name="(tabs)" options={{headerShown: false}} />
             <Stack.Screen name="categories" options={{headerShown: false}} />
             <Stack.Screen name="budget" options={{headerShown: false}} />
-            <Stack.Screen name="income-summary" options={{headerShown: false}} />
+            <Stack.Screen
+              name="income-summary"
+              options={{headerShown: false}}
+            />
             <Stack.Screen name="+not-found" />
           </Stack>
           <SnackBar />

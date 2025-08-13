@@ -1,5 +1,10 @@
 import {selectStatus} from '@/redux/main/selectors';
-import {useDispatch, useSelector, TypedUseSelectorHook, useStore} from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+  TypedUseSelectorHook,
+  useStore,
+} from 'react-redux';
 import type {AppStore, RootState, AppDispatch} from '@/redux/store';
 
 // Use throughout your app instead of plain `useDispatch` and `useSelector`

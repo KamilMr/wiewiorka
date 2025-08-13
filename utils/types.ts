@@ -13,7 +13,7 @@ type BudgetCardItem = {
 
 type BudgetCardProps = {
   items: BudgetCardItem[];
-  date: string,
+  date: string;
 };
 
 interface BudgetMainSlice {
@@ -24,9 +24,4 @@ interface BudgetMainSlice {
   yearMonth: string;
 }
 
-export {
-  BudgetCardProps,
-  BudgetCardItem,
-  AggregatedData,
-  BudgetMainSlice,
-}
+export {BudgetCardProps, BudgetCardItem, AggregatedData, BudgetMainSlice};

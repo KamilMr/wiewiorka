@@ -52,7 +52,7 @@ export default function DynamicRecordList({
   const t = useAppTheme();
   return (
     <ScrollView onScroll={handleScroll}>
-      {_.keys(records).map((dateKey) => (
+      {_.keys(records).map(dateKey => (
         <View key={dateKey} style={{marginBottom: sizes.xxl}}>
           <Text variant="bodyLarge">
             {dateKey === formatDate(new Date(), 'dd/MM/yyyy')
@@ -64,10 +64,11 @@ export default function DynamicRecordList({
             <View
               style={styles.row}
               key={exp.id}
-              onTouchEnd={handleNavigate(exp.id, exp.exp)}>
+              onTouchEnd={handleNavigate(exp.id, exp.exp)}
+            >
               <CircleIcon
                 fillOuter={exp.exp ? exp.color : t.colors.softLavender}
-                fillInner={exp.exp ? t.colors.white: t.colors.softLavender}
+                fillInner={exp.exp ? t.colors.white : t.colors.softLavender}
               />
 
               {/* Description */}
@@ -84,12 +85,14 @@ export default function DynamicRecordList({
                   variant="bodyMedium"
                   style={{
                     color: exp.exp ? t.colors.deepMaroon : t.colors.primary,
-                  }}>
+                  }}
+                >
                   {exp.price + ' zł'}
                 </Text>
                 <Text
                   variant="bodySmall"
-                  style={{textAlign: 'right', color: t.colors.secondary}}>
+                  style={{textAlign: 'right', color: t.colors.secondary}}
+                >
                   {exp.owner}
                 </Text>
               </View>

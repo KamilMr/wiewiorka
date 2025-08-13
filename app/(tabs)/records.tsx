@@ -48,7 +48,8 @@ const Records = () => {
 
   return (
     <SafeAreaView
-      style={{padding: sizes.xl, backgroundColor: t.colors.background}}>
+      style={{padding: sizes.xl, backgroundColor: t.colors.background}}
+    >
       <Searchbar
         placeholder="Szukaj"
         onChangeText={setSearchQuery}

@@ -1,8 +1,5 @@
 import React from 'react';
-import {
-  Redirect,
-  Stack,
-} from 'expo-router';
+import {Redirect, Stack} from 'expo-router';
 
 import {IconButton} from 'react-native-paper';
 

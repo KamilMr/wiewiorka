@@ -20,10 +20,10 @@ export const buildBarChart = (
 ) => {
   const values = _.entries(sumById(obj));
   const tR = values.map(([itemId, valueArr]) => {
-    const [decGrId, decCatId] = decId(itemId).map((o) => +o);
+    const [decGrId, decCatId] = decId(itemId).map(o => +o);
     const isCat = decCatId > 0;
 
-    const foundedCat: Subcategory | undefined = categories.find((iterCat) =>
+    const foundedCat: Subcategory | undefined = categories.find(iterCat =>
       isCat ? iterCat.id === decCatId : iterCat.groupId === decGrId,
     );
     if (!foundedCat) {
@@ -68,7 +68,7 @@ export const buildPieChart = (
   categories: Subcategory[],
 ) => {
   const values = _.entries(sumById(obj));
-  const max = _.sum(values.map((arr) => arr[1]).flat(2));
+  const max = _.sum(values.map(arr => arr[1]).flat(2));
   const perc = (n: number) => ((n * 100) / max).toFixed(2);
 
   const tR = values

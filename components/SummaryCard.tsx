@@ -45,7 +45,8 @@ const SummaryCard = (props: Omit<SummaryCardProps, 'id'>) => {
             flexDirection: 'row',
             justifyContent: 'space-between',
             marginBottom: 16,
-          }}>
+          }}
+        >
           <TouchableOpacity
             onPress={() =>
               router.navigate({
@@ -53,12 +54,14 @@ const SummaryCard = (props: Omit<SummaryCardProps, 'id'>) => {
                 params: {date: date.split('/').reverse().join('-') + '-01'},
               })
             }
-            style={styles.buttonContainer}>
+            style={styles.buttonContainer}
+          >
             <View
               style={[
                 styles.buttonContent,
                 {backgroundColor: 'rgba(0, 255, 0, 0.1)'},
-              ]}>
+              ]}
+            >
               <IconButton icon="arrow-down" iconColor="green" />
               <View>
                 <Text>Wpłynęło netto</Text>
@@ -75,12 +78,14 @@ const SummaryCard = (props: Omit<SummaryCardProps, 'id'>) => {
             onPress={handleNavigate(
               date.split('/').reverse().join('-') + '-01',
             )}
-            style={styles.buttonContainer}>
+            style={styles.buttonContainer}
+          >
             <View
               style={[
                 styles.buttonContent,
                 {backgroundColor: 'rgba(255, 0, 0, 0.1)'},
-              ]}>
+              ]}
+            >
               <IconButton icon="arrow-up" iconColor="red" />
               <View>
                 <Text>Wydano:</Text>

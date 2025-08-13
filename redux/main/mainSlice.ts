@@ -38,9 +38,9 @@ const mainSlice = createSlice({
   initialState: emptyState(),
   reducers: {
     startLoading: (state, action) => {
-      state.status = 'fetching'
+      state.status = 'fetching';
     },
-    stopLoading: (state) => {
+    stopLoading: state => {
       state.status = 'idle';
     },
     setSnackbar: (state, action) => {
@@ -75,7 +75,7 @@ const mainSlice = createSlice({
     },
     updateExpense: (state, action) => {
       const exp = action.payload;
-      const expIdx = state.expenses.findIndex((ex) => ex.id === exp[0].id);
+      const expIdx = state.expenses.findIndex(ex => ex.id === exp[0].id);
       const stateNew = state.expenses.slice();
       stateNew.splice(expIdx, 1);
 
@@ -105,12 +105,10 @@ const mainSlice = createSlice({
     },
     dropMain: () => emptyState(),
     removeExpense: (state, action) => {
-      state.expenses = state.expenses.filter(
-        (exp) => exp.id !== action.payload,
-      );
+      state.expenses = state.expenses.filter(exp => exp.id !== action.payload);
     },
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
       .addCase(fetchIni.fulfilled, (state, action) => {
         let {expenses, income, categories} = action.payload;

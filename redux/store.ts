@@ -15,13 +15,14 @@ const rootReducer = combineReducers({
   main: mainReducer,
 });
 
-const authMiddleware = (store: MiddlewareAPI) => (next: any) => async (action: any) => {
-  if (['session_not_active', 'not_auth'].includes(action.error?.message)) {
-    store.dispatch(dropMe());
-    store.dispatch(dropMain());
-  }
-  return next(action);
-};
+const authMiddleware =
+  (store: MiddlewareAPI) => (next: any) => async (action: any) => {
+    if (['session_not_active', 'not_auth'].includes(action.error?.message)) {
+      store.dispatch(dropMe());
+      store.dispatch(dropMain());
+    }
+    return next(action);
+  };
 
 const setLoadingStatusMiddleware =
   (store: MiddlewareAPI) => (next: any) => async (action: any) => {
@@ -37,7 +38,7 @@ const setLoadingStatusMiddleware =
   };
 
 const migrations = {
-  4: (state: any ) => {
+  4: (state: any) => {
     return {
       ...state,
       auth: authEmptyState(),
@@ -58,7 +59,7 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 const store = configureStore({
   reducer: persistedReducer,
-  middleware: (getDefaultMiddleware) =>
+  middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
       serializableCheck: false,
       immutableCheck: false,
