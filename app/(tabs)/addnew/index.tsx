@@ -16,7 +16,6 @@ import {
   DatePicker,
   PriceAndCategory,
   Select,
-  Text,
   TextInput,
 } from '@/components';
 import {SelectRadioButtons} from '@/components/addnew/SelectRadioButtons';
@@ -25,7 +24,6 @@ import {sizes} from '@/constants/theme';
 import {deleteExpense, deleteIncome, uploadExpense, uploadIncome} from '@/redux/main/thunks';
 import {useAppDispatch, useAppSelector} from '@/hooks';
 import {
-  selectCategories,
   selectCategoriesByUsage,
   selectExpense,
   selectIncome,
@@ -64,8 +62,8 @@ export default function AddNew() {
   const isPasRecord = isNaN(+id) ? false : true;
 
   // logic when editing an existing record
-  const record = useAppSelector(
-    incomingType === 'expense' ? selectExpense(+id) : selectIncome(+id),
+  const record = useAppSelector((state) =>
+    incomingType === 'expense' ? selectExpense(+id)(state) : selectIncome(+id)(state),
   );
   const [form, setForm] = useState(initState());
 
@@ -120,7 +118,7 @@ export default function AddNew() {
             ? new Date(record?.date)
             : new Date(record.date.split('/').reverse().join('-')),
         price: record?.price.toString() || '',
-        category: record?.category || record?.source || '',
+        category: 'source' in record ? record.source : record.category || '',
       };
       setForm(tR);
       dirty.current = tR;
@@ -199,7 +197,7 @@ export default function AddNew() {
       const remainingAmount = (+form.price || 0) - totalSplitPrice;
       return hasValidItems && remainingAmount === 0;
     }
-    
+
     // For non-split items, price and category are required
     if (!form.price || !form.category) {
       return false;
@@ -370,7 +368,7 @@ export default function AddNew() {
           )}
 
           {type === 'expense' && !isPasRecord && (
-            <View style={{flexDirection: 'row',  marginVertical: 8}}>
+            <View style={{flexDirection: 'row',  marginVertical: 8, alignContent: 'center', justifyContent: 'center', alignItems: 'center', alignSelf: 'center'}}>
               <TextInput
                 ref={focusRef}
                 label="Cena"
@@ -454,7 +452,7 @@ export default function AddNew() {
             mode="contained"
             disabled={!validateForm() || isDataTheSame()}
             onPress={handleSave}>
-            {isPasRecord ? 'Zapisz zmiany' : 'Zapisz'} 
+            {isPasRecord ? 'Zapisz zmiany' : 'Zapisz'}
           </ButtonWithStatus>
         </View>
       </ScrollView>

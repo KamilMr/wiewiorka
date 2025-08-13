@@ -277,7 +277,6 @@ export const selectBudgets = (
                   const cat = categories.find(
                     (cat: Subcategory) => cat.id === currExp.categoryId,
                   );
-                  console.log(cat);
 
                   if (cat.groupId === groupId) prevExp += currExp.price;
                 } else if (currExp.categoryId === categoryId)

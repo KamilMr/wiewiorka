@@ -1,5 +1,5 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
-import {RootState, AppStore} from '../store';
+import {RootState} from '../store';
 
 import {getURL} from '@/common';
 import {Expense, Income} from '@/types';
