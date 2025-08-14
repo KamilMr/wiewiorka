@@ -9,7 +9,7 @@ import {
 } from 'expo-router';
 import {formatDate} from 'date-fns';
 import {View, StyleSheet, ScrollView, SafeAreaView, Alert} from 'react-native';
-import {RadioButton, Button, IconButton} from 'react-native-paper';
+import {Button, IconButton} from 'react-native-paper';
 
 import {
   ButtonWithStatus,
@@ -45,6 +45,7 @@ const initState = (date = new Date()) => ({
 const initSplitItem = () => ({
   price: '',
   category: '',
+  description: '',
 });
 
 export default function AddNew() {
@@ -58,7 +59,7 @@ export default function AddNew() {
   const [newCustomIncome, setNewCustomIncome] = useState<string | null>(null);
   const [isSplit, setIsSplit] = useState<boolean>(false);
   const [splitItems, setSplitItems] = useState<
-    Array<{price: string; category: string}>
+    Array<{price: string; category: string; description: string}>
   >([initSplitItem(), initSplitItem()]);
 
   const focusRef = useRef<HTMLInputElement>(null);
@@ -182,7 +183,7 @@ export default function AddNew() {
 
   const updateSplitItem = (
     index: number,
-    field: 'price' | 'category',
+    field: 'price' | 'category' | 'description',
     value: string,
   ) => {
     const newSplitItems = [...splitItems];
@@ -241,7 +242,7 @@ export default function AddNew() {
           categoryId:
             expenseCategories.find(cat => cat.name === item.category)?.id || 0,
         };
-        if (form.description) dataToSave.description = form.description;
+        if (item.description) dataToSave.description = item.description;
         return dispatch(uploadExpense(dataToSave)).unwrap();
       });
 
@@ -330,12 +331,14 @@ export default function AddNew() {
         }}
       >
         <View style={{flex: 1}}>
-          <TextInput
-            style={styles.input}
-            label={'Opis'}
-            onChangeText={text => setForm({...form, description: text})}
-            value={form.description}
-          />
+          {!isSplit && (
+            <TextInput
+              style={styles.input}
+              label={'Opis'}
+              onChangeText={text => setForm({...form, description: text})}
+              value={form.description}
+            />
+          )}
 
           <View style={[styles.input, {padding: 0, marginVertical: 24}]}>
             <DatePicker
@@ -384,7 +387,7 @@ export default function AddNew() {
             />
           )}
 
-          {type === 'expense' && !isPasRecord && (
+          {(type === 'expense' || type === 'income') && !isPasRecord && (
             <View
               style={{
                 flexDirection: 'row',
@@ -401,13 +404,15 @@ export default function AddNew() {
                 onChangeText={text => setForm({...form, price: text})}
                 value={form.price}
               />
-              <IconButton
-                icon={isSplit ? 'call-merge' : 'call-split'}
-                onPress={handleSplitToggle}
-                disabled={!form.price && !isSplit}
-                size={20}
-                style={{margin: 0, padding: 0, width: 60}}
-              />
+              {type === 'expense' && (
+                <IconButton
+                  icon={isSplit ? 'call-merge' : 'call-split'}
+                  onPress={handleSplitToggle}
+                  disabled={!form.price && !isSplit}
+                  size={20}
+                  style={{margin: 0, padding: 0, width: 60}}
+                />
+              )}
             </View>
           )}
 
@@ -451,7 +456,7 @@ export default function AddNew() {
                 />
               ))}
               <Button
-                mode="outlined"
+                mode="text"
                 onPress={addSplitItem}
                 style={{marginTop: 8}}
                 icon="plus"

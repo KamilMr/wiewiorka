@@ -1,21 +1,37 @@
+import {useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {IconButton} from 'react-native-paper';
 
 import {Select, Text, TextInput} from '@/components';
-import {sizes} from '@/constants/theme';
+import {sizes, useAppTheme} from '@/constants/theme';
 
 interface PriceAndCategoryProps {
-  item: {price: string; category: string};
+  item: {price: string; category: string; description?: string};
   index: number;
   expenseCategories: Array<{name: string; id: number}>;
   onUpdateItem: (
     index: number,
-    field: 'price' | 'category',
+    field: 'price' | 'category' | 'description',
     value: string,
   ) => void;
   onRemoveItem: (index: number) => void;
   canRemove: boolean;
 }
+
+const AddDescriptionButton = ({
+  hasDescription,
+  onPress,
+}: {
+  hasDescription: boolean;
+  onPress: () => void;
+}) => (
+  <IconButton
+    icon={hasDescription ? 'text-box-remove' : 'text-box-plus'}
+    onPress={onPress}
+    size={20}
+    style={styles.addDescriptionButton}
+  />
+);
 
 const PriceAndCategory = ({
   item,
@@ -25,32 +41,58 @@ const PriceAndCategory = ({
   onRemoveItem,
   canRemove,
 }: PriceAndCategoryProps) => {
+  const [showDescriptionInput, setShowDescriptionInput] = useState(false);
+  const t = useAppTheme();
+
   const itemsToSelect = expenseCategories.map(cat => ({
     label: cat.name,
     value: cat.name,
   }));
+
+  const handleDescriptionToggle = () => {
+    setShowDescriptionInput(!showDescriptionInput);
+    onUpdateItem(index, 'description', '');
+  };
 
   return (
     <View style={styles.root}>
       <View
         style={{
           flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: sizes.md,
+          position: 'absolute',
+          top: -10,
+          right: -10,
         }}
       >
-        <Text style={{fontSize: 14, fontWeight: '500'}}>
-          Pozycja {index + 1}
-        </Text>
         {canRemove && (
           <IconButton
-            icon="close"
+            icon="trash-can-outline"
             size={20}
+            iconColor={t.colors.error}
             onPress={() => onRemoveItem(index)}
           />
         )}
       </View>
+
+      <View style={{flexDirection: 'row', marginVertical: sizes.md}}>
+        <View style={{flex: 1}}>
+          {showDescriptionInput && (
+            <TextInput
+              dense
+              label="Opis"
+              onChangeText={text => onUpdateItem(index, 'description', text)}
+              value={item.description || ''}
+            />
+          )}
+        </View>
+        <View style={styles.descriptionRow}>
+          <AddDescriptionButton
+            hasDescription={!!item.description || showDescriptionInput}
+            onPress={handleDescriptionToggle}
+          />
+        </View>
+      </View>
+
       <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
         <TextInput
           style={{flex: 1, marginVertical: 0}}
@@ -77,6 +119,7 @@ const PriceAndCategory = ({
 
 const styles = StyleSheet.create({
   root: {
+    position: 'relative',
     backgroundColor: 'white',
     padding: sizes.xl,
     marginVertical: sizes.md,
@@ -86,6 +129,16 @@ const styles = StyleSheet.create({
     shadowOffset: {width: 0, height: 1},
     shadowOpacity: 0.1,
     shadowRadius: sizes.md,
+  },
+  descriptionRow: {
+    alignItems: 'flex-end',
+    marginBottom: sizes.lg,
+  },
+  addDescriptionButton: {
+    // padding: sizes.sm,
+  },
+  addDescriptionText: {
+    fontSize: 14,
   },
 });
 

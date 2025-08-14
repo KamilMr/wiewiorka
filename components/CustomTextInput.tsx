@@ -1,9 +1,7 @@
-import React, {forwardRef} from 'react';
+import {forwardRef} from 'react';
 import {StyleSheet} from 'react-native';
 
 import {TextInput, TextInputProps} from 'react-native-paper';
-
-import {sizes} from '@/constants/theme';
 
 const CustomTextInput = forwardRef<typeof TextInput, TextInputProps>(
   ({onChangeText, value, style, ...props}, ref) => {
@@ -22,8 +20,7 @@ const CustomTextInput = forwardRef<typeof TextInput, TextInputProps>(
 );
 
 const styles = StyleSheet.create({
-  root: {
-  },
+  root: {},
 });
 
 export default CustomTextInput;
