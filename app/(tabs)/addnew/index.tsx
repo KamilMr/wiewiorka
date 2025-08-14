@@ -34,6 +34,7 @@ import {
   selectIncome,
   selectSources,
 } from '@/redux/main/selectors';
+import {Expense, Income} from '@/types';
 
 const initState = (date = new Date()) => ({
   description: '',
@@ -138,7 +139,7 @@ export default function AddNew() {
     useCallback(() => {
       // clean up params
       const unsubscribe = navigation.addListener('blur', () => {
-        navigation.setParams({id: undefined, type: undefined});
+        navigation.setParams({id: undefined, type: undefined} as any);
         cleanState();
       });
 
@@ -174,8 +175,8 @@ export default function AddNew() {
       const totalPrice = parseFloat(form.price);
       const halfPrice = (totalPrice / 2).toString();
       setSplitItems([
-        {price: halfPrice, category: form.category},
-        {price: halfPrice, category: ''},
+        {price: halfPrice, category: form.category, description: ''},
+        {price: halfPrice, category: '', description: ''},
       ]);
     }
     setIsSplit(!isSplit);
@@ -235,15 +236,14 @@ export default function AddNew() {
     if (type === 'expense' && isSplit) {
       // Handle split expenses - save multiple expenses
       const savePromises = splitItems.map(item => {
-        const dataToSave = {
-          id: '',
+        const expenseData: Partial<Expense> = {
           date: formatDate(form.date, 'yyyy-MM-dd'),
           price: +item.price,
           categoryId:
             expenseCategories.find(cat => cat.name === item.category)?.id || 0,
         };
-        if (item.description) dataToSave.description = item.description;
-        return dispatch(uploadExpense(dataToSave)).unwrap();
+        if (item.description) expenseData.description = item.description;
+        return dispatch(uploadExpense({rest: expenseData as Expense})).unwrap();
       });
 
       try {
@@ -260,36 +260,35 @@ export default function AddNew() {
       let dataToSave;
       if (type === 'expense') {
         const {description, date, price} = form;
-        dataToSave = {
-          id: id ? +id : '',
+        const expenseData: Partial<Expense> = {
           description,
           date: formatDate(date, 'yyyy-MM-dd'),
           price: +price,
           categoryId:
             expenseCategories.find(cat => cat.name === form.category)?.id || 0,
         };
-
-        dataToSave = _.omitBy(dataToSave, v => typeof v === 'string' && !v);
+        const cleanExpenseData = _.omitBy(expenseData, v => typeof v === 'string' && !v);
+        dispatch(uploadExpense({id: id ? id.toString() : undefined, rest: cleanExpenseData as unknown as Expense}))
+          .unwrap()
+          .then(() => {
+            setForm(initState());
+            router.navigate('/(tabs)/records');
+          });
       } else {
-        dataToSave = {
-          id: id ? +id : '',
+        const incomeData: Partial<Income> = {
           date: formatDate(form.date, 'yyyy-MM-dd'),
           price: +form.price,
           source: form.category,
           vat: 0,
         };
-        dataToSave = _.omitBy(dataToSave, v => typeof v === 'string' && !v);
+        const cleanIncomeData = _.omitBy(incomeData, v => typeof v === 'string' && !v);
+        dispatch(uploadIncome({id: id ? id.toString() : undefined, rest: cleanIncomeData as unknown as Income}))
+          .unwrap()
+          .then(() => {
+            setForm(initState());
+            router.navigate('/(tabs)/records');
+          });
       }
-      dispatch(
-        type === 'expense'
-          ? uploadExpense(dataToSave)
-          : uploadIncome(dataToSave),
-      )
-        .unwrap()
-        .then(() => {
-          setForm(initState());
-          router.navigate('/(tabs)/records');
-        });
     }
   };
 
@@ -304,13 +303,13 @@ export default function AddNew() {
         style: 'destructive',
         onPress: () => {
           if (type === 'expense') {
-            dispatch(deleteExpense(id as string))
+            dispatch(deleteExpense({id: id as string}))
               .unwrap()
               .then(() => {
                 router.navigate('/(tabs)/records');
               });
           } else {
-            dispatch(deleteIncome(id as string))
+            dispatch(deleteIncome({id: id as string}))
               .unwrap()
               .then(() => {
                 router.navigate('/(tabs)/records');
