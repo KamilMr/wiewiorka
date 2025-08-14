@@ -62,7 +62,7 @@ export default function AddNew() {
     Array<{price: string; category: string; description: string}>
   >([initSplitItem(), initSplitItem()]);
 
-  const focusRef = useRef<HTMLInputElement>(null);
+  const focusRef = useRef<any>(null);
   const dirty = useRef({});
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -391,7 +391,6 @@ export default function AddNew() {
             <View
               style={{
                 flexDirection: 'row',
-                // marginVertical: 8,
                 alignItems: 'center',
               }}
             >
