@@ -6,6 +6,7 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 
 import CustomText from './CustomText';
 import {sizes} from '@/constants/theme';
+import {normalize} from '@/common';
 
 export type Items = Array<{label: string; value: string}>;
 
@@ -36,7 +37,7 @@ const DropdownComponent = ({
 
   // Filter items based on search query
   const filteredItems = items.filter(item =>
-    item.label.toLowerCase().includes(searchQuery.toLowerCase()),
+    normalize(item.label.toLowerCase()).includes(normalize(searchQuery.toLowerCase())),
   );
 
   // Auto-focus search input when menu becomes visible
