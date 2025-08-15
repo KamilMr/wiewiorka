@@ -167,6 +167,8 @@ export default function AddNew() {
   const handleSelectType = (type: string) => {
     setType(type);
     setForm({...form, category: ''});
+    setIsSplit(false);
+    setSplitItems([initSplitItem(), initSplitItem()]);
   };
 
   const handleSplitToggle = () => {
@@ -387,7 +389,7 @@ export default function AddNew() {
             />
           )}
 
-          {(type === 'expense' || type === 'income') && !isPasRecord && (
+          {(type === 'expense' || type === 'income') && (
             <View
               style={{
                 flexDirection: 'row',
