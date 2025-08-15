@@ -37,7 +37,9 @@ const DropdownComponent = ({
 
   // Filter items based on search query
   const filteredItems = items.filter(item =>
-    normalize(item.label.toLowerCase()).includes(normalize(searchQuery.toLowerCase())),
+    normalize(item.label.toLowerCase()).includes(
+      normalize(searchQuery.toLowerCase()),
+    ),
   );
 
   // Auto-focus search input when menu becomes visible
@@ -61,6 +63,8 @@ const DropdownComponent = ({
     setIsVisible(false);
     setSearchQuery(''); // Clear search when menu is dismissed
   };
+
+  const handleCleanSearchQuery = () => setSearchQuery('');
 
   return (
     <View style={{backgroundColor: 'transparent'}}>
@@ -111,6 +115,11 @@ const DropdownComponent = ({
             dense
             autoFocus={isVisible}
             left={<TextInput.Icon icon="magnify" />}
+            right={
+              searchQuery ? (
+                <TextInput.Icon icon="close" onPress={handleCleanSearchQuery} />
+              ) : null
+            }
           />
         </View>
 
