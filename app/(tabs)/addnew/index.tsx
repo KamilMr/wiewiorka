@@ -96,7 +96,7 @@ export default function AddNew() {
         setTimeout(() => {
           if (!focusRef.current) return;
           focusRef.current.focus();
-        }, 0);
+        }, 200);
       }
 
       return () => {
