@@ -108,6 +108,7 @@ const DropdownComponent = ({
             style={styles.searchInput}
             mode="outlined"
             dense
+            autoFocus={isVisible}
             left={<TextInput.Icon icon="magnify" />}
           />
         </View>
