@@ -424,6 +424,7 @@ export default function AddNew() {
                 <View style={{flex: 1}}>
                   <Select
                     items={itemsToSelect}
+                    showDivider={type === 'expense'}
                     onChange={handleSelectCategory}
                     style={{root: {marginTop: 4}}}
                     value={
