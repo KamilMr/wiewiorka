@@ -1,7 +1,13 @@
 import {useState, useRef, useEffect} from 'react';
 import {StyleSheet, View} from 'react-native';
 
-import {Menu, Text, TouchableRipple, TextInput} from 'react-native-paper';
+import {
+  Menu,
+  Text,
+  TouchableRipple,
+  TextInput,
+  Divider,
+} from 'react-native-paper';
 import AntDesign from '@expo/vector-icons/AntDesign';
 
 import CustomText from './CustomText';
@@ -41,6 +47,10 @@ const DropdownComponent = ({
       normalize(searchQuery.toLowerCase()),
     ),
   );
+
+  // Split filtered items into first three and rest
+  const firstItems = filteredItems.slice(0, 3);
+  const restItems = filteredItems.slice(3);
 
   // Auto-focus search input when menu becomes visible
   useEffect(() => {
@@ -123,10 +133,23 @@ const DropdownComponent = ({
           />
         </View>
 
-        {/* Filtered items */}
-        {filteredItems.map((item, index) => (
+        {/* First three items */}
+        {firstItems.map((item, index) => (
           <Menu.Item
-            key={index}
+            key={`first-${index}`}
+            onPress={() => handleOnChange(item)}
+            title={item.label}
+            leadingIcon={item.value === value ? 'check' : undefined}
+          />
+        ))}
+
+        {/* Divider if there are rest items */}
+        {restItems.length > 0 && <Divider style={{height: 2}} />}
+
+        {/* Rest of the items */}
+        {restItems.map((item, index) => (
+          <Menu.Item
+            key={`rest-${index}`}
             onPress={() => handleOnChange(item)}
             title={item.label}
             leadingIcon={item.value === value ? 'check' : undefined}
