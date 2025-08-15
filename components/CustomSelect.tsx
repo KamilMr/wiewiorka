@@ -61,20 +61,8 @@ const DropdownComponent = ({
     setSearchQuery(''); // Clear search when menu is dismissed
   };
 
-  const renderLabel = () => {
-    if ((value || isVisible) && title) {
-      return (
-        <CustomText style={[styles.label, isVisible && {color: 'blue'}]}>
-          {title}
-        </CustomText>
-      );
-    }
-    return null;
-  };
-
   return (
-    <View style={[styles.root, style.root]}>
-      {renderLabel()}
+    <View style={{backgroundColor: 'transparent'}}>
       <Menu
         visible={isVisible}
         onDismiss={handleMenuDismiss}
@@ -150,9 +138,6 @@ const DropdownComponent = ({
 export default DropdownComponent;
 
 const styles = StyleSheet.create({
-  root: {
-    backgroundColor: 'transparent',
-  },
   dropdown: {
     height: 50,
     borderColor: 'gray',
