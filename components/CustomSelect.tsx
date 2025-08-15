@@ -146,7 +146,7 @@ const DropdownComponent = ({
         ))}
 
         {/* Divider if there are rest items */}
-        {restItems.length > 0 && showDivider && <Divider style={{height: 2}} />}
+        {restItems.length > 0 && showDivider && setSearchQuery.length === 0 && <Divider style={{height: 2}} />}
 
         {/* Rest of the items */}
         {restItems.map((item, index) => (
