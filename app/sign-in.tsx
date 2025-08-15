@@ -1,27 +1,58 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Link, router} from 'expo-router';
 import {StyleSheet, View} from 'react-native';
 
-import {Button, TextInput} from 'react-native-paper';
+import {Button, TextInput, Checkbox} from 'react-native-paper';
 
 import {signIn} from '@/redux/auth/thunks';
 import {useAppDispatch} from '@/hooks';
 import {Text} from '@/components';
 import {useAppTheme} from '@/constants/theme';
+import {save, getValueFor, deleteValue} from '@/utils/secureStorage';
 
 const Login = () => {
   const dispatch = useAppDispatch();
-  const [data, setData] = useState({
-    email: process.env.EXPO_PUBLIC_USER_EMAIL || '',
-    password: process.env.EXPO_PUBLIC_USER_PASSWORD || '',
-  });
+  const [data, setData] = useState({email: '', password: ''});
   const [rememberUser, setRememberUser] = useState(false);
 
   const t = useAppTheme();
 
+  useEffect(() => {
+    const loadSavedCredentials = async () => {
+      try {
+        const savedEmail = await getValueFor('rememberedEmail');
+        const savedPassword = await getValueFor('rememberedPassword');
+
+        if (savedEmail && savedPassword) {
+          setData({
+            email: savedEmail,
+            password: savedPassword,
+          });
+          setRememberUser(true);
+        }
+      } catch (error) {
+        console.log('No saved credentials found');
+      }
+    };
+
+    loadSavedCredentials();
+  }, []);
+
   const isFormReady = data.password && data.email;
 
-  const handleCheckbox = () => setRememberUser(!rememberUser);
+  const handleCheckbox = async () => {
+    const newRememberValue = !rememberUser;
+    setRememberUser(newRememberValue);
+
+    if (!newRememberValue) {
+      try {
+        await deleteValue('rememberedEmail');
+        await deleteValue('rememberedPassword');
+      } catch (error) {
+        console.log('Error clearing saved credentials');
+      }
+    }
+  };
 
   const handleData = (field: string) => (text: string) => {
     setData(data => ({...data, [field]: text}));
@@ -34,6 +65,12 @@ const Login = () => {
   const handleSave = async () => {
     try {
       await dispatch(signIn(data)).unwrap();
+
+      if (rememberUser) {
+        await save('rememberedEmail', data.email);
+        await save('rememberedPassword', data.password);
+      }
+
       router.replace('/');
     } catch (error: any) {
       console.error('error', error?.message || 'Coś poszło nie tak');
@@ -61,6 +98,15 @@ const Login = () => {
           onChangeText={handleData('password')}
           style={styles.textInput}
         />
+        <View style={styles.checkboxContainer}>
+          <Checkbox
+            status={rememberUser ? 'checked' : 'unchecked'}
+            onPress={handleCheckbox}
+          />
+          <Text style={styles.checkboxLabel} onPress={handleCheckbox}>
+            Zapamiętaj mnie
+          </Text>
+        </View>
       </View>
       <Button
         onPress={handleSave}
@@ -95,6 +141,15 @@ const styles = StyleSheet.create({
   textInput: {
     marginVertical: 4 * 2,
     marginHorizontal: 4 * 2,
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 4 * 2,
+    marginTop: 4 * 2,
+  },
+  checkboxLabel: {
+    marginLeft: 4,
   },
 });
 
