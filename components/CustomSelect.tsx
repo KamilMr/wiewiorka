@@ -10,8 +10,6 @@ import {
 } from 'react-native-paper';
 import AntDesign from '@expo/vector-icons/AntDesign';
 
-import CustomText from './CustomText';
-import {sizes} from '@/constants/theme';
 import {normalize} from '@/common';
 
 export type Items = Array<{label: string; value: string}>;
@@ -83,16 +81,19 @@ const DropdownComponent = ({
       <Menu
         visible={isVisible}
         onDismiss={handleMenuDismiss}
-        style={{backgroundColor: 'white', width: '99%'}}
+        style={{backgroundColor: 'white', width: '80%'}}
         contentStyle={{
-          marginTop: 50,
+          maxHeight: 400,
+          marginBottom: 10,
         }}
+        anchorPosition="bottom"
+        mode="elevated"
         anchor={
           <TouchableRipple
             onPress={() => !disable && setIsVisible(true)}
             disabled={disable}
             style={[
-              styles.dropdown,
+              styles.dropdownContainer,
               isVisible && {borderColor: 'blue'},
               disable && styles.disabled,
             ]}
@@ -186,7 +187,7 @@ const DropdownComponent = ({
 export default DropdownComponent;
 
 const styles = StyleSheet.create({
-  dropdown: {
+  dropdownContainer: {
     height: 50,
     borderColor: 'gray',
     borderWidth: 0.5,
