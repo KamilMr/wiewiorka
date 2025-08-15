@@ -1,5 +1,5 @@
 import {useState, useRef, useEffect} from 'react';
-import {StyleSheet, View} from 'react-native';
+import {StyleSheet, View, ScrollView} from 'react-native';
 
 import {
   Menu,
@@ -83,7 +83,10 @@ const DropdownComponent = ({
       <Menu
         visible={isVisible}
         onDismiss={handleMenuDismiss}
-        style={{backgroundColor: 'white', minWidth: 320}}
+        style={{backgroundColor: 'white', width: '99%'}}
+        contentStyle={{
+          marginTop: 50,
+        }}
         anchor={
           <TouchableRipple
             onPress={() => !disable && setIsVisible(true)}
@@ -115,7 +118,7 @@ const DropdownComponent = ({
           </TouchableRipple>
         }
       >
-        {/* Search TextField */}
+        {/* Fixed Search TextField */}
         <View style={styles.searchContainer}>
           <TextInput
             ref={searchInputRef}
@@ -135,37 +138,46 @@ const DropdownComponent = ({
           />
         </View>
 
-        {/* First three items */}
-        {firstItems.map((item, index) => (
-          <Menu.Item
-            key={`first-${index}`}
-            onPress={() => handleOnChange(item)}
-            title={item.label}
-            leadingIcon={item.value === value ? 'check' : undefined}
-          />
-        ))}
+        {/* Scrollable Menu Items */}
+        <ScrollView
+          style={styles.scrollableContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={true}
+        >
+          {/* First three items */}
+          {firstItems.map((item, index) => (
+            <Menu.Item
+              key={`first-${index}`}
+              onPress={() => handleOnChange(item)}
+              title={item.label}
+              leadingIcon={item.value === value ? 'check' : undefined}
+            />
+          ))}
 
-        {/* Divider if there are rest items */}
-        {restItems.length > 0 && showDivider && setSearchQuery.length === 0 && <Divider style={{height: 2}} />}
+          {/* Divider if there are rest items */}
+          {restItems.length > 0 && showDivider && searchQuery.length === 0 && (
+            <Divider style={{height: 2}} />
+          )}
 
-        {/* Rest of the items */}
-        {restItems.map((item, index) => (
-          <Menu.Item
-            key={`rest-${index}`}
-            onPress={() => handleOnChange(item)}
-            title={item.label}
-            leadingIcon={item.value === value ? 'check' : undefined}
-          />
-        ))}
+          {/* Rest of the items */}
+          {restItems.map((item, index) => (
+            <Menu.Item
+              key={`rest-${index}`}
+              onPress={() => handleOnChange(item)}
+              title={item.label}
+              leadingIcon={item.value === value ? 'check' : undefined}
+            />
+          ))}
 
-        {/* Show message if no items match search */}
-        {filteredItems.length === 0 && searchQuery.length > 0 && (
-          <Menu.Item
-            title="Brak wyników"
-            disabled
-            titleStyle={styles.noResultsText}
-          />
-        )}
+          {/* Show message if no items match search */}
+          {filteredItems.length === 0 && searchQuery.length > 0 && (
+            <Menu.Item
+              title="Brak wyników"
+              disabled
+              titleStyle={styles.noResultsText}
+            />
+          )}
+        </ScrollView>
       </Menu>
     </View>
   );
@@ -216,6 +228,9 @@ const styles = StyleSheet.create({
     padding: 8,
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
+  },
+  scrollableContent: {
+    maxHeight: 300,
   },
   searchInput: {
     backgroundColor: 'white',
