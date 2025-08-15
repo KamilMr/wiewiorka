@@ -1,6 +1,7 @@
 import {useEffect} from 'react';
 import {Stack} from 'expo-router';
 import {Provider} from 'react-redux';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
 import 'react-native-reanimated';
 import {useFonts} from 'expo-font';
@@ -31,25 +32,27 @@ const RootLayout = () => {
   }
 
   return (
-    <Provider store={store}>
-      <PersistGate persistor={persistor}>
-        <PaperProvider theme={paperTheme}>
-          <Stack initialRouteName="(tabs)">
-            <Stack.Screen name="sign-in" options={{headerShown: false}} />
-            <Stack.Screen name="sign-up" options={{headerShown: false}} />
-            <Stack.Screen name="(tabs)" options={{headerShown: false}} />
-            <Stack.Screen name="categories" options={{headerShown: false}} />
-            <Stack.Screen name="budget" options={{headerShown: false}} />
-            <Stack.Screen
-              name="income-summary"
-              options={{headerShown: false}}
-            />
-            <Stack.Screen name="+not-found" />
-          </Stack>
-          <SnackBar />
-        </PaperProvider>
-      </PersistGate>
-    </Provider>
+    <GestureHandlerRootView style={{flex: 1}}>
+      <Provider store={store}>
+        <PersistGate persistor={persistor}>
+          <PaperProvider theme={paperTheme}>
+            <Stack initialRouteName="(tabs)">
+              <Stack.Screen name="sign-in" options={{headerShown: false}} />
+              <Stack.Screen name="sign-up" options={{headerShown: false}} />
+              <Stack.Screen name="(tabs)" options={{headerShown: false}} />
+              <Stack.Screen name="categories" options={{headerShown: false}} />
+              <Stack.Screen name="budget" options={{headerShown: false}} />
+              <Stack.Screen
+                name="income-summary"
+                options={{headerShown: false}}
+              />
+              <Stack.Screen name="+not-found" />
+            </Stack>
+            <SnackBar />
+          </PaperProvider>
+        </PersistGate>
+      </Provider>
+    </GestureHandlerRootView>
   );
 };
 export default RootLayout;
