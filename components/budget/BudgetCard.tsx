@@ -31,9 +31,9 @@ export default function BudgetCard({items = [], date}: BudgetCardProps) {
 
   return (
     <Card>
-      <Card.Title 
-        title={`Budżet ${mm}-${yy}`} 
-        right={(props) => (
+      <Card.Title
+        title={`Budżet ${mm}-${yy}`}
+        right={props => (
           <Menu
             visible={menuVisible}
             onDismiss={() => setMenuVisible(false)}
@@ -51,8 +51,8 @@ export default function BudgetCard({items = [], date}: BudgetCardProps) {
                 onPress: () => {
                   setMenuVisible(false);
                   router.push('/budget/create-budget');
-                }
-              }
+                },
+              },
             ]}
           />
         )}

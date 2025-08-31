@@ -1,15 +1,18 @@
-import {useEffect, useState, memo, useCallback} from 'react';
+import {
+  useEffect,
+  useState,
+  memo,
+  useCallback,
+  useRef,
+  forwardRef,
+} from 'react';
 import {SafeAreaView, ScrollView, View} from 'react-native';
 import {addDays, addMonths, formatDate} from 'date-fns';
 import {router} from 'expo-router';
 import _ from 'lodash';
-import { TextInput as PaperTextInput } from 'react-native-paper';
+import {TextInput as PaperTextInput} from 'react-native-paper';
 
-import {
-  TextInput,
-  ButtonWithStatus as Button,
-  Text,
-} from '@/components';
+import {TextInput, ButtonWithStatus as Button, Text} from '@/components';
 
 import {useAppDispatch, useAppSelector} from '@/hooks';
 import {sizes, useAppTheme} from '@/constants/theme';
@@ -29,25 +32,41 @@ interface CategoryInputProps {
   category: Subcategory;
   value: string;
   onChangeText: (categoryId: number, text: string) => void;
+  onSubmitEditing?: () => void;
+  returnKeyType?: 'next' | 'done';
 }
 
-const CategoryInput = memo(({category, value, onChangeText}: CategoryInputProps) => {
-  const handleChange = useCallback((text: string) => {
-    onChangeText(category.id, text);
-  }, [category.id, onChangeText]);
+const CategoryInput = memo(
+  forwardRef<any, CategoryInputProps>(
+    (
+      {category, value, onChangeText, onSubmitEditing, returnKeyType = 'next'},
+      ref,
+    ) => {
+      const handleChange = useCallback(
+        (text: string) => {
+          onChangeText(category.id, text);
+        },
+        [category.id, onChangeText],
+      );
 
-  return (
-    <View key={category.id} style={{marginBottom: sizes.md}}>
-      <TextInput
-        label={category.name}
-        value={value}
-        keyboardType="numeric"
-        onChangeText={handleChange}
-        right={<PaperTextInput.Affix text="zł" />}
-      />
-    </View>
-  );
-});
+      return (
+        <View key={category.id} style={{marginBottom: sizes.md}}>
+          <TextInput
+            ref={ref}
+            label={category.name}
+            value={value}
+            keyboardType="numeric"
+            onChangeText={handleChange}
+            right={<PaperTextInput.Affix text="zł" />}
+            returnKeyType={returnKeyType}
+            onSubmitEditing={onSubmitEditing}
+            blurOnSubmit={false}
+          />
+        </View>
+      );
+    },
+  ),
+);
 
 const CreateBudget = () => {
   const categories: Subcategory[] = useAppSelector(selectCategories);
@@ -63,42 +82,69 @@ const CreateBudget = () => {
   const currentMonth = new Date();
   const currentMonthDate = formatDate(currentMonth, 'yyyy-MM');
 
-  const getPrefillAmounts = (budgets: any[], currentMonthDate: string): {[key: number]: string} => {
-    const currentMonthBudgets = budgets.filter(budget => 
-      budget.yearMonth.startsWith(currentMonthDate)
+  const getPrefillAmounts = (
+    budgets: any[],
+    currentMonthDate: string,
+  ): {[key: number]: string} => {
+    const currentMonthBudgets = budgets.filter(budget =>
+      budget.yearMonth.startsWith(currentMonthDate),
     );
-    
+
     const prefillAmounts: {[key: number]: string} = {};
     currentMonthBudgets.forEach(budget => {
       if (budget.categoryId) {
         prefillAmounts[budget.categoryId] = budget.amount.toString();
       }
     });
-    
+
     return prefillAmounts;
   };
 
-  const [budgetAmounts, setBudgetAmounts] = useState<{[key: number]: string}>(() => 
-    getPrefillAmounts(budgets, currentMonthDate)
+  const [budgetAmounts, setBudgetAmounts] = useState<{[key: number]: string}>(
+    () => getPrefillAmounts(budgets, currentMonthDate),
   );
 
   const groupedByMain = _.groupBy(categories, 'groupName');
+  const flatCategories = Object.values(groupedByMain).flat();
+  const inputRefs = useRef<{[key: number]: any}>({});
 
-  const handleAmountChange = useCallback((categoryId: number, amount: string) => {
-    setBudgetAmounts(prev => ({...prev, [categoryId]: amount}));
-  }, []);
+  const handleAmountChange = useCallback(
+    (categoryId: number, amount: string) => {
+      setBudgetAmounts(prev => ({...prev, [categoryId]: amount}));
+    },
+    [],
+  );
+
+  const focusNextInput = useCallback(
+    (currentCategoryId: number) => {
+      const currentIndex = flatCategories.findIndex(
+        cat => cat.id === currentCategoryId,
+      );
+      const nextIndex = currentIndex + 1;
+
+      if (nextIndex < flatCategories.length) {
+        const nextCategoryId = flatCategories[nextIndex].id;
+        inputRefs.current[nextCategoryId]?.focus();
+      }
+    },
+    [flatCategories],
+  );
 
   const handleSave = async () => {
     const budgetsToSave = Object.entries(budgetAmounts)
-      .filter(([_, amount]) => amount && amount.trim() !== '' && parseInt(amount) > 0)
+      .filter(
+        ([_, amount]) => amount && amount.trim() !== '' && parseInt(amount) > 0,
+      )
       .map(([categoryId, amount]) => ({
         amount: parseInt(amount),
         date: budgetDate,
-        categoryId: parseInt(categoryId)
+        categoryId: parseInt(categoryId),
       }));
 
     if (budgetsToSave.length === 0) {
-      dispatch(setSnackbar({open: true, msg: 'Nie wprowadzono żadnych budżetów'}));
+      dispatch(
+        setSnackbar({open: true, msg: 'Nie wprowadzono żadnych budżetów'}),
+      );
       return;
     }
 
@@ -117,30 +163,51 @@ const CreateBudget = () => {
   return (
     <SafeAreaView>
       <ScrollView style={{padding: sizes.xl}}>
-        <Text variant="bodyLarge" style={{textAlign: 'center', marginBottom: sizes.xl}}>
+        <Text
+          variant="bodyLarge"
+          style={{textAlign: 'center', marginBottom: sizes.xl}}
+        >
           Nowy Budżet {mm}-{yy}
         </Text>
-        
+
         {Object.entries(groupedByMain).map(([groupName, subcategories]) => (
           <View key={groupName} style={{marginBottom: sizes.lg}}>
-            <Text variant="bodyMedium" style={{marginBottom: sizes.md, color: t.colors.primary}}>
+            <Text
+              variant="bodyMedium"
+              style={{marginBottom: sizes.md, color: t.colors.primary}}
+            >
               {groupName}
             </Text>
-            {subcategories.map((category) => (
-              <CategoryInput
-                key={category.id}
-                category={category}
-                value={budgetAmounts[category.id] || ''}
-                onChangeText={handleAmountChange}
-              />
-            ))}
+            {subcategories.map(category => {
+              const isLastInput =
+                flatCategories[flatCategories.length - 1].id === category.id;
+              return (
+                <CategoryInput
+                  key={category.id}
+                  ref={ref => {
+                    if (ref) {
+                      inputRefs.current[category.id] = ref;
+                    }
+                  }}
+                  category={category}
+                  value={budgetAmounts[category.id] || ''}
+                  onChangeText={handleAmountChange}
+                  onSubmitEditing={() => focusNextInput(category.id)}
+                  returnKeyType={isLastInput ? 'done' : 'next'}
+                />
+              );
+            })}
           </View>
         ))}
-        
+
         <Button
           mode="contained"
           onPress={handleSave}
-          style={{marginTop: sizes.lg, alignSelf: 'center', marginBottom: sizes.xxxl}}
+          style={{
+            marginTop: sizes.lg,
+            alignSelf: 'center',
+            marginBottom: sizes.xxxl,
+          }}
         >
           Zapisz budżet
         </Button>
