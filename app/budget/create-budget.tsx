@@ -34,12 +34,20 @@ interface CategoryInputProps {
   onChangeText: (categoryId: number, text: string) => void;
   onSubmitEditing?: () => void;
   returnKeyType?: 'next' | 'done';
+  containerRef?: (ref: View | null) => void;
 }
 
 const CategoryInput = memo(
   forwardRef<any, CategoryInputProps>(
     (
-      {category, value, onChangeText, onSubmitEditing, returnKeyType = 'next'},
+      {
+        category,
+        value,
+        onChangeText,
+        onSubmitEditing,
+        returnKeyType = 'next',
+        containerRef,
+      },
       ref,
     ) => {
       const handleChange = useCallback(
@@ -50,7 +58,11 @@ const CategoryInput = memo(
       );
 
       return (
-        <View key={category.id} style={{marginBottom: sizes.md}}>
+        <View
+          key={category.id}
+          style={{marginBottom: sizes.md}}
+          ref={containerRef}
+        >
           <TextInput
             ref={ref}
             label={category.name}
@@ -107,6 +119,8 @@ const CreateBudget = () => {
   const groupedByMain = _.groupBy(categories, 'groupName');
   const flatCategories = Object.values(groupedByMain).flat();
   const inputRefs = useRef<{[key: number]: any}>({});
+  const containerRefs = useRef<{[key: number]: View | null}>({});
+  const scrollViewRef = useRef<ScrollView>(null);
 
   const handleAmountChange = useCallback(
     (categoryId: number, amount: string) => {
@@ -114,6 +128,29 @@ const CreateBudget = () => {
     },
     [],
   );
+
+  const scrollToInput = useCallback((categoryId: number) => {
+    const containerView = containerRefs.current[categoryId];
+    const scrollView = scrollViewRef.current;
+
+    if (containerView && scrollView) {
+      // Add a small delay to ensure the focus is complete
+      setTimeout(() => {
+        containerView.measureLayout(
+          scrollView,
+          (x, y, width, height) => {
+            // Scroll to position with some padding (100px above the input)
+            const scrollY = Math.max(0, y - 100);
+            scrollView.scrollTo({y: scrollY, animated: true});
+          },
+          () => {
+            // Fallback if measureLayout fails
+            console.log('Failed to measure layout for scroll');
+          },
+        );
+      }, 100);
+    }
+  }, []);
 
   const focusNextInput = useCallback(
     (currentCategoryId: number) => {
@@ -125,9 +162,10 @@ const CreateBudget = () => {
       if (nextIndex < flatCategories.length) {
         const nextCategoryId = flatCategories[nextIndex].id;
         inputRefs.current[nextCategoryId]?.focus();
+        scrollToInput(nextCategoryId);
       }
     },
-    [flatCategories],
+    [flatCategories, scrollToInput],
   );
 
   const handleSave = async () => {
@@ -162,7 +200,7 @@ const CreateBudget = () => {
 
   return (
     <SafeAreaView>
-      <ScrollView style={{padding: sizes.xl}}>
+      <ScrollView ref={scrollViewRef} style={{padding: sizes.xl}}>
         <Text
           variant="bodyLarge"
           style={{textAlign: 'center', marginBottom: sizes.xl}}
@@ -188,6 +226,9 @@ const CreateBudget = () => {
                     if (ref) {
                       inputRefs.current[category.id] = ref;
                     }
+                  }}
+                  containerRef={ref => {
+                    containerRefs.current[category.id] = ref;
                   }}
                   category={category}
                   value={budgetAmounts[category.id] || ''}
