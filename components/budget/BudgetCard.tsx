@@ -1,13 +1,16 @@
-import {Card, ProgressBar} from 'react-native-paper';
+import {Card, ProgressBar, IconButton} from 'react-native-paper';
 import {StyleSheet, View} from 'react-native';
+import {useState} from 'react';
+import {router} from 'expo-router';
 
-import {Text} from '..';
+import {Text, Menu} from '..';
 import {sizes, useAppTheme} from '@/constants/theme';
 import {formatPrice} from '@/common';
 import {BudgetCardProps} from '@/utils/types';
 
 export default function BudgetCard({items = [], date}: BudgetCardProps) {
   const t = useAppTheme();
+  const [menuVisible, setMenuVisible] = useState(false);
   // three stages of color based of percentage
   const getColor = (percentage: number) => {
     if (percentage > 0.9) {
@@ -28,7 +31,32 @@ export default function BudgetCard({items = [], date}: BudgetCardProps) {
 
   return (
     <Card>
-      <Card.Title title={`Budżet ${mm}-${yy}`} />
+      <Card.Title 
+        title={`Budżet ${mm}-${yy}`} 
+        right={(props) => (
+          <Menu
+            visible={menuVisible}
+            onDismiss={() => setMenuVisible(false)}
+            closeMenu={() => setMenuVisible(false)}
+            anchor={
+              <IconButton
+                {...props}
+                icon="dots-vertical"
+                onPress={() => setMenuVisible(true)}
+              />
+            }
+            items={[
+              {
+                title: 'Dodaj nowy budżet',
+                onPress: () => {
+                  setMenuVisible(false);
+                  router.push('/budget/create-budget');
+                }
+              }
+            ]}
+          />
+        )}
+      />
       <Card.Content>
         {items.map(item => (
           <View key={item.id} style={styles.mainContentBox}>

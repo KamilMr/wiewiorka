@@ -281,3 +281,23 @@ export const uploadBudget = createAsyncThunk<any, Budget, {state: RootState}>(
     setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
   },
 );
+
+export const uploadMultiBudgets = createAsyncThunk<any, Budget[], {state: RootState}>(
+  'budget/uploadMulti',
+  async (budgets: Budget[], thunkAPI): Promise<void> => {
+    const token = thunkAPI.getState().auth.token;
+
+    let data;
+    let resp = await fetch(getURL('budget'), {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-type': 'application/json',
+      },
+      body: JSON.stringify(budgets),
+    });
+    data = await resp.json();
+    if (data.err) throw data.err;
+    setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
+  },
+);
