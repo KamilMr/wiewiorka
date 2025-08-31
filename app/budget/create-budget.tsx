@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useState, memo, useCallback} from 'react';
 import {SafeAreaView, ScrollView, View} from 'react-native';
 import {addDays, addMonths, formatDate} from 'date-fns';
 import {router} from 'expo-router';
@@ -25,6 +25,30 @@ interface Subcategory {
   groupId: number;
 }
 
+interface CategoryInputProps {
+  category: Subcategory;
+  value: string;
+  onChangeText: (categoryId: number, text: string) => void;
+}
+
+const CategoryInput = memo(({category, value, onChangeText}: CategoryInputProps) => {
+  const handleChange = useCallback((text: string) => {
+    onChangeText(category.id, text);
+  }, [category.id, onChangeText]);
+
+  return (
+    <View key={category.id} style={{marginBottom: sizes.md}}>
+      <TextInput
+        label={category.name}
+        value={value}
+        keyboardType="numeric"
+        onChangeText={handleChange}
+        right={<PaperTextInput.Affix text="zł" />}
+      />
+    </View>
+  );
+});
+
 const CreateBudget = () => {
   const categories: Subcategory[] = useAppSelector(selectCategories);
   const budgets = useAppSelector(state => state.main.budgets);
@@ -35,14 +59,11 @@ const CreateBudget = () => {
   const budgetDate = formatDate(addMonths(new Date(), 1), 'yyyy-MM-dd');
   const [yy, mm] = budgetDate.split('-');
 
-  const [budgetAmounts, setBudgetAmounts] = useState<{[key: number]: string}>({});
-
   // Get current month's date (previous month relative to new budget)
   const currentMonth = new Date();
   const currentMonthDate = formatDate(currentMonth, 'yyyy-MM');
 
-  useEffect(() => {
-    // Prefill with current month's budget values
+  const getPrefillAmounts = (budgets: any[], currentMonthDate: string): {[key: number]: string} => {
     const currentMonthBudgets = budgets.filter(budget => 
       budget.yearMonth.startsWith(currentMonthDate)
     );
@@ -54,14 +75,18 @@ const CreateBudget = () => {
       }
     });
     
-    setBudgetAmounts(prefillAmounts);
-  }, [budgets, currentMonthDate]);
+    return prefillAmounts;
+  };
+
+  const [budgetAmounts, setBudgetAmounts] = useState<{[key: number]: string}>(() => 
+    getPrefillAmounts(budgets, currentMonthDate)
+  );
 
   const groupedByMain = _.groupBy(categories, 'groupName');
 
-  const handleAmountChange = (categoryId: number, amount: string) => {
+  const handleAmountChange = useCallback((categoryId: number, amount: string) => {
     setBudgetAmounts(prev => ({...prev, [categoryId]: amount}));
-  };
+  }, []);
 
   const handleSave = async () => {
     const budgetsToSave = Object.entries(budgetAmounts)
@@ -92,25 +117,22 @@ const CreateBudget = () => {
   return (
     <SafeAreaView>
       <ScrollView style={{padding: sizes.xl}}>
-        <Text variant="headlineMedium" style={{textAlign: 'center', marginBottom: sizes.xl}}>
+        <Text variant="bodyLarge" style={{textAlign: 'center', marginBottom: sizes.xl}}>
           Nowy Budżet {mm}-{yy}
         </Text>
         
         {Object.entries(groupedByMain).map(([groupName, subcategories]) => (
           <View key={groupName} style={{marginBottom: sizes.lg}}>
-            <Text variant="titleLarge" style={{marginBottom: sizes.md, color: t.colors.primary}}>
+            <Text variant="bodyMedium" style={{marginBottom: sizes.md, color: t.colors.primary}}>
               {groupName}
             </Text>
             {subcategories.map((category) => (
-              <View key={category.id} style={{marginBottom: sizes.md}}>
-                <TextInput
-                  label={category.name}
-                  value={budgetAmounts[category.id] || ''}
-                  keyboardType="numeric"
-                  onChangeText={(text) => handleAmountChange(category.id, text)}
-                  right={<PaperTextInput.Affix text="zł" />}
-                />
-              </View>
+              <CategoryInput
+                key={category.id}
+                category={category}
+                value={budgetAmounts[category.id] || ''}
+                onChangeText={handleAmountChange}
+              />
             ))}
           </View>
         ))}
