@@ -12,9 +12,16 @@ import {Provider as PaperProvider} from 'react-native-paper';
 import {store, persistor} from '@/redux/store';
 import {paperTheme} from '@/constants/theme';
 import {SnackBar} from '@/components';
+import {useSync} from '@/hooks';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
+
+const Sync = () => {
+  useSync();
+
+  return null;
+};
 
 const RootLayout = () => {
   const [loaded] = useFonts({
@@ -35,6 +42,7 @@ const RootLayout = () => {
     <GestureHandlerRootView style={{flex: 1}}>
       <Provider store={store}>
         <PersistGate persistor={persistor}>
+          <Sync />
           <PaperProvider theme={paperTheme}>
             <Stack initialRouteName="(tabs)">
               <Stack.Screen name="sign-in" options={{headerShown: false}} />

@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "wiewiorka",
+    "name": "Wiewiorka",
     "slug": "wiewiorka",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -13,7 +13,8 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.mrek.wiewiorka"
     },
     "android": {
       "adaptiveIcon": {

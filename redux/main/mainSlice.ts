@@ -11,12 +11,11 @@ import {
   handleDeleteCategory,
   handleDeleteGroupCategory,
   handleGroupCategory,
-  uploadExpense,
   uploadFile,
-  uploadIncome,
 } from './thunks';
 import aggregateDataByDay from '../../utils/aggregateData';
 import {MainSlice, Income, Expense} from '@/types';
+import {printJsonIndent} from '@/common';
 
 const emptyState = (): MainSlice => ({
   status: 'idle',
@@ -74,38 +73,124 @@ const mainSlice = createSlice({
       ];
     },
     updateExpense: (state, action) => {
-      const exp = action.payload;
-      const expIdx = state.expenses.findIndex(ex => ex.id === exp[0].id);
-      const stateNew = state.expenses.slice();
-      stateNew.splice(expIdx, 1);
-
-      state.expenses = [
-        ...stateNew,
-        ...exp.map((ex: Expense) => ({
-          ...ex,
-          date: format(ex.date, 'yyyy-MM-dd'),
+      const expense = action.payload;
+      const expIdx = state.expenses.findIndex(ex => ex.id === expense.id);
+      if (expIdx !== -1) {
+        state.expenses[expIdx] = {
+          ...expense,
+          date: format(expense.date, 'yyyy-MM-dd'),
+        };
+      }
+    },
+    addIncome: (state, action) => {
+      state.incomes = [
+        ...state.incomes,
+        ...action.payload.map((inc: Income) => ({
+          ...inc,
+          date: format(inc.date, 'yyyy-MM-dd'),
         })),
       ];
     },
-    addIncome: (state, action) => {
-      if (!action.payload?.length) return;
-      state.incomes = action.payload.map((inc: Income) => ({
-        ...inc,
-        date: format(inc.date, 'yyyy-MM-dd'),
-      }));
-
-      state.sources = action.payload.income.reduce(
-        (pv: {[key: string]: string[]}, cv: Income) => {
-          pv[cv.owner] ??= [];
-          if (!pv[cv.owner].includes(cv.source)) pv[cv.owner].push(cv.source);
-          return pv;
-        },
-        {},
-      );
+    addBudgets: (state, action) => {
+      printJsonIndent('addBudgets called with:', action.payload);
+      state.budgets = [
+        ...state.budgets,
+        ...action.payload.map((budget: any) => ({
+          ...budget,
+          yearMonth: budget.date
+            ? format(budget.date, 'yyyy-MM-dd')
+            : budget.yearMonth,
+        })),
+      ];
+      printJsonIndent('addBudgets: New budgets state:', state.budgets);
+    },
+    updateBudget: (state, action) => {
+      const {id, ...data} = action.payload;
+      const budgetIndex = state.budgets.findIndex(budget => budget.id === id);
+      if (budgetIndex !== -1) {
+        state.budgets[budgetIndex] = {
+          ...state.budgets[budgetIndex],
+          ...data,
+        };
+      }
+    },
+    deleteBudget: (state, action) => {
+      const {id} = action.payload;
+      const budgetIndex = state.budgets.findIndex(budget => budget.id === id);
+      if (budgetIndex !== -1) {
+        state.budgets.splice(budgetIndex, 1);
+      }
+    },
+    updateIncome: (state, action) => {
+      const income = action.payload;
+      const incIdx = state.incomes.findIndex(inc => inc.id === income.id);
+      if (incIdx !== -1) {
+        state.incomes[incIdx] = {
+          ...income,
+          date: format(income.date, 'yyyy-MM-dd'),
+        };
+      }
     },
     dropMain: () => emptyState(),
     removeExpense: (state, action) => {
       state.expenses = state.expenses.filter(exp => exp.id !== action.payload);
+    },
+    replaceExpense: (state, action) => {
+      const {frontendId, resp} = action.payload;
+      const expenseIndex = state.expenses.findIndex(
+        exp => exp.id === frontendId,
+      );
+      if (expenseIndex !== -1) {
+        state.expenses[expenseIndex] = {
+          ...state.expenses[expenseIndex],
+          ...resp,
+        }; // TODO: use object.asign
+      }
+    },
+    replaceIncome: (state, action) => {
+      const {frontendId, resp} = action.payload;
+      const incomeIndex = state.incomes.findIndex(inc => inc.id === frontendId);
+      if (incomeIndex !== -1) {
+        state.incomes[incomeIndex] = {...state.incomes[incomeIndex], ...resp};
+      }
+    },
+    replaceBudget: (state, action) => {
+      const {frontendId, resp} = action.payload;
+      printJsonIndent('replaceBudget called with:', {frontendId, resp});
+
+      if (Array.isArray(resp)) {
+        // Remove all budgets with matching frontendId prefix
+        state.budgets = state.budgets.filter(
+          budget => !budget.id.startsWith(frontendId),
+        );
+        // Add the new budgets from server with proper yearMonth field
+        const transformedBudgets = resp.map((budget: any) => ({
+          ...budget,
+          yearMonth: budget.date
+            ? budget.date.substring(0, 7)
+            : budget.yearMonth,
+        }));
+        state.budgets = [...state.budgets, ...transformedBudgets];
+        printJsonIndent(
+          'Replaced multiple budgets, new budget count:',
+          state.budgets.length,
+        );
+      } else {
+        const budgetIndex = state.budgets.findIndex(
+          budget => budget.id === frontendId,
+        );
+        if (budgetIndex !== -1) {
+          const transformedBudget = {
+            ...resp,
+            yearMonth: resp.date ? resp.date.substring(0, 7) : resp.yearMonth,
+          };
+          state.budgets[budgetIndex] = {
+            ...state.budgets[budgetIndex],
+            ...transformedBudget,
+          };
+          console.log('Replaced single budget at index:', budgetIndex);
+        }
+      }
     },
   },
   extraReducers: builder => {
@@ -149,16 +234,6 @@ const mainSlice = createSlice({
         state.snackbar.type = 'error';
         state.snackbar.msg = action.error.message ?? 'Coś poszło nie tak';
       })
-      .addCase(uploadExpense.fulfilled, (state, action) => {
-        state.snackbar.open = true;
-        state.snackbar.type = 'info';
-        state.snackbar.msg = 'Zapisano wydatek';
-      })
-      .addCase(uploadExpense.rejected, (state, action) => {
-        state.snackbar.open = true;
-        state.snackbar.type = 'error';
-        state.snackbar.msg = action.error.message ?? 'Coś poszło nie tak';
-      })
       .addCase(deleteExpense.fulfilled, (state, action) => {
         state.snackbar.open = true;
         state.snackbar.type = 'info';
@@ -167,16 +242,6 @@ const mainSlice = createSlice({
       .addCase(deleteExpense.rejected, (state, action) => {
         state.snackbar.open = true;
         state.snackbar.type = 'info';
-        state.snackbar.msg = action.error.message ?? 'Coś poszło nie tak';
-      })
-      .addCase(uploadIncome.fulfilled, (state, action) => {
-        state.snackbar.open = true;
-        state.snackbar.type = 'info';
-        state.snackbar.msg = 'Zapisano wpływ';
-      })
-      .addCase(uploadIncome.rejected, (state, action) => {
-        state.snackbar.open = true;
-        state.snackbar.type = 'error';
         state.snackbar.msg = action.error.message ?? 'Coś poszło nie tak';
       })
       .addCase(deleteIncome.fulfilled, (state, action) => {
@@ -208,15 +273,22 @@ const mainSlice = createSlice({
 });
 
 export const {
+  addBudgets,
   addExpense,
   addIncome,
+  deleteBudget,
   dropMain,
   initState,
   removeExpense,
+  replaceBudget,
+  replaceExpense,
+  replaceIncome,
   setSnackbar,
   startLoading,
   stopLoading,
+  updateBudget,
   updateExpense,
+  updateIncome,
 } = mainSlice.actions;
 
 export {emptyState as mainEmptyState};

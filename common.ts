@@ -1,6 +1,7 @@
 import {formatDate, isAfter, isBefore, isSameDay, parse} from 'date-fns';
 import {NativeScrollEvent, NativeSyntheticEvent} from 'react-native';
 import uniqueId from 'react-native-uuid';
+import formatDateTz, {timeFormats} from './utils/formatTimeTz';
 
 const URL = process.env.EXPO_PUBLIC_API_URL;
 
@@ -98,18 +99,57 @@ const normalize = (str: string): string => {
   });
 };
 
-const printJsonIndent = (title: string, obj: any) => {
-  console.log(title, JSON.stringify(obj, null, 2));
+const printJsonIndent = (arg1: string | object, arg2?: object) => {
+  if (typeof arg1 === 'object') {
+    arg2 = arg1;
+    arg1 = 'log: ';
+  }
+  console.log(arg1, JSON.stringify(arg2, null, 2));
+};
+
+const makeRandomId = (length: number): string => {
+  const chars =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+};
+
+const isFirstBeforeSecond = (date1: string | Date, date2: string | Date) => {
+  const d1 =
+    typeof date1 === 'string' ? parse(date1, 'yyyy-MM-dd', new Date()) : date1;
+  const d2 =
+    typeof date2 === 'string' ? parse(date2, 'yyyy-MM-dd', new Date()) : date2;
+
+  if (!(d1 instanceof Date) || !(d2 instanceof Date)) {
+    throw new Error('Invalid date format');
+  }
+
+  return isBefore(d1, d2);
+};
+
+const formatToDashDate = (d: string | Date) => {
+  const d1 = typeof d === 'string' ? parse(d, 'yyyy-MM-dd', new Date()) : d;
+  if (!(d1 instanceof Date)) {
+    throw new Error('Invalid date format');
+  }
+
+  return formatDateTz({date: d1, pattern: timeFormats.dateOnly2});
 };
 
 export {
   convertDate,
   dh,
   formatPrice,
+  formatToDashDate,
   generateColor,
   getURL,
   isCloseToBottom,
+  isFirstBeforeSecond,
   makeNewIdArr,
+  makeRandomId,
   normalize,
   printJsonIndent,
   shortenText,

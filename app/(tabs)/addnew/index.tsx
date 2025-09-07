@@ -22,10 +22,12 @@ import {SelectRadioButtons} from '@/components/addnew/SelectRadioButtons';
 import {RemainingAmountDisplay} from '@/components/addnew/RemainingAmountDisplay';
 import {sizes} from '@/constants/theme';
 import {
+  addNewExpense,
   deleteExpense,
   deleteIncome,
-  uploadExpense,
-  uploadIncome,
+  updateExpense,
+  addNewIncome,
+  updateIncome,
 } from '@/redux/main/thunks';
 import {useAppDispatch, useAppSelector} from '@/hooks';
 import {
@@ -34,8 +36,9 @@ import {
   selectIncome,
   selectSources,
 } from '@/redux/main/selectors';
+import {Expense} from '@/types';
 
-const initState = (date = new Date()) => ({
+const initState = (date = new Date(), categories: any[] = []) => ({
   description: '',
   date,
   price: '',
@@ -74,14 +77,14 @@ export default function AddNew() {
       ? selectExpense(+id)(state)
       : selectIncome(+id)(state),
   );
-  const [form, setForm] = useState(initState());
+  const [form, setForm] = useState(initState(new Date(), expenseCategories));
 
   const isDataTheSame = () => {
     return _.isEqual(dirty.current, form);
   };
 
   const cleanState = () => {
-    setForm(initState());
+    setForm(initState(new Date(), expenseCategories));
     dirty.current = {};
     setNewCustomIncome(null);
     setType('expense');
@@ -155,7 +158,6 @@ export default function AddNew() {
 
   const handleSelectCategory = (category: {label: string; value: string}) => {
     if (category.value === 'Dodaj nową kategorię') {
-      console.log('dodaj nową kategorię');
     } else {
       setForm({...form, category: category.value});
       if (!form.price) return focusRef.current?.focus();
@@ -227,17 +229,19 @@ export default function AddNew() {
   };
 
   const handleNavigateBack = () => {
-    setForm(initState());
+    setForm(initState(new Date(), expenseCategories));
     dirty.current = {};
     router.navigate('/(tabs)/records');
   };
 
   const handleSave = async () => {
-    console.log(type, isSplit);
     if (type === 'expense' && isSplit) {
       // Handle split expenses - save multiple expenses
       const savePromises = splitItems.map(item => {
-        const dataToSave = {
+        const dataToSave: Pick<
+          Expense,
+          'id' | 'date' | 'price' | 'categoryId' | 'description'
+        > = {
           id: '',
           date: formatDate(form.date, 'yyyy-MM-dd'),
           price: +item.price,
@@ -245,18 +249,16 @@ export default function AddNew() {
             expenseCategories.find(cat => cat.name === item.category)?.id || 0,
         };
         if (item.description) dataToSave.description = item.description;
-        return dispatch(uploadExpense(dataToSave)).unwrap();
+        return dispatch(addNewExpense(dataToSave));
       });
 
       try {
         await Promise.all(savePromises);
-        setForm(initState());
+        setForm(initState(new Date(), expenseCategories));
         setIsSplit(false);
         setSplitItems([initSplitItem(), initSplitItem()]);
         router.navigate('/(tabs)/records');
-      } catch (error) {
-        console.error('Error saving split expenses:', error);
-      }
+      } catch (error) {}
     } else {
       // Handle single expense or income
       let dataToSave;
@@ -284,12 +286,16 @@ export default function AddNew() {
       }
       dispatch(
         type === 'expense'
-          ? uploadExpense(dataToSave)
-          : uploadIncome(dataToSave),
+          ? isPasRecord
+            ? updateExpense(dataToSave)
+            : addNewExpense(dataToSave)
+          : isPasRecord
+            ? updateIncome(dataToSave)
+            : addNewIncome(dataToSave),
       )
         .unwrap()
         .then(() => {
-          setForm(initState());
+          setForm(initState(new Date(), expenseCategories));
           router.navigate('/(tabs)/records');
         });
     }

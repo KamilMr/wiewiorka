@@ -9,10 +9,12 @@ import mainReducer, {
   startLoading,
   stopLoading,
 } from './main/mainSlice';
+import syncReducer, {syncEmptyState, dropSync} from './sync/syncSlice';
 
 const rootReducer = combineReducers({
   auth: authReducer,
   main: mainReducer,
+  sync: syncReducer,
 });
 
 const authMiddleware =
@@ -20,6 +22,7 @@ const authMiddleware =
     if (['session_not_active', 'not_auth'].includes(action.error?.message)) {
       store.dispatch(dropMe());
       store.dispatch(dropMain());
+      store.dispatch(dropSync());
     }
     return next(action);
   };
@@ -45,13 +48,21 @@ const migrations = {
       main: mainEmptyState(),
     };
   },
+  5: (state: any) => {
+    return {
+      ...state,
+      auth: authEmptyState(),
+      main: mainEmptyState(),
+      sync: syncEmptyState(),
+    };
+  },
 };
 
 const persistConfig = {
   key: 'squirrel',
-  version: 4,
+  version: 5,
   storage: AsyncStorage,
-  whitelist: ['auth', 'main'],
+  whitelist: ['auth', 'main', 'sync'],
   migrate: createMigrate(migrations, {debug: false}),
 };
 

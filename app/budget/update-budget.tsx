@@ -87,7 +87,7 @@ const CreateBudget = () => {
   const categories: Subcategory[] = useAppSelector(selectCategories);
   const {date: budgetDate}: {date: string} = useLocalSearchParams();
   const budgets: BudgetCardItem[] = useAppSelector(
-    selectBudgets(formatToDashDate(subMonths(new Date(budgetDate), 1))),
+    selectBudgets(formatToDashDate(new Date(budgetDate))),
   );
   const dispatch = useAppDispatch();
   const t = useAppTheme();
@@ -172,6 +172,7 @@ const CreateBudget = () => {
           foundCategory
         ) {
           acc.push({
+            id: budgets.find(b => b.budgetedName === categoryName)?.id,
             amount: numAmount,
             date: budgetDate,
             categoryId: foundCategory.id,
@@ -191,7 +192,7 @@ const CreateBudget = () => {
     }
 
     try {
-      dispatch(createUpdateBudget(budgetsToSave));
+      await dispatch(createUpdateBudget(budgetsToSave)).unwrap();
       router.back();
     } catch (error: any) {
       let message = 'Wystąpił błąd podczas zapisywania budżetu';

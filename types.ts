@@ -26,8 +26,8 @@ export interface Income {
 }
 
 export interface Expense {
-  id: number;
-  description: string;
+  id: number | string;
+  description: string | null;
   date: string;
   price: number;
   categoryId: number;
@@ -69,4 +69,24 @@ export interface MainSlice {
   _aggregated: AggregatedData;
   sources: {[key: string]: string[]};
   snackbar: Snackbar;
+}
+
+export interface SyncOperation {
+  id: string;
+  path: string[];
+  method: 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+  cb?: string;
+  data?: any;
+  timestamp: number;
+  retryCount: number;
+  handler: string;
+  frontendId?: string;
+}
+
+export interface SyncSlice {
+  pendingOperations: SyncOperation[];
+  isSyncing: boolean;
+  lastSyncTimestamp: number | null;
+  syncErrors: {[operationId: string]: string};
+  shouldReload: boolean;
 }

@@ -1,20 +1,20 @@
 import React, {useEffect} from 'react';
 import {Redirect, Tabs} from 'expo-router';
-import {TouchableOpacity} from 'react-native';
-
-import {ActivityIndicator} from 'react-native-paper';
+import {View, StyleSheet} from 'react-native';
 
 import {selectToken} from '@/redux/auth/authSlice';
 import {fetchIni} from '@/redux/main/thunks';
 import {useAppDispatch, useAppSelector} from '@/hooks';
 import {TabBarIcon} from '@/components/navigation/TabBarIcon';
 import {sizes} from '@/constants/theme';
-import {selectStatus} from '@/redux/main/selectors';
+import {selectOperations} from '@/redux/sync/syncSlice';
+import {useNetInfo} from '@react-native-community/netinfo';
 
 export default function TabLayout() {
   const token = useAppSelector(selectToken);
-  const fetching = useAppSelector(selectStatus);
+  const operations = useAppSelector(selectOperations);
   const dispatch = useAppDispatch();
+  const netInfo = useNetInfo();
 
   useEffect(() => {
     if (!token) return;
@@ -23,9 +23,30 @@ export default function TabLayout() {
 
   if (!token) return <Redirect href="/sign-in" />;
 
-  const handleFetch = async () => {
-    if (fetching === 'fetching') return;
-    dispatch(fetchIni());
+  const getStatusDotColor = () => {
+    if (!netInfo.isConnected) return '#666666';
+    if (netInfo.isInternetReachable === false) return '#FFA500';
+    if (operations.length > 0) return '#4CAF50';
+    return '#4CAF50';
+  };
+
+  const getStatusDotStyle = () => {
+    const baseStyle = {
+      width: 20,
+      height: 20,
+      borderRadius: 10,
+      backgroundColor: getStatusDotColor(),
+    };
+
+    if (netInfo.isConnected && operations.length > 0) {
+      return {
+        ...baseStyle,
+        borderWidth: 2,
+        borderColor: '#FFA500',
+      };
+    }
+
+    return baseStyle;
   };
 
   return (
@@ -36,13 +57,7 @@ export default function TabLayout() {
         tabBarShowLabel: false,
         headerRightContainerStyle: {paddingRight: sizes.xxl},
         headerRight: () => {
-          return fetching === 'idle' ? (
-            <TouchableOpacity onPress={handleFetch}>
-              <TabBarIcon name="reload" />
-            </TouchableOpacity>
-          ) : (
-            <ActivityIndicator />
-          );
+          return <View style={getStatusDotStyle()} />;
         },
       }}
     >
@@ -89,3 +104,5 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({});

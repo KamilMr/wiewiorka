@@ -9,6 +9,7 @@ type BudgetCardItem = {
   budgetedName: string;
   amount: number;
   allocated: number;
+  yearMonth: string;
 };
 
 type BudgetCardProps = {

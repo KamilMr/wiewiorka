@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "expo start",
+    "dev": "node scripts/setup-ip.js && expo start",
     "reset-project": "node ./scripts/reset-project.js",
     "start-clean": "chmod +x ./scripts/clean-cache.sh && ./scripts/clean-cache.sh",
     "android": "expo run:android",
@@ -12,6 +12,9 @@
     "web": "expo start --web",
     "test": "jest --watchAll",
     "build": "eas build -p android --profile preview",
+    "build:dev": "eas build --profile development",
+    "build:staging": "eas build --profile preview",
+    "build:prod": "eas build --profile production",
     "lint": "expo lint",
     "format": "prettier --write ."
   },
@@ -19,8 +22,10 @@
     "preset": "jest-expo"
   },
   "dependencies": {
+    "@date-fns/tz": "^1.4.1",
     "@expo/vector-icons": "^14.1.0",
     "@react-native-async-storage/async-storage": "2.1.2",
+    "@react-native-community/netinfo": "^11.4.1",
     "@react-navigation/native": "^7.1.17",
     "@reduxjs/toolkit": "^2.8.2",
     "date-fns": "^4.1.0",
@@ -71,5 +76,6 @@
     "react-test-renderer": "^18.3.1",
     "typescript": "^5.9.2"
   },
-  "private": true
+  "private": true,
+  "packageManager": "pnpm@10.15.1+sha512.34e538c329b5553014ca8e8f4535997f96180a1d0f614339357449935350d924e22f8614682191264ec33d1462ac21561aff97f6bb18065351c162c7e8f6de67"
 }

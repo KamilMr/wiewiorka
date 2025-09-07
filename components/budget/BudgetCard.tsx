@@ -50,7 +50,10 @@ export default function BudgetCard({items = [], date}: BudgetCardProps) {
                 title: 'Dodaj nowy budżet',
                 onPress: () => {
                   setMenuVisible(false);
-                  router.push('/budget/create-budget');
+                  router.push({
+                    pathname: '/budget/create-budget',
+                    params: {date},
+                  });
                 },
               },
             ]}

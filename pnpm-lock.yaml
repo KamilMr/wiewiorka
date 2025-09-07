@@ -7,12 +7,18 @@ settings:
 importers:
   .:
     dependencies:
+      '@date-fns/tz':
+        specifier: ^1.4.1
+        version: 1.4.1
       '@expo/vector-icons':
         specifier: ^14.1.0
         version: 14.1.0(expo-font@13.3.2(expo@53.0.20(@babel/core@7.28.3)(@expo/metro-runtime@5.0.4(react-native@0.79.2(@babel/core@7.28.3)(@types/react@18.3.23)(react@19.0.0)))(react-native@0.79.2(@babel/core@7.28.3)(@types/react@18.3.23)(react@19.0.0))(react@19.0.0))(react@19.0.0))(react-native@0.79.2(@babel/core@7.28.3)(@types/react@18.3.23)(react@19.0.0))(react@19.0.0)
       '@react-native-async-storage/async-storage':
         specifier: 2.1.2
         version: 2.1.2(react-native@0.79.2(@babel/core@7.28.3)(@types/react@18.3.23)(react@19.0.0))
+      '@react-native-community/netinfo':
+        specifier: ^11.4.1
+        version: 11.4.1(react-native@0.79.2(@babel/core@7.28.3)(@types/react@18.3.23)(react@19.0.0))
       '@react-navigation/native':
         specifier: ^7.1.17
         version: 7.1.17(react-native@0.79.2(@babel/core@7.28.3)(@types/react@18.3.23)(react@19.0.0))(react@19.0.0)
@@ -965,6 +971,12 @@ packages:
     peerDependencies:
       react: '>=16.3.0'
 
+  '@date-fns/tz@1.4.1':
+    resolution:
+      {
+        integrity: sha512-P5LUNhtbj6YfI3iJjw5EL9eUAG6OitD0W3fWQcpQjDRc/QIsL0tRNuO1PcDvPccWL1fSTXXdE1ds+l95DV/OFA==,
+      }
+
   '@egjs/hammerjs@2.0.17':
     resolution:
       {
@@ -1522,6 +1534,14 @@ packages:
       }
     peerDependencies:
       react-native: ^0.0.0-0 || >=0.65 <1.0
+
+  '@react-native-community/netinfo@11.4.1':
+    resolution:
+      {
+        integrity: sha512-B0BYAkghz3Q2V09BF88RA601XursIEA111tnc2JOaN7axJWmNefmfjZqw/KdSxKZp7CZUuPpjBmz/WCR9uaHYg==,
+      }
+    peerDependencies:
+      react-native: '>=0.59'
 
   '@react-native/assets-registry@0.79.2':
     resolution:
@@ -8885,6 +8905,8 @@ snapshots:
       hoist-non-react-statics: 3.3.2
       react: 19.0.0
 
+  '@date-fns/tz@1.4.1': {}
+
   '@egjs/hammerjs@2.0.17':
     dependencies:
       '@types/hammerjs': 2.0.46
@@ -9523,6 +9545,10 @@ snapshots:
   '@react-native-async-storage/async-storage@2.1.2(react-native@0.79.2(@babel/core@7.28.3)(@types/react@18.3.23)(react@19.0.0))':
     dependencies:
       merge-options: 3.0.4
+      react-native: 0.79.2(@babel/core@7.28.3)(@types/react@18.3.23)(react@19.0.0)
+
+  '@react-native-community/netinfo@11.4.1(react-native@0.79.2(@babel/core@7.28.3)(@types/react@18.3.23)(react@19.0.0))':
+    dependencies:
       react-native: 0.79.2(@babel/core@7.28.3)(@types/react@18.3.23)(react@19.0.0)
 
   '@react-native/assets-registry@0.79.2': {}
