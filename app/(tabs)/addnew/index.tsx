@@ -8,7 +8,15 @@ import {
   useNavigation,
 } from 'expo-router';
 import {formatDate} from 'date-fns';
-import {View, StyleSheet, ScrollView, SafeAreaView, Alert} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  SafeAreaView,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import {Button, IconButton} from 'react-native-paper';
 
 import {
@@ -330,171 +338,176 @@ export default function AddNew() {
   };
 
   return (
-    <SafeAreaView style={styles.root}>
-      <ScrollView
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{
-          flexGrow: 1,
-          padding: sizes.lg,
-        }}
-      >
-        <View style={{flex: 1}}>
-          {!isSplit && (
-            <TextInput
-              style={styles.input}
-              label={'Opis'}
-              onChangeText={text => setForm({...form, description: text})}
-              value={form.description}
-            />
-          )}
-
-          <View style={[styles.input, {padding: 0, marginVertical: 24}]}>
-            <DatePicker
-              label="Wybierz Datę"
-              onChange={date => date && setForm({...form, date})}
-              value={form.date}
-            />
-          </View>
-
-          <SelectRadioButtons
-            disabled={isPasRecord}
-            items={[
-              {label: 'Wydatek', value: 'expense'},
-              {label: 'Przychód', value: 'income'},
-            ]}
-            onSelect={handleSelectType}
-            selected={type}
-          />
-
-          {/* Add new category  selection */}
-          {type === 'income' && (
-            <SelectRadioButtons
-              items={[
-                {label: 'Dodaj nową kategorię', value: 'new'},
-                {label: 'Wybierz z listy', value: 'list'},
-              ]}
-              onSelect={value => {
-                if (value === 'new') {
-                  setNewCustomIncome('');
-                } else {
-                  setNewCustomIncome(null);
-                }
-                setForm({...form, category: ''});
-              }}
-              selected={newCustomIncome !== null ? 'new' : 'list'}
-            />
-          )}
-
-          {/* Add new category  input */}
-          {newCustomIncome !== null && (
-            <TextInput
-              style={styles.input}
-              label="Nowy rodzaj wpływu"
-              onChangeText={text => setForm({...form, category: text})}
-              value={form.category}
-            />
-          )}
-
-          {(type === 'expense' || type === 'income') && (
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}
-            >
+    <KeyboardAvoidingView
+      style={{flex: 1, backgroundColor: 'white', paddingBottom: 90}}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <SafeAreaView style={styles.root}>
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{
+            flexGrow: 1,
+            padding: sizes.lg,
+          }}
+        >
+          <View style={{flex: 1}}>
+            {!isSplit && (
               <TextInput
-                ref={focusRef}
-                label="Cena"
-                style={{flex: 2}}
-                keyboardType="numeric"
-                disabled={isSplit}
-                onChangeText={text => setForm({...form, price: text})}
-                value={form.price}
+                style={styles.input}
+                label={'Opis'}
+                onChangeText={text => setForm({...form, description: text})}
+                value={form.description}
               />
-              {type === 'expense' && (
-                <IconButton
-                  icon={isSplit ? 'call-merge' : 'call-split'}
-                  onPress={handleSplitToggle}
-                  disabled={!form.price && !isSplit}
-                  size={20}
-                  style={{margin: 0, padding: 0, width: 60}}
-                />
-              )}
-            </View>
-          )}
+            )}
 
-          {!isSplit && (
-            <View style={styles.splitIconRow}>
-              {(type === 'expense' ||
-                (type === 'income' && newCustomIncome === null)) && (
-                <View style={{flex: 1}}>
-                  <Select
-                    items={itemsToSelect}
-                    showDivider={type === 'expense'}
-                    onChange={handleSelectCategory}
-                    style={{root: {marginTop: 4}}}
-                    value={
-                      type === 'income'
-                        ? form.category
-                        : expenseCategories.find(
-                            cat => cat.name === form.category,
-                          )?.name
-                    }
-                  />
-                </View>
-              )}
-            </View>
-          )}
-
-          {isSplit && type === 'expense' && (
-            <View style={styles.splitContainer}>
-              <RemainingAmountDisplay
-                totalPrice={form.price}
-                splitItems={splitItems}
+            <View style={[styles.input, {padding: 0, marginVertical: 24}]}>
+              <DatePicker
+                label="Wybierz Datę"
+                onChange={date => date && setForm({...form, date})}
+                value={form.date}
               />
-              {splitItems.map((item, index) => (
-                <PriceAndCategory
-                  key={index}
-                  item={item}
-                  index={index}
-                  expenseCategories={expenseCategories}
-                  onUpdateItem={updateSplitItem}
-                  onRemoveItem={removeSplitItem}
-                  canRemove={splitItems.length > 2}
-                />
-              ))}
-              <Button
-                mode="text"
-                onPress={addSplitItem}
-                style={{marginTop: 8}}
-                icon="plus"
+            </View>
+
+            <SelectRadioButtons
+              disabled={isPasRecord}
+              items={[
+                {label: 'Wydatek', value: 'expense'},
+                {label: 'Przychód', value: 'income'},
+              ]}
+              onSelect={handleSelectType}
+              selected={type}
+            />
+
+            {/* Add new category  selection */}
+            {type === 'income' && (
+              <SelectRadioButtons
+                items={[
+                  {label: 'Dodaj nową kategorię', value: 'new'},
+                  {label: 'Wybierz z listy', value: 'list'},
+                ]}
+                onSelect={value => {
+                  if (value === 'new') {
+                    setNewCustomIncome('');
+                  } else {
+                    setNewCustomIncome(null);
+                  }
+                  setForm({...form, category: ''});
+                }}
+                selected={newCustomIncome !== null ? 'new' : 'list'}
+              />
+            )}
+
+            {/* Add new category  input */}
+            {newCustomIncome !== null && (
+              <TextInput
+                style={styles.input}
+                label="Nowy rodzaj wpływu"
+                onChangeText={text => setForm({...form, category: text})}
+                value={form.category}
+              />
+            )}
+
+            {(type === 'expense' || type === 'income') && (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}
               >
-                Dodaj pozycję
-              </Button>
-            </View>
-          )}
-        </View>
-        <View>
-          {+id ? (
-            <ButtonWithStatus textColor="red" onPress={handleDelete}>
-              Usuń
+                <TextInput
+                  ref={focusRef}
+                  label="Cena"
+                  style={{flex: 2}}
+                  keyboardType="numeric"
+                  disabled={isSplit}
+                  onChangeText={text => setForm({...form, price: text})}
+                  value={form.price}
+                />
+                {type === 'expense' && (
+                  <IconButton
+                    icon={isSplit ? 'call-merge' : 'call-split'}
+                    onPress={handleSplitToggle}
+                    disabled={!form.price && !isSplit}
+                    size={20}
+                    style={{margin: 0, padding: 0, width: 60}}
+                  />
+                )}
+              </View>
+            )}
+
+            {!isSplit && (
+              <View style={styles.splitIconRow}>
+                {(type === 'expense' ||
+                  (type === 'income' && newCustomIncome === null)) && (
+                  <View style={{flex: 1}}>
+                    <Select
+                      items={itemsToSelect}
+                      showDivider={type === 'expense'}
+                      onChange={handleSelectCategory}
+                      style={{root: {marginTop: 4}}}
+                      value={
+                        type === 'income'
+                          ? form.category
+                          : expenseCategories.find(
+                              cat => cat.name === form.category,
+                            )?.name
+                      }
+                    />
+                  </View>
+                )}
+              </View>
+            )}
+
+            {isSplit && type === 'expense' && (
+              <View style={styles.splitContainer}>
+                <RemainingAmountDisplay
+                  totalPrice={form.price}
+                  splitItems={splitItems}
+                />
+                {splitItems.map((item, index) => (
+                  <PriceAndCategory
+                    key={index}
+                    item={item}
+                    index={index}
+                    expenseCategories={expenseCategories}
+                    onUpdateItem={updateSplitItem}
+                    onRemoveItem={removeSplitItem}
+                    canRemove={splitItems.length > 2}
+                  />
+                ))}
+                <Button
+                  mode="text"
+                  onPress={addSplitItem}
+                  style={{marginTop: 8}}
+                  icon="plus"
+                >
+                  Dodaj pozycję
+                </Button>
+              </View>
+            )}
+          </View>
+          <View>
+            {+id ? (
+              <ButtonWithStatus textColor="red" onPress={handleDelete}>
+                Usuń
+              </ButtonWithStatus>
+            ) : null}
+            <ButtonWithStatus onPress={handleNavigateBack}>
+              Przerwij
             </ButtonWithStatus>
-          ) : null}
-          <ButtonWithStatus onPress={handleNavigateBack}>
-            Przerwij
-          </ButtonWithStatus>
-          <ButtonWithStatus
-            ref={buttonRef}
-            showLoading
-            mode="contained"
-            disabled={!validateForm() || isDataTheSame()}
-            onPress={handleSave}
-          >
-            {isPasRecord ? 'Zapisz zmiany' : 'Zapisz'}
-          </ButtonWithStatus>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+            <ButtonWithStatus
+              ref={buttonRef}
+              showLoading
+              mode="contained"
+              disabled={!validateForm() || isDataTheSame()}
+              onPress={handleSave}
+            >
+              {isPasRecord ? 'Zapisz zmiany' : 'Zapisz'}
+            </ButtonWithStatus>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 }
 
