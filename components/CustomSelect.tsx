@@ -1,5 +1,12 @@
 import {useState, useRef, useEffect} from 'react';
-import {StyleSheet, View, ScrollView} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
+} from 'react-native';
 
 import {
   Menu,
@@ -65,19 +72,24 @@ const DropdownComponent = ({
 
   const handleOnChange = (item: {label: string; value: string}) => {
     setIsVisible(false);
-    setSearchQuery(''); // Clear search when item is selected
+    setSearchQuery('');
+    Keyboard.dismiss();
     onChange(item);
   };
 
   const handleMenuDismiss = () => {
     setIsVisible(false);
-    setSearchQuery(''); // Clear search when menu is dismissed
+    setSearchQuery('');
+    Keyboard.dismiss();
   };
 
   const handleCleanSearchQuery = () => setSearchQuery('');
 
   return (
-    <View style={{backgroundColor: 'transparent'}}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{backgroundColor: 'transparent'}}
+    >
       <Menu
         visible={isVisible}
         onDismiss={handleMenuDismiss}
@@ -90,7 +102,12 @@ const DropdownComponent = ({
         mode="elevated"
         anchor={
           <TouchableRipple
-            onPress={() => !disable && setIsVisible(true)}
+            onPress={() => {
+              if (!disable) {
+                Keyboard.dismiss();
+                setIsVisible(true);
+              }
+            }}
             disabled={disable}
             style={[
               styles.dropdownContainer,
@@ -144,6 +161,8 @@ const DropdownComponent = ({
           style={styles.scrollableContent}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={true}
+          keyboardDismissMode="on-drag"
+          nestedScrollEnabled={true}
         >
           {/* First three items */}
           {firstItems.map((item, index) => (
@@ -180,7 +199,7 @@ const DropdownComponent = ({
           )}
         </ScrollView>
       </Menu>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 
