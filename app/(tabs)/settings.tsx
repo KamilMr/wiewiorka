@@ -5,11 +5,11 @@ import {useAppDispatch, useAppSelector} from '@/hooks';
 import {logout} from '@/redux/auth/thunks';
 import {useAppTheme} from '@/constants/theme';
 import {router} from 'expo-router';
-import {fetchIni} from '@/redux/main/thunks';
 import {selectStatus} from '@/redux/main/selectors';
 import {setShouldReload, selectOperations} from '@/redux/sync/syncSlice';
 import {TabBarIcon} from '@/components/navigation/TabBarIcon';
 import {useNetInfo} from '@react-native-community/netinfo';
+import AppVersion from '@/components/AppVersion';
 
 const Settings = () => {
   const dispatch = useAppDispatch();
@@ -34,24 +34,26 @@ const Settings = () => {
   };
   return (
     <View style={[styles.root, {backgroundColor: t.colors.white}]}>
-      <Button
-        mode="contained"
-        onPress={() => {
-          router.navigate('/budget');
-        }}
-        style={{marginBottom: 40}}
-      >
-        Budżet
-      </Button>
-      <Button
-        mode="contained"
-        onPress={() => {
-          router.navigate('/categories');
-        }}
-        style={{marginBottom: 40}}
-      >
-        Kategorie
-      </Button>
+      <View style={styles.tabsContainer}>
+        <TouchableOpacity
+          style={styles.tabItem}
+          onPress={() => router.navigate('/budget')}
+        >
+          <TabBarIcon name="wallet" color={t.colors.primary} />
+          <Text style={[styles.tabText, {color: t.colors.primary}]}>
+            Budżet
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.tabItem}
+          onPress={() => router.navigate('/categories')}
+        >
+          <TabBarIcon name="list" color={t.colors.primary} />
+          <Text style={[styles.tabText, {color: t.colors.primary}]}>
+            Kategorie
+          </Text>
+        </TouchableOpacity>
+      </View>
       <View style={styles.reloadContainer}>
         {fetching === 'idle' ? (
           <TouchableOpacity onPress={handleFetch} style={styles.reloadButton}>
@@ -72,15 +74,10 @@ const Settings = () => {
           </View>
         )}
       </View>
-      <Button
-        icon="logout"
-        mode="contained"
-        onPress={handleLogout}
-        style={{marginBottom: 40}}
-      >
+      <Button icon="logout" mode="contained" onPress={handleLogout}>
         Wyloguj się
       </Button>
-      <View style={{height: 80}} />
+      <AppVersion />
     </View>
   );
 };
@@ -91,6 +88,32 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: '100%',
     marginBottom: 90,
+  },
+  tabsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '90%',
+    marginBottom: 40,
+  },
+  tabItem: {
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: 'rgba(0,0,0,0.05)',
+    borderRadius: 12,
+    flex: 1,
+    marginHorizontal: 8,
+  },
+  tabText: {
+    marginTop: 8,
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  bottomRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '90%',
+    marginBottom: 40,
   },
   reloadContainer: {
     marginBottom: 40,

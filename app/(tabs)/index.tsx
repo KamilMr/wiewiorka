@@ -24,8 +24,8 @@ const Home = () => {
       >
         <View style={{width: '90%', gap: 16}}>
           <ScrollView>
-            <FinancialQuote />
             <SummaryCard_v2 />
+            <FinancialQuote />
             <BudgetCard
               items={_.sortBy(items, ['budgetedName'])}
               date={formatDateTz({pattern: timeFormats.dateOnly2})}
