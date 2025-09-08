@@ -1,5 +1,5 @@
 import {Card, ProgressBar, IconButton} from 'react-native-paper';
-import {StyleSheet, View} from 'react-native';
+import {StyleSheet, View, ScrollView} from 'react-native';
 import {useState} from 'react';
 import {router} from 'expo-router';
 
@@ -30,7 +30,7 @@ export default function BudgetCard({items = [], date}: BudgetCardProps) {
   const [yy, mm] = date.split('-');
 
   return (
-    <Card>
+    <Card style={{maxHeight: 220}}>
       <Card.Title
         title={`Budżet ${mm}-${yy}`}
         right={props => (
@@ -42,6 +42,7 @@ export default function BudgetCard({items = [], date}: BudgetCardProps) {
               <IconButton
                 {...props}
                 icon="dots-vertical"
+                disabled={true}
                 onPress={() => setMenuVisible(true)}
               />
             }
@@ -60,47 +61,64 @@ export default function BudgetCard({items = [], date}: BudgetCardProps) {
           />
         )}
       />
-      <Card.Content>
-        {items.map(item => (
-          <View key={item.id} style={styles.mainContentBox}>
-            {/* Top box */}
-            <View style={styles.mainInnerBox}>
-              {/* Left side */}
-              <View>
-                <Text variant="titleMedium">{item.budgetedName}</Text>
-                <Text variant="bodySmall">{formatPrice(item.amount)}</Text>
+      <Card.Content style={{paddingBottom: 0}}>
+        <ScrollView
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={false}
+          nestedScrollEnabled={true}
+        >
+          {items.map(item => (
+            <View key={item.id} style={styles.mainContentBox}>
+              {/* Top box */}
+              <View style={styles.mainInnerBox}>
+                {/* Left side */}
+                <View>
+                  <Text variant="titleMedium">{item.budgetedName}</Text>
+                  <Text variant="bodySmall">{formatPrice(item.amount)}</Text>
+                </View>
+
+                {/* Right side */}
+                <View>
+                  <Text variant="titleMedium">
+                    {formatPrice(item.allocated)}
+                  </Text>
+                </View>
               </View>
 
-              {/* Right side */}
+              {/* Bottom box slider */}
               <View>
-                <Text variant="titleMedium">{formatPrice(item.allocated)}</Text>
+                <ProgressBar
+                  progress={calculateProgress(
+                    +item.amount,
+                    +item.allocated || 0,
+                  )}
+                  color={getColor(
+                    calculateProgress(+item.amount, +item.allocated || 0),
+                  )}
+                />
               </View>
             </View>
-
-            {/* Bottom box slider */}
-            <View>
-              <ProgressBar
-                progress={calculateProgress(+item.amount, +item.allocated || 0)}
-                color={getColor(
-                  calculateProgress(+item.amount, +item.allocated || 0),
-                )}
-              />
-            </View>
-          </View>
-        ))}
+          ))}
+        </ScrollView>
       </Card.Content>
     </Card>
   );
 }
 
 const styles = StyleSheet.create({
+  scrollView: {
+    maxHeight: 160,
+  },
   mainContentBox: {
     flexDirection: 'column',
     justifyContent: 'space-between',
-    marginVertical: sizes.lg,
+    marginVertical: sizes.sm,
+    paddingHorizontal: sizes.xs,
   },
   mainInnerBox: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: sizes.xs,
   },
 });

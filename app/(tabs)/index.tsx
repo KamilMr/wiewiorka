@@ -1,12 +1,14 @@
-import {View, Text} from 'react-native';
+import {ScrollView, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
-import {BudgetCard} from '@/components';
-import {useAppTheme} from '@/constants/theme';
-import {useAppSelector} from '@/hooks';
-import {selectBudgets} from '@/redux/main/selectors';
-import SummaryCard_v2 from '@/components/SummaryCardv2';
 import FinancialQuote from '@/components/FinancialQuote';
+import SummaryCard_v2 from '@/components/SummaryCardv2';
+import {BudgetCard} from '@/components';
+import {selectBudgets} from '@/redux/main/selectors';
+import {useAppSelector} from '@/hooks';
+import {useAppTheme} from '@/constants/theme';
+import formatDateTz, {timeFormats} from '@/utils/formatTimeTz';
+import _ from 'lodash';
 
 const Home = () => {
   const t = useAppTheme();
@@ -21,9 +23,14 @@ const Home = () => {
         }}
       >
         <View style={{width: '90%', gap: 16}}>
-          <FinancialQuote />
-          <SummaryCard_v2 />
-          {/* <BudgetCard items={items} /> */}
+          <ScrollView>
+            <FinancialQuote />
+            <SummaryCard_v2 />
+            <BudgetCard
+              items={_.sortBy(items, ['budgetedName'])}
+              date={formatDateTz({pattern: timeFormats.dateOnly2})}
+            />
+          </ScrollView>
         </View>
       </View>
     </SafeAreaView>
