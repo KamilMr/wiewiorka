@@ -236,10 +236,19 @@ export const addNewIncome = createAsyncThunk<
   Income & {frontendId?: string | number},
   {state: RootState}
 >('income/save', async (income, thunkAPI) => {
-  const {dispatch} = thunkAPI;
+  const {dispatch, getState} = thunkAPI;
+
+  const auth = getState().auth;
+
+  const incomeWithAuth = {
+    ...income,
+    ownerId: auth.id || 0,
+    houseId: auth.houses?.[0] || '',
+    owner: auth.name || '',
+  };
 
   const frontendId = `f_${makeNewIdArr(1)[0]}`;
-  dispatch(mainSliceReducers.addIncome([{...income, id: frontendId}]));
+  dispatch(mainSliceReducers.addIncome([{...incomeWithAuth, id: frontendId}]));
 
   dispatch(
     addToQueue({

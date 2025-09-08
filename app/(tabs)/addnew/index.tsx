@@ -16,6 +16,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  Keyboard,
 } from 'react-native';
 import {Button, IconButton} from 'react-native-paper';
 
@@ -338,13 +339,15 @@ export default function AddNew() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={{flex: 1, backgroundColor: 'white', paddingBottom: 90}}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <SafeAreaView style={styles.root}>
+    <SafeAreaView style={styles.root}>
+      <KeyboardAvoidingView
+        style={{flex: 1}}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
+      >
         <ScrollView
           keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
           contentContainerStyle={{
             flexGrow: 1,
             padding: sizes.lg,
@@ -506,8 +509,8 @@ export default function AddNew() {
             </ButtonWithStatus>
           </View>
         </ScrollView>
-      </SafeAreaView>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 

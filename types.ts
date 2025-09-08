@@ -4,6 +4,8 @@ export interface AuthSlice {
   name: string;
   email: string;
   token: string;
+  id: string;
+  houses: [string];
 }
 
 export type Snackbar = {
