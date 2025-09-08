@@ -64,7 +64,7 @@ const SummaryCard = (props: Omit<SummaryCardProps, 'id'>) => {
             >
               <IconButton icon="arrow-down" iconColor="green" />
               <View>
-                <Text>Wpłynęło netto</Text>
+                <Text>Wpłynęło</Text>
                 <Text>
                   {`${formatPrice(
                     income - sumCosts < 0 ? 0 : income - sumCosts,
@@ -88,7 +88,7 @@ const SummaryCard = (props: Omit<SummaryCardProps, 'id'>) => {
             >
               <IconButton icon="arrow-up" iconColor="red" />
               <View>
-                <Text>Wydano:</Text>
+                <Text>Wydano</Text>
                 <Text>{`${formatPrice(outcome - sumCosts)}`}</Text>
               </View>
             </View>

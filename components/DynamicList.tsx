@@ -1,18 +1,17 @@
 import {
   GestureResponderEvent,
-  Image,
   NativeScrollEvent,
   NativeSyntheticEvent,
   ScrollView,
   StyleSheet,
   View,
 } from 'react-native';
-
-import {Text} from '@/components';
 import _ from 'lodash';
-import {format as formatDate} from 'date-fns';
-import {colorNames, sizes, useAppTheme} from '@/constants/theme';
+
 import {CircleIcon} from './Icons';
+import {Text} from '@/components';
+import {format as formatDate} from 'date-fns';
+import {sizes, useAppTheme} from '@/constants/theme';
 
 interface SelExpense {
   id: number;

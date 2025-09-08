@@ -33,6 +33,7 @@ export interface Expense {
   date: string;
   price: number;
   categoryId: number;
+  category: string;
   image: string;
   houseId: string;
   owner: string;

@@ -1,18 +1,13 @@
 import {useState} from 'react';
-import {router, useLocalSearchParams} from 'expo-router';
+import {useLocalSearchParams} from 'expo-router';
 
-import {
-  NativeSyntheticEvent,
-  NativeScrollEvent,
-  StyleSheet,
-  View,
-} from 'react-native';
+import {NativeScrollEvent, NativeSyntheticEvent, View} from 'react-native';
 import _ from 'lodash';
 
-import {useAppSelector} from '@/hooks';
-import {selectRecords} from '@/redux/main/selectors';
 import DynamicRecordList from '@/components/DynamicList';
-import {isCloseToBottom} from '@/common';
+import {isCloseToBottom, printJsonIndent} from '@/common';
+import {selectRecords} from '@/redux/main/selectors';
+import {useAppSelector} from '@/hooks';
 import {useAppTheme} from '@/constants/theme';
 
 const TransactionList = () => {
@@ -46,14 +41,4 @@ const TransactionList = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 0.2,
-    borderBottomColor: 'lightgray',
-  },
-  image: {width: 40, height: 40, borderRadius: 20, marginRight: 16},
-});
 export default TransactionList;

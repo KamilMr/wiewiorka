@@ -1,10 +1,10 @@
 import {useEffect, useState} from 'react';
 import {router, useLocalSearchParams} from 'expo-router';
-import {ScrollView, View} from 'react-native';
-import {Button, IconButton} from 'react-native-paper';
 
-import {format, lastDayOfMonth} from 'date-fns';
 import _ from 'lodash';
+import {Button, IconButton} from 'react-native-paper';
+import {ScrollView, View} from 'react-native';
+import {format, lastDayOfMonth} from 'date-fns';
 
 import {selectByTimeRange, selectCategories} from '@/redux/main/selectors';
 import {useAppSelector} from '@/hooks';

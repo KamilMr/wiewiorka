@@ -73,9 +73,9 @@ export const selectRecords = (number: number, search: Search) =>
           };
         });
 
-      tR = tR.filter((record: Expense & Income) => {
+      tR = tR.filter(record => {
         const passesTextFilter = filterTxt(record, searchedTxt);
-        const passesCategoryFilter = record.exp ? filterCat(record, fc) : true;
+        const passesCategoryFilter = filterCat(record, fc);
         return passesTextFilter && passesCategoryFilter;
       });
       return _.chain(tR)
