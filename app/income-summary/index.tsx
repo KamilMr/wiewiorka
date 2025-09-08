@@ -1,12 +1,14 @@
-import {View, StyleSheet, FlatList} from 'react-native';
-import {useAppTheme} from '@/constants/theme';
 import {useSelector} from 'react-redux';
-import {selectIncomes} from '@/redux/main/selectors';
+import {useLocalSearchParams} from 'expo-router';
+
+import {Tooltip, IconButton} from 'react-native-paper';
+import {View, StyleSheet, FlatList} from 'react-native';
+
 import {PieChartBar, Text} from '@/components';
 import {generateColor, formatPrice, printJsonIndent} from '@/common';
-import {useLocalSearchParams} from 'expo-router';
+import {selectIncomes} from '@/redux/main/selectors';
 import {selectMe} from '@/redux/auth/authSlice';
-import {Tooltip, IconButton} from 'react-native-paper';
+import {useAppTheme} from '@/constants/theme';
 
 interface Income {
   date: string;
@@ -79,7 +81,7 @@ const IncomeSummary = () => {
               showText
               textColor={'black'}
               textSize={12}
-              radius={100}
+              radius={70}
             />
           </View>
           <View style={styles.legendContainer}>
@@ -169,7 +171,7 @@ const styles = StyleSheet.create({
   },
   legendContainer: {
     flex: 1,
-    paddingLeft: 16,
+    paddingLeft: 24,
   },
   legendItem: {
     flexDirection: 'row',
