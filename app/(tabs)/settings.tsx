@@ -10,6 +10,8 @@ import {setShouldReload, selectOperations} from '@/redux/sync/syncSlice';
 import {TabBarIcon} from '@/components/navigation/TabBarIcon';
 import {useNetInfo} from '@react-native-community/netinfo';
 import AppVersion from '@/components/AppVersion';
+import {clearDevMode} from '@/redux/main/mainSlice';
+import {useDev} from '@/common';
 
 const Settings = () => {
   const dispatch = useAppDispatch();
@@ -17,6 +19,7 @@ const Settings = () => {
   const fetching = useAppSelector(selectStatus);
   const operations = useAppSelector(selectOperations);
   const netInfo = useNetInfo();
+  const devMode = useDev();
 
   const handleLogout = () => {
     dispatch(logout());
@@ -31,6 +34,10 @@ const Settings = () => {
     if (!netInfo.isConnected) return '#666666';
     if (netInfo.isInternetReachable === false) return '#FFA500';
     return '#4CAF50';
+  };
+
+  const handleDevModeToggle = () => {
+    dispatch(clearDevMode());
   };
   return (
     <View style={[styles.root, {backgroundColor: t.colors.white}]}>
@@ -74,6 +81,16 @@ const Settings = () => {
           </View>
         )}
       </View>
+      {devMode && (
+        <Button 
+          icon="bug" 
+          mode="outlined" 
+          onPress={handleDevModeToggle}
+          style={styles.devButton}
+        >
+          Wyłącz tryb programisty
+        </Button>
+      )}
       <Button icon="logout" mode="contained" onPress={handleLogout}>
         Wyloguj się
       </Button>
@@ -147,6 +164,10 @@ const styles = StyleSheet.create({
   reloadText: {
     fontSize: 16,
     color: '#333',
+  },
+  devButton: {
+    marginBottom: 20,
+    borderColor: '#FF6B6B',
   },
 });
 

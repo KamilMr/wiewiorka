@@ -71,6 +71,7 @@ export interface MainSlice {
   categories: {[key: number]: Category};
   _aggregated: AggregatedData;
   sources: {[key: string]: string[]};
+  devMode: boolean;
   snackbar: Snackbar;
 }
 

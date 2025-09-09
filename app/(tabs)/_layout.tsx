@@ -9,6 +9,7 @@ import {TabBarIcon} from '@/components/navigation/TabBarIcon';
 import {sizes} from '@/constants/theme';
 import {selectOperations} from '@/redux/sync/syncSlice';
 import {useNetInfo} from '@react-native-community/netinfo';
+import DevModeToggle from '@/components/DevModeToggle';
 
 export default function TabLayout() {
   const token = useAppSelector(selectToken);
@@ -57,7 +58,11 @@ export default function TabLayout() {
         tabBarShowLabel: false,
         headerRightContainerStyle: {paddingRight: sizes.xxl},
         headerRight: () => {
-          return <View style={getStatusDotStyle()} />;
+          return (
+            <DevModeToggle>
+              <View style={getStatusDotStyle()} />
+            </DevModeToggle>
+          );
         },
       }}
     >

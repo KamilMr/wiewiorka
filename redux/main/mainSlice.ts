@@ -25,6 +25,7 @@ const emptyState = (): MainSlice => ({
   categories: {},
   sources: {},
   _aggregated: {},
+  devMode: false,
   snackbar: {
     open: false,
     type: 'success',
@@ -132,6 +133,12 @@ const mainSlice = createSlice({
       }
     },
     dropMain: () => emptyState(),
+    toggleDevMode: (state) => {
+      state.devMode = !state.devMode;
+    },
+    clearDevMode: (state) => {
+      state.devMode = false;
+    },
     removeExpense: (state, action) => {
       state.expenses = state.expenses.filter(exp => exp.id !== action.payload);
     },
@@ -276,6 +283,7 @@ export const {
   addBudgets,
   addExpense,
   addIncome,
+  clearDevMode,
   deleteBudget,
   dropMain,
   initState,
@@ -286,6 +294,7 @@ export const {
   setSnackbar,
   startLoading,
   stopLoading,
+  toggleDevMode,
   updateBudget,
   updateExpense,
   updateIncome,
