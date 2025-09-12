@@ -1,10 +1,14 @@
 import React from 'react';
 import {Redirect, Stack} from 'expo-router';
+import {View} from 'react-native';
 
 import {IconButton} from 'react-native-paper';
 
 import {useAppSelector} from '@/hooks';
 import {selectToken} from '@/redux/auth/authSlice';
+import DevModeToggle from '@/components/DevModeToggle';
+import StatusIndicator from '@/components/StatusIndicator';
+import {sizes} from '@/constants/theme';
 
 export default function Layout() {
   const token = useAppSelector(selectToken);
@@ -18,7 +22,15 @@ export default function Layout() {
         options={() => ({
           headerShown: true,
           title: 'Kategorie',
-          headerRight: () => <IconButton icon={'pencil'} />,
+          headerRightContainerStyle: {paddingRight: sizes.xxl},
+          headerRight: () => (
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <IconButton icon={'pencil'} />
+              <DevModeToggle>
+                <StatusIndicator />
+              </DevModeToggle>
+            </View>
+          ),
         })}
       />
       <Stack.Screen
@@ -26,6 +38,12 @@ export default function Layout() {
         options={() => ({
           headerShown: true,
           title: 'Edycja',
+          headerRightContainerStyle: {paddingRight: sizes.xxl},
+          headerRight: () => (
+            <DevModeToggle>
+              <StatusIndicator />
+            </DevModeToggle>
+          ),
         })}
       />
     </Stack>

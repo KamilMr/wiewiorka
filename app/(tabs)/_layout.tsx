@@ -7,15 +7,12 @@ import {fetchIni} from '@/redux/main/thunks';
 import {useAppDispatch, useAppSelector} from '@/hooks';
 import {TabBarIcon} from '@/components/navigation/TabBarIcon';
 import {sizes} from '@/constants/theme';
-import {selectOperations} from '@/redux/sync/syncSlice';
-import {useNetInfo} from '@react-native-community/netinfo';
 import DevModeToggle from '@/components/DevModeToggle';
+import StatusIndicator from '@/components/StatusIndicator';
 
 export default function TabLayout() {
   const token = useAppSelector(selectToken);
-  const operations = useAppSelector(selectOperations);
   const dispatch = useAppDispatch();
-  const netInfo = useNetInfo();
 
   useEffect(() => {
     if (!token) return;
@@ -23,32 +20,6 @@ export default function TabLayout() {
   }, [dispatch]);
 
   if (!token) return <Redirect href="/sign-in" />;
-
-  const getStatusDotColor = () => {
-    if (!netInfo.isConnected) return '#666666';
-    if (netInfo.isInternetReachable === false) return '#FFA500';
-    if (operations.length > 0) return '#4CAF50';
-    return '#4CAF50';
-  };
-
-  const getStatusDotStyle = () => {
-    const baseStyle = {
-      width: 20,
-      height: 20,
-      borderRadius: 10,
-      backgroundColor: getStatusDotColor(),
-    };
-
-    if (netInfo.isConnected && operations.length > 0) {
-      return {
-        ...baseStyle,
-        borderWidth: 2,
-        borderColor: '#FFA500',
-      };
-    }
-
-    return baseStyle;
-  };
 
   return (
     <Tabs
@@ -60,7 +31,7 @@ export default function TabLayout() {
         headerRight: () => {
           return (
             <DevModeToggle>
-              <View style={getStatusDotStyle()} />
+              <StatusIndicator />
             </DevModeToggle>
           );
         },
