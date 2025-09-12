@@ -118,7 +118,6 @@ const styles = StyleSheet.create({
   tabsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    width: '90%',
     marginBottom: 40,
   },
   tabItem: {

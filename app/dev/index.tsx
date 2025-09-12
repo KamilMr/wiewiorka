@@ -27,6 +27,15 @@ const DevPage = () => {
             Dropdown
           </Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.cardItem}
+          onPress={() => router.navigate('/dev/keyboard-avoid')}
+        >
+          <TabBarIcon name="keyboard" color={t.colors.primary} />
+          <Text style={[styles.cardText, {color: t.colors.primary}]}>
+            Keyboard Avoid
+          </Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
