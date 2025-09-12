@@ -46,6 +46,7 @@ import {
   selectSources,
 } from '@/redux/main/selectors';
 import {Expense} from '@/types';
+import ElementDropdown from '@/components/ElementDropdown';
 
 const initState = (date = new Date(), categories: any[] = []) => ({
   description: '',
@@ -443,7 +444,7 @@ export default function AddNew() {
                 {(type === 'expense' ||
                   (type === 'income' && newCustomIncome === null)) && (
                   <View style={{flex: 1}}>
-                    <Select
+                    <ElementDropdown
                       items={itemsToSelect}
                       showDivider={type === 'expense'}
                       onChange={handleSelectCategory}
