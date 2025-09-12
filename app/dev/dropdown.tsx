@@ -3,6 +3,7 @@ import {useState} from 'react';
 
 import {useAppTheme} from '@/constants/theme';
 import {Select} from '@/components';
+import ElementDropdown from '@/components/ElementDropdown';
 
 const DropdownPage = () => {
   const t = useAppTheme();
@@ -51,8 +52,24 @@ const DropdownPage = () => {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Kategorie</Text>
+        <Text style={styles.sectionTitle}>Kategorie (Current Select)</Text>
         <Select
+          items={mockCategories}
+          value={selectedCategory}
+          onChange={item => setSelectedCategory(item.value)}
+          placeholder="Wybierz kategorię"
+        />
+        {selectedCategory && (
+          <Text style={styles.selectedText}>
+            Wybrano:{' '}
+            {mockCategories.find(c => c.value === selectedCategory)?.label}
+          </Text>
+        )}
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Kategorie (Element Dropdown)</Text>
+        <ElementDropdown
           items={mockCategories}
           value={selectedCategory}
           onChange={item => setSelectedCategory(item.value)}
