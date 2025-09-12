@@ -13,31 +13,35 @@ const DevModeToggle: React.FC<DevModeToggleProps> = ({children}) => {
   const dispatch = useAppDispatch();
   const pathname = usePathname();
   const devMode = useDev();
-  
+
   const [tapCount, setTapCount] = useState(0);
   const firstTapTime = useRef<number | null>(null);
 
   const handleTap = () => {
     if (pathname !== '/settings') return;
-    
+
     const now = Date.now();
-    
+
     if (firstTapTime.current === null) {
       firstTapTime.current = now;
       setTapCount(1);
     } else {
       const timeDiff = now - firstTapTime.current;
-      
+
       if (timeDiff <= 5000) {
         const newTapCount = tapCount + 1;
         setTapCount(newTapCount);
-        
+
         if (newTapCount >= 5) {
           dispatch(toggleDevMode());
-          dispatch(setSnackbar({
-            msg: devMode ? 'Tryb programisty wyłączony' : 'Tryb programisty włączony',
-            type: 'success'
-          }));
+          dispatch(
+            setSnackbar({
+              msg: devMode
+                ? 'Tryb programisty wyłączony'
+                : 'Tryb programisty włączony',
+              type: 'success',
+            }),
+          );
           setTapCount(0);
           firstTapTime.current = null;
         }
@@ -50,12 +54,12 @@ const DevModeToggle: React.FC<DevModeToggleProps> = ({children}) => {
 
   return (
     <TouchableOpacity onPress={handleTap} style={styles.container}>
-      {children}
       {devMode && (
         <View style={styles.devBadge}>
           <Text style={styles.devText}>DEV</Text>
         </View>
       )}
+      {children}
     </TouchableOpacity>
   );
 };
@@ -72,7 +76,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 6,
     paddingVertical: 2,
-    marginLeft: 8,
+    marginRight: 8,
   },
   devText: {
     color: 'white',

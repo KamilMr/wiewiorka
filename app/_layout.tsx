@@ -54,6 +54,7 @@ const RootLayout = () => {
                 name="income-summary"
                 options={{headerShown: false}}
               />
+              <Stack.Screen name="dev" options={{headerShown: false}} />
               <Stack.Screen name="+not-found" />
             </Stack>
             <SnackBar />

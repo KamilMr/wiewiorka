@@ -1,17 +1,17 @@
 import {Button, ActivityIndicator} from 'react-native-paper';
 import {StyleSheet, View, TouchableOpacity, Text} from 'react-native';
 
-import {useAppDispatch, useAppSelector} from '@/hooks';
+import AppVersion from '@/components/AppVersion';
+import {TabBarIcon} from '@/components/navigation/TabBarIcon';
+import {clearDevMode} from '@/redux/main/mainSlice';
 import {logout} from '@/redux/auth/thunks';
-import {useAppTheme} from '@/constants/theme';
 import {router} from 'expo-router';
 import {selectStatus} from '@/redux/main/selectors';
 import {setShouldReload, selectOperations} from '@/redux/sync/syncSlice';
-import {TabBarIcon} from '@/components/navigation/TabBarIcon';
-import {useNetInfo} from '@react-native-community/netinfo';
-import AppVersion from '@/components/AppVersion';
-import {clearDevMode} from '@/redux/main/mainSlice';
+import {useAppDispatch, useAppSelector} from '@/hooks';
+import {useAppTheme} from '@/constants/theme';
 import {useDev} from '@/common';
+import {useNetInfo} from '@react-native-community/netinfo';
 
 const Settings = () => {
   const dispatch = useAppDispatch();
@@ -60,6 +60,15 @@ const Settings = () => {
             Kategorie
           </Text>
         </TouchableOpacity>
+        {devMode && (
+          <TouchableOpacity
+            style={styles.tabItem}
+            onPress={() => router.navigate('/dev')}
+          >
+            <TabBarIcon name="bug" color={t.colors.primary} />
+            <Text style={[styles.tabText, {color: t.colors.primary}]}>Dev</Text>
+          </TouchableOpacity>
+        )}
       </View>
       <View style={styles.reloadContainer}>
         {fetching === 'idle' ? (
@@ -82,9 +91,9 @@ const Settings = () => {
         )}
       </View>
       {devMode && (
-        <Button 
-          icon="bug" 
-          mode="outlined" 
+        <Button
+          icon="bug"
+          mode="outlined"
           onPress={handleDevModeToggle}
           style={styles.devButton}
         >

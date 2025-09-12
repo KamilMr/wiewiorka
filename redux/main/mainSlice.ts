@@ -133,10 +133,10 @@ const mainSlice = createSlice({
       }
     },
     dropMain: () => emptyState(),
-    toggleDevMode: (state) => {
+    toggleDevMode: state => {
       state.devMode = !state.devMode;
     },
-    clearDevMode: (state) => {
+    clearDevMode: state => {
       state.devMode = false;
     },
     removeExpense: (state, action) => {
