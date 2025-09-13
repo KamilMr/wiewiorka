@@ -130,7 +130,14 @@ const mainSlice = createSlice({
       state.devMode = false;
     },
     removeExpense: (state, action) => {
-      state.expenses = state.expenses.filter(exp => exp.id !== action.payload);
+      state.expenses = state.expenses.filter(
+        exp => exp.id.toString() !== action.payload,
+      );
+    },
+    removeIncome: (state, action) => {
+      state.incomes = state.incomes.filter(
+        inc => inc.id.toString() !== action.payload,
+      );
     },
     replaceExpense: (state, action) => {
       const {frontendId, resp} = action.payload;
@@ -233,6 +240,7 @@ export const {
   dropMain,
   initState,
   removeExpense,
+  removeIncome,
   replaceBudget,
   replaceExpense,
   replaceIncome,

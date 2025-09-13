@@ -14,13 +14,14 @@ import {
   replaceExpense as replaceExpenseAction,
   replaceIncome as replaceIncomeAction,
   deleteBudget as deleteBudgetAction,
+  removeExpense as removeExpenseAction,
+  removeIncome as removeIncomeAction,
 } from './mainSlice';
 import {
   addToQueue,
   removeFromQueue,
   setSyncError,
   incrementRetryCount,
-  setSyncingStatus,
   setOperationStatus,
 } from '../sync/syncSlice';
 import {SYNC_CONFIG} from '@/constants/theme';
@@ -226,11 +227,22 @@ export const addNewExpense = createAsyncThunk<
   Expense & {frontendId?: string | number},
   {state: RootState}
 >('expense/save', async (expense, thunkAPI) => {
-  const {dispatch} = thunkAPI;
+  const {dispatch, getState} = thunkAPI;
 
+  const auth = getState().auth;
   // Editing existing expense
   const frontendId = `f_${makeNewIdArr(1)[0]}`;
-  dispatch(addExpenseAction([{...expense, id: frontendId}]));
+  dispatch(
+    addExpenseAction([
+      {
+        ...expense,
+        ownerId: auth.id || 0,
+        houseId: auth.houses?.[0] || '',
+        owner: auth.name || '',
+        id: frontendId,
+      },
+    ]),
+  );
 
   dispatch(
     addToQueue({
@@ -504,6 +516,32 @@ export const deleteIncome = createAsyncThunk<
   setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
 });
 
+export const deleteExpenseLocal = createAsyncThunk<
+  any,
+  string,
+  {state: RootState}
+>('expense/deleteLocal', async (id, thunkAPI) => {
+  const {dispatch} = thunkAPI;
+
+  // Always remove from local state first
+  dispatch(removeExpenseAction(id));
+
+  // Check if it's a synced item (needs backend deletion)
+  const isUnsynced = typeof id === 'string' && id.startsWith('f_');
+
+  if (!isUnsynced) {
+    // Schedule backend deletion for synced items
+    dispatch(
+      addToQueue({
+        path: ['main', 'expenses', id],
+        method: 'DELETE',
+        handler: 'genericSync',
+        frontendId: id,
+      }),
+    );
+  }
+});
+
 export const genericSync = createAsyncThunk<
   any,
   {
@@ -555,6 +593,7 @@ export const genericSync = createAsyncThunk<
 
       return result.d;
     } catch (error) {
+      printJsonIndent(error);
       dispatch(
         incrementRetryCount({operationId, maxRetries: SYNC_CONFIG.MAX_RETRIES}),
       );
