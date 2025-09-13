@@ -16,9 +16,9 @@ import {useAppTheme} from '@/constants/theme';
 import {useAppDispatch, useAppSelector} from '@/hooks';
 import {selectCategories, selectMainCategories} from '@/redux/main/selectors';
 import {
-  handleDeleteCategory,
-  handleDeleteGroupCategory,
-  handleGroupCategory,
+  deleteSubcategoryLocal,
+  deleteGroupCategoryLocal,
+  addGroupCategoryLocal,
 } from '@/redux/main/thunks';
 import GroupedItemsList from '@/components/categories/GroupedItemsList';
 import {DeleteCategory} from '@/components/categories/types';
@@ -81,17 +81,17 @@ export default function MainView() {
 
   const handleDelete = async ({id, kind}: DeleteCategory) => {
     if (kind === 'category') {
-      dispatch(handleDeleteCategory({id}));
+      dispatch(deleteSubcategoryLocal(id));
     }
     if (kind === 'group') {
-      dispatch(handleDeleteGroupCategory({id}));
+      dispatch(deleteGroupCategoryLocal(id));
     }
 
     emptyModal();
   };
 
   const handleSave = () => {
-    dispatch(handleGroupCategory({method: 'POST', name: newGroup.name}))
+    dispatch(addGroupCategoryLocal({name: newGroup.name, color: '#FFFFFF'}))
       .unwrap()
       .then(() => {
         setNewGroup({name: ''});

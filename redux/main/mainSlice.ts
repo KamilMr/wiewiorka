@@ -196,6 +196,140 @@ const mainSlice = createSlice({
         }
       }
     },
+    addSubcategoryAction: (state, action) => {
+      const subcategory = action.payload;
+      const groupId = subcategory.groupId;
+      if (state.categories[groupId]) {
+        state.categories[groupId].subcategories.push(subcategory);
+      }
+    },
+    replaceSubcategoryAction: (state, action) => {
+      const {frontendId, resp} = action.payload;
+      const {previousGroupId, ...subcategoryData} = resp;
+      const newGroupId = subcategoryData.groupId;
+
+      // If previousGroupId is provided and different from current group
+      if (previousGroupId && previousGroupId !== newGroupId) {
+        // Remove from previous group
+        if (state.categories[previousGroupId]) {
+          state.categories[previousGroupId].subcategories = state.categories[
+            previousGroupId
+          ].subcategories.filter(sub => sub.id !== frontendId);
+        }
+
+        // Add to new group
+        if (state.categories[newGroupId]) {
+          state.categories[newGroupId].subcategories.push(subcategoryData);
+        }
+      } else {
+        // Find and replace in current group
+        if (state.categories[newGroupId]) {
+          const subIndex = state.categories[newGroupId].subcategories.findIndex(
+            sub => sub.id === frontendId,
+          );
+          if (subIndex !== -1) {
+            state.categories[newGroupId].subcategories[subIndex] =
+              subcategoryData;
+          }
+        }
+      }
+    },
+    updateSubcategoryAction: (state, action) => {
+      const updatedSubcategory = action.payload;
+      const newGroupId = updatedSubcategory.groupId;
+
+      // Find subcategory in any group
+      let currentGroupId = null;
+      let subIndex = -1;
+
+      Object.keys(state.categories).forEach(groupId => {
+        const groupIdNum = parseInt(groupId);
+        const index = state.categories[groupIdNum].subcategories.findIndex(
+          sub => sub.id === updatedSubcategory.id,
+        );
+        if (index !== -1) {
+          currentGroupId = groupIdNum;
+          subIndex = index;
+        }
+      });
+
+      if (currentGroupId !== null && subIndex !== -1) {
+        // If groupId changed, move to new group
+        if (currentGroupId !== newGroupId) {
+          // Remove from current group
+          const subcategory =
+            state.categories[currentGroupId].subcategories[subIndex];
+          state.categories[currentGroupId].subcategories.splice(subIndex, 1);
+
+          // Add to new group
+          if (state.categories[newGroupId]) {
+            state.categories[newGroupId].subcategories.push({
+              ...subcategory,
+              ...updatedSubcategory,
+            });
+          }
+        } else {
+          // Update in same group
+          state.categories[currentGroupId].subcategories[subIndex] = {
+            ...state.categories[currentGroupId].subcategories[subIndex],
+            ...updatedSubcategory,
+          };
+        }
+      }
+    },
+    deleteSubcategoryAction: (state, action) => {
+      const subcategoryId = action.payload;
+      // Search through all categories to find and remove the subcategory
+      Object.keys(state.categories).forEach(groupId => {
+        const groupIdNum = parseInt(groupId);
+        if (state.categories[groupIdNum]) {
+          state.categories[groupIdNum].subcategories = state.categories[
+            groupIdNum
+          ].subcategories.filter(
+            sub => sub.id.toString() !== subcategoryId.toString(),
+          );
+        }
+      });
+    },
+    addGroupCategoryAction: (state, action) => {
+      const groupCategory = action.payload;
+      state.categories[groupCategory.id] = {
+        name: groupCategory.name,
+        color: groupCategory.color,
+        subcategories: [],
+      };
+    },
+    updateGroupCategoryAction: (state, action) => {
+      const groupCategory = action.payload;
+      if (state.categories[groupCategory.id]) {
+        state.categories[groupCategory.id] = {
+          ...state.categories[groupCategory.id],
+          name: groupCategory.name,
+          color: groupCategory.color,
+        };
+      }
+    },
+    deleteGroupCategoryAction: (state, action) => {
+      const groupId = action.payload;
+      delete state.categories[groupId];
+    },
+    replaceGroupCategoryAction: (state, action) => {
+      const {frontendId, resp} = action.payload;
+      // Replace group category with server response
+      if (state.categories[frontendId]) {
+        const existingSubcategories =
+          state.categories[frontendId].subcategories;
+        state.categories[resp.id] = {
+          name: resp.name,
+          color: resp.color,
+          subcategories: existingSubcategories,
+        };
+        // Remove old entry if ID changed
+        if (frontendId !== resp.id) {
+          delete state.categories[frontendId];
+        }
+      }
+    },
   },
   extraReducers: builder => {
     builder
@@ -234,23 +368,31 @@ const mainSlice = createSlice({
 export const {
   addBudgets,
   addExpense,
+  addGroupCategoryAction,
   addIncome,
+  addSubcategoryAction,
   clearDevMode,
   deleteBudget,
+  deleteGroupCategoryAction,
+  deleteSubcategoryAction,
   dropMain,
   initState,
   removeExpense,
   removeIncome,
   replaceBudget,
   replaceExpense,
+  replaceGroupCategoryAction,
   replaceIncome,
+  replaceSubcategoryAction,
   setSnackbar,
   startLoading,
   stopLoading,
   toggleDevMode,
   updateBudget,
   updateExpense,
+  updateGroupCategoryAction,
   updateIncome,
+  updateSubcategoryAction,
 } = mainSlice.actions;
 
 export {emptyState as mainEmptyState};

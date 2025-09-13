@@ -11,7 +11,7 @@ import {
 } from './types';
 import {CircleIcon} from '../Icons';
 import {useAppDispatch} from '@/hooks';
-import {handleCategory} from '@/redux/main/thunks';
+import {addSubcategoryLocal} from '@/redux/main/thunks';
 import {useState} from 'react';
 
 const WIDTH_ICON_VIEW = 45;
@@ -71,8 +71,7 @@ const GroupedItemsList = ({
 
   const handleSave = () => {
     dispatch(
-      handleCategory({
-        method: 'POST',
+      addSubcategoryLocal({
         name: newCategory,
         groupId: +groupId,
         color: '#FFFFFF',

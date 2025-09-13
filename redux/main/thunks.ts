@@ -1,7 +1,7 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {RootState} from '../store';
 
-import {getURL, makeNewIdArr, printJsonIndent} from '@/common';
+import {getURL, makeNewIdArr, makeRandomId, printJsonIndent} from '@/common';
 import {Expense, Income} from '@/types';
 import {
   addBudgets as addBudgetsAction,
@@ -16,6 +16,13 @@ import {
   deleteBudget as deleteBudgetAction,
   removeExpense as removeExpenseAction,
   removeIncome as removeIncomeAction,
+  addSubcategoryAction,
+  updateSubcategoryAction,
+  deleteSubcategoryAction,
+  addGroupCategoryAction,
+  updateGroupCategoryAction,
+  deleteGroupCategoryAction,
+  setSnackbar,
 } from './mainSlice';
 import {
   addToQueue,
@@ -428,6 +435,218 @@ export const handleDeleteCategory = createAsyncThunk<
   return data.d;
 });
 
+export const addSubcategoryLocal = createAsyncThunk<
+  any,
+  {
+    name: string;
+    color: string;
+    groupId: number;
+  },
+  {state: RootState}
+>('subcategory/addLocal', async (payload, thunkAPI) => {
+  const {dispatch, getState} = thunkAPI;
+
+  const auth = getState().auth;
+  const {name, color, groupId} = payload;
+
+  // Generate frontend ID for optimistic update
+  const frontendId = `f_${makeRandomId(8)}`;
+
+  // Create temporary subcategory object
+  const tempSubcategory = {
+    id: frontendId,
+    name,
+    color: color.split('#')[1] || 'ffffff',
+    groupId,
+    owner: auth.name,
+    ownerId: auth.houses[0],
+  };
+
+  console.log(tempSubcategory);
+  // Immediate local update
+  dispatch(addSubcategoryAction(tempSubcategory));
+
+  // Queue sync operation
+  dispatch(
+    addToQueue({
+      path: ['main', 'category'],
+      method: 'POST',
+      data: {name, color: color.split('#')[1] || 'ffffff', groupId},
+      handler: 'genericSync',
+      frontendId,
+      cb: 'replaceSubcategoryAction',
+    }),
+  );
+
+  return tempSubcategory;
+});
+
+export const updateSubcategoryLocal = createAsyncThunk<
+  any,
+  {
+    id: number;
+    name: string;
+    color: string;
+    groupId: number;
+  },
+  {state: RootState}
+>('subcategory/updateLocal', async (payload, thunkAPI) => {
+  const {dispatch} = thunkAPI;
+  const {id, name, color, groupId} = payload;
+
+  // Immediate local update
+  dispatch(updateSubcategoryAction(payload));
+
+  // Queue sync operation
+  dispatch(
+    addToQueue({
+      path: ['main', 'category', id.toString()],
+      method: 'PUT',
+      data: {name, color: color.split('#')[1] || 'ffffff', groupId},
+      handler: 'genericSync',
+      frontendId: id.toString(),
+      cb: 'replaceSubcategoryAction',
+    }),
+  );
+
+  return payload;
+});
+
+export const deleteSubcategoryLocal = createAsyncThunk<
+  any,
+  string | number,
+  {state: RootState}
+>('subcategory/deleteLocal', async (id, thunkAPI) => {
+  const {dispatch} = thunkAPI;
+
+  // Immediate local update - remove from state
+  dispatch(deleteSubcategoryAction(id));
+
+  // Queue sync operation - let queue logic decide if it's needed
+  dispatch(
+    addToQueue({
+      path: ['main', 'category', id.toString()],
+      method: 'DELETE',
+      handler: 'genericSync',
+      frontendId: id.toString(),
+    }),
+  );
+
+  return id;
+});
+
+export const addGroupCategoryLocal = createAsyncThunk<
+  any,
+  {
+    name: string;
+    color: string;
+  },
+  {state: RootState}
+>('groupCategory/addLocal', async (payload, thunkAPI) => {
+  const {dispatch, getState} = thunkAPI;
+
+  const auth = getState().auth;
+  const {name, color} = payload;
+
+  // Generate frontend ID for optimistic update
+  const frontendId = `f_g_${makeRandomId(8)}`;
+
+  // Create temporary group category object
+  const tempGroupCategory = {
+    id: frontendId,
+    name,
+    color: color.split('#')[1] || 'ffffff',
+    owner: auth.name,
+    ownerId: auth.houses[0],
+  };
+
+  // Immediate local update
+  dispatch(addGroupCategoryAction(tempGroupCategory));
+
+  // Queue sync operation
+  dispatch(
+    addToQueue({
+      path: ['main', 'category', 'group'],
+      method: 'POST',
+      data: {name, color: tempGroupCategory.color},
+      handler: 'genericSync',
+      frontendId,
+      cb: 'replaceGroupCategoryAction',
+    }),
+  );
+
+  return tempGroupCategory;
+});
+
+export const updateGroupCategoryLocal = createAsyncThunk<
+  any,
+  {
+    id: number | string;
+    name: string;
+    color: string;
+  },
+  {state: RootState}
+>('groupCategory/updateLocal', async (payload, thunkAPI) => {
+  const {dispatch} = thunkAPI;
+
+  // Immediate local update
+  dispatch(updateGroupCategoryAction(payload));
+
+  // Queue sync operation
+  dispatch(
+    addToQueue({
+      path: ['main', 'category', 'group', payload.id.toString()],
+      method: 'PUT',
+      data: {
+        name: payload.name,
+        color: payload.color.split('#')[1] || 'ffffff',
+      },
+      handler: 'genericSync',
+      frontendId: payload.id.toString(),
+      cb: 'replaceGroupCategoryAction',
+    }),
+  );
+
+  return payload;
+});
+
+export const deleteGroupCategoryLocal = createAsyncThunk<
+  any,
+  string | number,
+  {state: RootState}
+>('groupCategory/deleteLocal', async (id, thunkAPI) => {
+  const {dispatch, getState} = thunkAPI;
+  const state = getState();
+
+  // Check if group has subcategories
+  const group = state.main.categories[id];
+  if (group && group.subcategories.length > 0) {
+    dispatch(
+      setSnackbar({
+        open: true,
+        type: 'error',
+        msg: 'Najpierw usuń wszystkie podkategorie',
+      }),
+    );
+    throw new Error('Cannot delete group with subcategories');
+  }
+
+  // Immediate local update - remove from state
+  dispatch(deleteGroupCategoryAction(id));
+
+  // Queue sync operation - let queue logic decide if it's needed
+  dispatch(
+    addToQueue({
+      path: ['main', 'category', 'group', id.toString()],
+      method: 'DELETE',
+      handler: 'genericSync',
+      frontendId: id.toString(),
+    }),
+  );
+
+  return id;
+});
+
 export const handleDeleteGroupCategory = createAsyncThunk<
   any,
   {id?: string},
@@ -529,20 +748,15 @@ export const deleteExpense = createAsyncThunk<
   setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
 });
 
-export const deleteIncome = createAsyncThunk<
-  any,
-  string,
-  {state: RootState}
->('income/delete', async (id, thunkAPI) => {
-  const {dispatch} = thunkAPI;
+export const deleteIncome = createAsyncThunk<any, string, {state: RootState}>(
+  'income/delete',
+  async (id, thunkAPI) => {
+    const {dispatch} = thunkAPI;
 
-  // Always remove from local state first
-  dispatch(removeIncomeAction(id));
+    // Always remove from local state first
+    dispatch(removeIncomeAction(id));
 
-  // Check if it's a synced item (needs backend deletion)
-  const isUnsynced = typeof id === 'string' && id.startsWith('f_');
-
-  if (!isUnsynced) {
+    // Check if it's a synced item (needs backend deletion)
     // Schedule backend deletion for synced items
     dispatch(
       addToQueue({
@@ -552,8 +766,8 @@ export const deleteIncome = createAsyncThunk<
         frontendId: id,
       }),
     );
-  }
-});
+  },
+);
 
 export const deleteExpenseLocal = createAsyncThunk<
   any,
@@ -565,20 +779,15 @@ export const deleteExpenseLocal = createAsyncThunk<
   // Always remove from local state first
   dispatch(removeExpenseAction(id));
 
-  // Check if it's a synced item (needs backend deletion)
-  const isUnsynced = typeof id === 'string' && id.startsWith('f_');
-
-  if (!isUnsynced) {
-    // Schedule backend deletion for synced items
-    dispatch(
-      addToQueue({
-        path: ['main', 'expenses', id],
-        method: 'DELETE',
-        handler: 'genericSync',
-        frontendId: id,
-      }),
-    );
-  }
+  // Schedule backend deletion for synced items
+  dispatch(
+    addToQueue({
+      path: ['main', 'expenses', id],
+      method: 'DELETE',
+      handler: 'genericSync',
+      frontendId: id,
+    }),
+  );
 });
 
 export const genericSync = createAsyncThunk<

@@ -14,7 +14,12 @@ import {
 } from '@/redux/main/selectors';
 import {Subcategory} from '@/redux/main/mainSlice';
 import {sizes, useAppTheme} from '@/constants/theme';
-import {handleCategory} from '@/redux/main/thunks';
+import {
+  handleCategory,
+  addSubcategoryLocal,
+  updateSubcategoryLocal,
+} from '@/redux/main/thunks';
+import {setSnackbar} from '@/redux/main/mainSlice';
 import {TwoButtons} from '@/components/categories/TwoButtons';
 
 interface State {
@@ -86,16 +91,47 @@ export default function OneCategory() {
 
   const handleSave = async () => {
     // validate
-    dispatch(
-      handleCategory({
-        method: id && Number.isInteger(+id) ? 'PUT' : 'POST',
-        ...state,
-      }),
-    )
-      .unwrap()
-      .then(() => {
-        router.navigate('..');
-      });
+    const isEdit = id && Number.isInteger(+id);
+
+    let errmsg;
+
+    if (typeof state.groupId === 'string' && state.groupId.startsWith('f_'))
+      errmsg = 'Połącz z internetem aby zapisać główną kategorię';
+
+    if (_.isEmpty(state.name) || !state.groupId) {
+      errmsg = 'Wypełnij wszystkie pola';
+    }
+
+    if (!state.name || !state.color || !state.groupId) {
+      dispatch(
+        setSnackbar({
+          open: true,
+          type: 'error',
+          msg: errmsg || `Coś poszło nie tak`,
+        }),
+      );
+      return;
+    }
+
+    if (isEdit) {
+      dispatch(
+        updateSubcategoryLocal({
+          id: state.id,
+          name: state.name,
+          color: state.color,
+          groupId: state.groupId,
+        }),
+      );
+    } else {
+      dispatch(
+        addSubcategoryLocal({
+          name: state.name,
+          color: state.color || '#FFFFFF',
+          groupId: state.groupId,
+        }),
+      );
+    }
+    router.navigate('..');
   };
 
   const handleColorChange = (color: string) => {
@@ -122,14 +158,8 @@ export default function OneCategory() {
 
   const itemsToSelect = categories.map(([k, groupId]) => ({
     label: k,
-    value: +groupId,
+    value: isNaN(+groupId) ? groupId : +groupId,
   }));
-
-  // useEffect(() => {
-  //   if (isDirty !== edit) {
-  //     setEdit(isDirty);
-  //   }
-  // }, [isDirty]);
 
   return (
     <ScrollView style={{height: '100%', backgroundColor: t.colors.white}}>
