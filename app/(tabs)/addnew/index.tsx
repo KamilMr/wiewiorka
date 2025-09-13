@@ -24,7 +24,6 @@ import {
   ButtonWithStatus,
   DatePicker,
   PriceAndCategory,
-  Select,
   TextInput,
 } from '@/components';
 import {SelectRadioButtons} from '@/components/addnew/SelectRadioButtons';
@@ -32,7 +31,7 @@ import {RemainingAmountDisplay} from '@/components/addnew/RemainingAmountDisplay
 import {sizes} from '@/constants/theme';
 import {
   addNewExpense,
-  deleteExpense,
+  deleteExpenseLocal,
   deleteIncome,
   updateExpense,
   addNewIncome,
@@ -324,18 +323,11 @@ export default function AddNew() {
         style: 'destructive',
         onPress: () => {
           if (type === 'expense') {
-            dispatch(deleteExpense(id as string))
-              .unwrap()
-              .then(() => {
-                router.navigate('/(tabs)/records');
-              });
+            dispatch(deleteExpenseLocal(id as string));
           } else {
-            dispatch(deleteIncome(id as string))
-              .unwrap()
-              .then(() => {
-                router.navigate('/(tabs)/records');
-              });
+            dispatch(deleteIncome(id as string));
           }
+          router.navigate('/(tabs)/records');
         },
       },
     ]);
@@ -481,7 +473,7 @@ export default function AddNew() {
           )}
         </View>
         <View>
-          {+id ? (
+          {id ? (
             <ButtonWithStatus textColor="red" onPress={handleDelete}>
               Usuń
             </ButtonWithStatus>
