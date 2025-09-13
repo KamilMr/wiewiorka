@@ -2,7 +2,6 @@ import {formatDate, isAfter, isBefore, isSameDay, parse} from 'date-fns';
 import {NativeScrollEvent, NativeSyntheticEvent} from 'react-native';
 import uniqueId from 'react-native-uuid';
 import formatDateTz, {timeFormats} from './utils/formatTimeTz';
-import {useAppSelector} from '@/hooks';
 
 const URL = process.env.EXPO_PUBLIC_API_URL;
 
@@ -140,10 +139,6 @@ const formatToDashDate = (d: string | Date) => {
   return formatDateTz({date: d1, pattern: timeFormats.dateOnly2});
 };
 
-const useDev = () => {
-  return useAppSelector(state => state.main.devMode);
-};
-
 export {
   convertDate,
   dh,
@@ -158,5 +153,4 @@ export {
   normalize,
   printJsonIndent,
   shortenText,
-  useDev,
 };

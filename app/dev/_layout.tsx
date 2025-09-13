@@ -1,6 +1,6 @@
 import {Stack, router} from 'expo-router';
 import {useEffect} from 'react';
-import {useDev} from '@/common';
+import {useDev} from '@/hooks';
 import KeyboardView from '@/components/KeyboardView';
 import DevModeToggle from '@/components/DevModeToggle';
 import StatusIndicator from '@/components/StatusIndicator';

@@ -10,7 +10,7 @@ import {selectStatus} from '@/redux/main/selectors';
 import {setShouldReload, selectOperations} from '@/redux/sync/syncSlice';
 import {useAppDispatch, useAppSelector} from '@/hooks';
 import {useAppTheme} from '@/constants/theme';
-import {useDev} from '@/common';
+import {useDev} from '@/hooks';
 import {useNetInfo} from '@react-native-community/netinfo';
 
 const Settings = () => {

@@ -10,7 +10,7 @@ import {
 import {usePathname} from 'expo-router';
 import {useAppDispatch} from '@/hooks';
 import {toggleDevMode, setSnackbar, clearDevMode} from '@/redux/main/mainSlice';
-import {useDev} from '@/common';
+import {useDev} from '@/hooks';
 import {TabBarIcon} from '@/components/navigation/TabBarIcon';
 
 interface DevModeToggleProps {
