@@ -6,11 +6,7 @@ import {
   useStore,
 } from 'react-redux';
 import type {AppStore, RootState, AppDispatch} from '@/redux/store';
-import {
-  selectOperations,
-  selectShouldReload,
-  clearShouldReload,
-} from '@/redux/sync/syncSlice';
+import {selectOperations} from '@/redux/sync/syncSlice';
 import {useEffect, useState} from 'react';
 import * as mainThunks from '@/redux/main/thunks';
 import {useNetInfo} from '@react-native-community/netinfo';
@@ -31,7 +27,6 @@ const handler = {
 
 const useSync = () => {
   const operations = useAppSelector(selectOperations);
-  const shouldReload = useAppSelector(selectShouldReload);
   const dispatch = useAppDispatch();
   const con = useNetInfo();
 
@@ -40,13 +35,6 @@ const useSync = () => {
   useEffect(() => {
     if (!con.isConnected) return;
     let timerId: ReturnType<typeof setTimeout> | undefined;
-
-    if (operations.length === 0 && shouldReload) {
-      dispatch(mainThunks.fetchIni()).then(() => {
-        dispatch(clearShouldReload());
-      });
-      return;
-    }
 
     if (operations.length === 0) return;
 
@@ -107,7 +95,7 @@ const useSync = () => {
     return () => {
       clearTimeout(timerId);
     };
-  }, [operations.length, con.isConnected, dispatch, shouldReload, reload]);
+  }, [operations.length, con.isConnected, dispatch, reload]);
 };
 
 const useDev = () => {
