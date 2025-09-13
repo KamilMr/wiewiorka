@@ -64,7 +64,7 @@ export type AppTheme = typeof paperTheme;
 export const useAppTheme = () => useTheme<AppTheme>();
 
 export const SYNC_CONFIG = {
-    MAX_RETRIES: 3,
-    RETRY_DELAY: 3 * 60 * 1000, // 3 minutes
-    CLEANUP_DELAY: 5 * 60 * 1000 // 5 minutes
-  };
+  MAX_RETRIES: 3,
+  RETRY_DELAY: 3 * 60 * 1000, // 3 minutes
+  CLEANUP_DELAY: 5 * 60 * 1000, // 5 minutes
+};

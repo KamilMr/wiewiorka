@@ -9,7 +9,7 @@ import {
 import _ from 'lodash';
 
 import {CircleIcon} from './Icons';
-import {Text} from '@/components';
+import {IconButton, Text} from '@/components';
 import {format as formatDate} from 'date-fns';
 import {sizes, useAppTheme} from '@/constants/theme';
 
@@ -42,6 +42,10 @@ interface Props {
 }
 
 // TODO: Consider using flat list
+
+const isUnsynced = (id: number): boolean => {
+  return String(id).startsWith('f_');
+};
 
 export default function DynamicRecordList({
   records,
@@ -79,15 +83,30 @@ export default function DynamicRecordList({
               </View>
 
               {/* Price */}
-              <View style={{alignItems: 'flex-end'}}>
-                <Text
-                  variant="bodyMedium"
-                  style={{
-                    color: exp.exp ? t.colors.deepMaroon : t.colors.primary,
-                  }}
-                >
-                  {exp.price + ' zł'}
-                </Text>
+              <View style={{alignItems: 'flex-end', position: 'relative'}}>
+                {isUnsynced(exp.id) && (
+                  <IconButton
+                    icon="sync-off"
+                    size={16}
+                    iconColor="#FF8C00"
+                    style={{
+                      marginLeft: sizes.sm,
+                      position: 'absolute',
+                      right: -15,
+                      top: -30,
+                    }}
+                  />
+                )}
+                <View style={styles.priceRow}>
+                  <Text
+                    variant="bodyMedium"
+                    style={{
+                      color: exp.exp ? t.colors.deepMaroon : t.colors.primary,
+                    }}
+                  >
+                    {exp.price + ' zł'}
+                  </Text>
+                </View>
                 <Text
                   variant="bodySmall"
                   style={{textAlign: 'right', color: t.colors.secondary}}
@@ -109,6 +128,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: sizes.xl,
+  },
+  priceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   image: {
     width: 40,

@@ -555,7 +555,9 @@ export const genericSync = createAsyncThunk<
 
       return result.d;
     } catch (error) {
-      dispatch(incrementRetryCount({operationId, maxRetries: SYNC_CONFIG.MAX_RETRIES}));
+      dispatch(
+        incrementRetryCount({operationId, maxRetries: SYNC_CONFIG.MAX_RETRIES}),
+      );
       dispatch(setSyncError({operationId, error: String(error)}));
 
       return {error: true, message: String(error)};
