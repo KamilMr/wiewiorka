@@ -52,8 +52,8 @@ import SafeScrollContainer from '@/components/SafeScrollContainer';
 const initState = (date = new Date(), categories: any[] = []) => ({
   description: '',
   date,
-  price: '',
-  category: '',
+  price: '300',
+  category: categories[0]?.name,
 });
 
 const initSplitItem = () => ({
