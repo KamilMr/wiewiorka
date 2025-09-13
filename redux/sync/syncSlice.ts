@@ -1,6 +1,6 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {SyncSlice, SyncOperation} from '@/types';
-import {makeRandomId} from '@/common';
+import {makeRandomId, printJsonIndent} from '@/common';
 import {SYNC_CONFIG} from '@/constants/theme';
 import {RootState} from '../store';
 
@@ -37,43 +37,38 @@ const syncSlice = createSlice({
         status: 'pending',
       };
 
-      console.log(
-        '📋 Adding operation to sync queue:',
-        JSON.stringify(operation, null, 2),
-      );
+      printJsonIndent('before', operation);
+      // Smart queue optimization logic
+      if (operation.method === 'DELETE') {
+        // DELETE and frontendId starts with f_ - remove all items from queue (unsynced item)
+        if (operation.frontendId && operation.frontendId.startsWith('f_')) {
+          state.pendingOperations = state.pendingOperations.filter(
+            op => op.frontendId !== operation.frontendId,
+          );
+          // Don't add DELETE to queue - item was never synced
+          printJsonIndent('after', state.pendingOperations);
+          return;
+        }
 
-      // Check if operation already exists to avoid duplicates
-      const existingIndex = state.pendingOperations.findIndex(
-        op => op.frontendId === action.payload.frontendId,
-      );
-
-      if (existingIndex >= 0) {
-        // Update existing operation instead of adding duplicate
-        console.log(
-          '🔄 Updating existing operation instead of adding duplicate',
+        // DELETE overrides all [POST, PUT, DELETE] -> [DELETE]
+        state.pendingOperations = state.pendingOperations.filter(
+          op => op.frontendId !== operation.frontendId,
         );
-        state.pendingOperations[existingIndex] = operation;
+        state.pendingOperations.push(operation);
       } else {
-        console.log('➕ Adding new operation to queue');
+        // POST and PUT go one after another, no changes
         state.pendingOperations.push(operation);
       }
 
-      console.log(
-        `📊 Queue now has ${state.pendingOperations.length} operations:`,
-        state.pendingOperations.map(op => `${op.method} ${op.path.join('/')}`),
-      );
+      printJsonIndent('after', state.pendingOperations);
     },
 
     removeFromQueue: (state, action: PayloadAction<string>) => {
-      console.log('🗑️ Removing operation from queue:', action.payload);
       state.pendingOperations = state.pendingOperations.filter(
         op => op.id !== action.payload,
       );
       // Remove associated error if exists
       delete state.syncErrors[action.payload];
-      console.log(
-        `📊 Queue now has ${state.pendingOperations.length} operations remaining`,
-      );
     },
 
     clearQueue: state => {
