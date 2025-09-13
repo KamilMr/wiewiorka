@@ -120,7 +120,7 @@ const DropdownComponent = ({
                 <AntDesign
                   style={styles.icon}
                   color={isVisible ? 'blue' : 'black'}
-                  name="Safety"
+                  name="select1"
                   size={20}
                 />
                 <Text style={styles.dropdownText}>

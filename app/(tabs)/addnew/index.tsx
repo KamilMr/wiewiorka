@@ -8,16 +8,7 @@ import {
   useNavigation,
 } from 'expo-router';
 import {formatDate} from 'date-fns';
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  SafeAreaView,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  Keyboard,
-} from 'react-native';
+import {View, StyleSheet, Alert} from 'react-native';
 import {Button, IconButton} from 'react-native-paper';
 
 import {
@@ -303,12 +294,9 @@ export default function AddNew() {
           : isPasRecord
             ? updateIncome(dataToSave)
             : addNewIncome(dataToSave),
-      )
-        .unwrap()
-        .then(() => {
-          setForm(initState(new Date(), expenseCategories));
-          router.navigate('/(tabs)/records');
-        });
+      );
+      setForm(initState(new Date(), expenseCategories));
+      router.navigate('/(tabs)/records');
     }
   };
 
@@ -322,11 +310,8 @@ export default function AddNew() {
         text: 'Usuń',
         style: 'destructive',
         onPress: () => {
-          if (type === 'expense') {
-            dispatch(deleteExpenseLocal(id as string));
-          } else {
-            dispatch(deleteIncome(id as string));
-          }
+          if (type === 'expense') dispatch(deleteExpenseLocal(id as string));
+          else dispatch(deleteIncome(id as string));
           router.navigate('/(tabs)/records');
         },
       },

@@ -10,6 +10,7 @@ import {selectOperations} from '@/redux/sync/syncSlice';
 import {useEffect, useState} from 'react';
 import * as mainThunks from '@/redux/main/thunks';
 import {useNetInfo} from '@react-native-community/netinfo';
+import {printJsonIndent} from '@/common';
 
 // Use throughout your app instead of plain `useDispatch` and `useSelector`
 const useAppDispatch = useDispatch.withTypes<AppDispatch>();
@@ -95,7 +96,7 @@ const useSync = () => {
     return () => {
       clearTimeout(timerId);
     };
-  }, [operations.length, con.isConnected, dispatch, reload]);
+  }, [operations, con.isConnected, dispatch, reload]);
 };
 
 const useDev = () => {

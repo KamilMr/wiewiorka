@@ -12,7 +12,6 @@ const SafeScrollContainer = ({children, style, fullHeight = true}) => {
   const {type} = useNavigationState(state => state);
   const safeInsets = useSafeAreaInsets();
 
-  console.log(headerHeight);
   if (type === 'stack') {
     return (
       <ScrollView>

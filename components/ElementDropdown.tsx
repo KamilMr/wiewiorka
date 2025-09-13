@@ -4,6 +4,7 @@ import {Dropdown} from 'react-native-element-dropdown';
 import AntDesign from '@expo/vector-icons/AntDesign';
 
 import {useAppTheme} from '@/constants/theme';
+import {IconButton} from '.';
 
 export type Items = Array<{label: string; value: string}>;
 
@@ -79,12 +80,7 @@ const ElementDropdown = ({
       onBlur={() => setIsFocus(false)}
       onChange={handleChange}
       renderLeftIcon={() => (
-        <AntDesign
-          style={styles.icon}
-          color={isFocus && !disable ? 'blue' : 'black'}
-          name="Safety"
-          size={20}
-        />
+        <IconButton style={styles.icon} icon="arrow-right" size={20} />
       )}
       renderItem={renderItem}
       disable={disable}

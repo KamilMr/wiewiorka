@@ -13,12 +13,7 @@ import {buildBarChart, buildPieChart} from '@/utils/chartBuilder';
 import {selectByTimeRange, selectCategories} from '@/redux/main/selectors';
 import {useAppSelector} from '@/hooks';
 import {useAppTheme} from '@/constants/theme';
-import {
-  EXCLUDED_CAT,
-  formatPrice,
-  printJsonIndent,
-  shortenText,
-} from '@/common';
+import {EXCLUDED_CAT, formatPrice, shortenText} from '@/common';
 
 type GroupedValue = number[];
 interface GroupedType {
@@ -164,7 +159,6 @@ const Summary = () => {
     setAxis([ax, ax === '1-0' ? '0-0' : axis[1]]);
   };
 
-  // printJsonIndent(data)
   return (
     <ScrollView style={{backgroundColor: t.colors.white}}>
       <DatePicker

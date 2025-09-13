@@ -5,7 +5,6 @@ import {format} from 'date-fns';
 
 import aggregateDataByDay from '../../utils/aggregateData';
 import {MainSlice, Income, Expense} from '@/types';
-import {printJsonIndent} from '@/common';
 
 const emptyState = (): MainSlice => ({
   status: 'idle',
@@ -83,7 +82,6 @@ const mainSlice = createSlice({
       ];
     },
     addBudgets: (state, action) => {
-      printJsonIndent('addBudgets called with:', action.payload);
       state.budgets = [
         ...state.budgets,
         ...action.payload.map((budget: any) => ({
@@ -93,7 +91,6 @@ const mainSlice = createSlice({
             : budget.yearMonth,
         })),
       ];
-      printJsonIndent('addBudgets: New budgets state:', state.budgets);
     },
     updateBudget: (state, action) => {
       const {id, ...data} = action.payload;
@@ -160,7 +157,6 @@ const mainSlice = createSlice({
     },
     replaceBudget: (state, action) => {
       const {frontendId, resp} = action.payload;
-      printJsonIndent('replaceBudget called with:', {frontendId, resp});
 
       if (Array.isArray(resp)) {
         // Remove all budgets with matching frontendId prefix
@@ -175,10 +171,6 @@ const mainSlice = createSlice({
             : budget.yearMonth,
         }));
         state.budgets = [...state.budgets, ...transformedBudgets];
-        printJsonIndent(
-          'Replaced multiple budgets, new budget count:',
-          state.budgets.length,
-        );
       } else {
         const budgetIndex = state.budgets.findIndex(
           budget => budget.id === frontendId,

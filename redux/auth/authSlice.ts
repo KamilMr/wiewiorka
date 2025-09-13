@@ -4,7 +4,6 @@ import _ from 'lodash';
 import {logout, signIn} from './thunks';
 import {RootState} from '../store';
 import {AuthSlice} from '@/types';
-import {printJsonIndent} from '@/common';
 
 const emptyState = (): AuthSlice => ({
   name: '',
@@ -22,7 +21,6 @@ export const authSlice = createSlice({
     builder
       .addCase(signIn.fulfilled, (state, action: PayloadAction<AuthSlice>) => {
         const {name = '', email, token, id, houses} = action.payload;
-        printJsonIndent('login', action.payload);
         state.name = name;
         state.email = email;
         state.token = token;

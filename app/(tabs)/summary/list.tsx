@@ -5,7 +5,7 @@ import {NativeScrollEvent, NativeSyntheticEvent, View} from 'react-native';
 import _ from 'lodash';
 
 import DynamicRecordList from '@/components/DynamicList';
-import {isCloseToBottom, printJsonIndent} from '@/common';
+import {isCloseToBottom} from '@/common';
 import {selectRecords} from '@/redux/main/selectors';
 import {useAppSelector} from '@/hooks';
 import {useAppTheme} from '@/constants/theme';

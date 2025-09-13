@@ -2,13 +2,7 @@ import {createSelector} from '@reduxjs/toolkit';
 import {format, formatDate, isAfter, isBefore, isSameDay} from 'date-fns';
 import _ from 'lodash';
 
-import {
-  EXCLUDED_CAT,
-  dh,
-  makeNewIdArr,
-  normalize,
-  printJsonIndent,
-} from '@/common';
+import {EXCLUDED_CAT, dh, makeNewIdArr, normalize} from '@/common';
 import {RootState} from '../store';
 import {Category, Expense, Income, Subcategory} from '@/types';
 import {BudgetMainSlice, BudgetCardItem} from '@/utils/types';

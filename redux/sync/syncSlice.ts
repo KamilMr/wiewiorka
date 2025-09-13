@@ -1,6 +1,6 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {SyncSlice, SyncOperation} from '@/types';
-import {makeRandomId, printJsonIndent} from '@/common';
+import {makeRandomId} from '@/common';
 import {SYNC_CONFIG} from '@/constants/theme';
 import {RootState} from '../store';
 
@@ -37,7 +37,6 @@ const syncSlice = createSlice({
         status: 'pending',
       };
 
-      printJsonIndent('before', operation);
       // Smart queue optimization logic
       if (operation.method === 'DELETE') {
         // DELETE and frontendId starts with f_ - remove all items from queue (unsynced item)
@@ -46,7 +45,6 @@ const syncSlice = createSlice({
             op => op.frontendId !== operation.frontendId,
           );
           // Don't add DELETE to queue - item was never synced
-          printJsonIndent('after', state.pendingOperations);
           return;
         }
 
@@ -59,8 +57,6 @@ const syncSlice = createSlice({
         // POST and PUT go one after another, no changes
         state.pendingOperations.push(operation);
       }
-
-      printJsonIndent('after', state.pendingOperations);
     },
 
     removeFromQueue: (state, action: PayloadAction<string>) => {

@@ -5,7 +5,7 @@ import {Tooltip, IconButton} from 'react-native-paper';
 import {View, StyleSheet, FlatList} from 'react-native';
 
 import {PieChartBar, Text} from '@/components';
-import {generateColor, formatPrice, printJsonIndent} from '@/common';
+import {generateColor, formatPrice} from '@/common';
 import {selectIncomes} from '@/redux/main/selectors';
 import {selectMe} from '@/redux/auth/authSlice';
 import {useAppTheme} from '@/constants/theme';

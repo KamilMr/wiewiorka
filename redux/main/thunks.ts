@@ -1,7 +1,7 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {RootState} from '../store';
 
-import {getURL, makeNewIdArr, makeRandomId, printJsonIndent} from '@/common';
+import {getURL, makeNewIdArr, makeRandomId} from '@/common';
 import {Expense, Income} from '@/types';
 import {
   addBudgets as addBudgetsAction,
@@ -131,11 +131,6 @@ export const createUpdateBudget = createAsyncThunk<
       isNew: !budget.id,
     }));
 
-    printJsonIndent(
-      'uploadMultiBudgets: Budgets with frontend IDs:',
-      budgetsWithFrontendIds,
-    );
-
     // Add to local state immediately
     const newBudgets = budgetsWithFrontendIds.filter(budget => budget.isNew);
     const existingBudgets = budgetsWithFrontendIds.filter(
@@ -246,21 +241,23 @@ export const fetchIni = createAsyncThunk<any, void, {state: RootState}>(
       const remainingOps = updatedState.sync.pendingOperations || [];
 
       // Only proceed if queue is now empty
-      if (remainingOps.length > 0) {
-        return null;
-      }
+      if (remainingOps.length > 0) throw 'Nie możemy pobrać danych';
     }
 
     const token = getState().auth.token;
     let data;
-    let resp = await fetch(getURL('ini'), {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    data = await resp.json();
-    if (data.err) throw data.err;
-    return data.d;
+    try {
+      let resp = await fetch(getURL('ini'), {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      data = await resp.json();
+      if (data.err) throw data.err;
+      return data.d;
+    } catch (err) {
+      throw String(err);
+    }
   },
 );
 
@@ -462,7 +459,6 @@ export const addSubcategoryLocal = createAsyncThunk<
     ownerId: auth.houses[0],
   };
 
-  console.log(tempSubcategory);
   // Immediate local update
   dispatch(addSubcategoryAction(tempSubcategory));
 
@@ -841,7 +837,6 @@ export const genericSync = createAsyncThunk<
 
       return result.d;
     } catch (error) {
-      printJsonIndent(error);
       dispatch(
         incrementRetryCount({operationId, maxRetries: SYNC_CONFIG.MAX_RETRIES}),
       );

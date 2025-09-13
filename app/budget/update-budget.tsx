@@ -7,7 +7,6 @@ import {
   forwardRef,
 } from 'react';
 import {SafeAreaView, ScrollView, View} from 'react-native';
-import {addDays, addMonths, formatDate, subDays, subMonths} from 'date-fns';
 import {router, useLocalSearchParams} from 'expo-router';
 import _, {parseInt} from 'lodash';
 import {TextInput as PaperTextInput} from 'react-native-paper';
@@ -17,10 +16,10 @@ import {TextInput, ButtonWithStatus as Button, Text} from '@/components';
 import {useAppDispatch, useAppSelector} from '@/hooks';
 import {sizes, useAppTheme} from '@/constants/theme';
 import {selectBudgets, selectCategories} from '@/redux/main/selectors';
-import {Budget, createUpdateBudget} from '@/redux/main/thunks';
+import {createUpdateBudget} from '@/redux/main/thunks';
 import {setSnackbar} from '@/redux/main/mainSlice';
-import formatDateTz, {timeFormats} from '@/utils/formatTimeTz';
-import {formatToDashDate, printJsonIndent} from '@/common';
+import formatDateTz from '@/utils/formatTimeTz';
+import {formatToDashDate} from '@/common';
 import {BudgetCardItem} from '@/utils/types';
 
 interface Subcategory {
