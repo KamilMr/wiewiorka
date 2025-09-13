@@ -1,6 +1,7 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {SyncSlice, SyncOperation} from '@/types';
 import {makeRandomId} from '@/common';
+import {SYNC_CONFIG} from '@/constants/theme';
 import {RootState} from '../store';
 
 const emptyState = (): SyncSlice => ({
@@ -18,7 +19,15 @@ const syncSlice = createSlice({
     addToQueue: (
       state,
       action: PayloadAction<
-        Omit<SyncOperation, 'id' | 'timestamp' | 'retryCount'>
+        Omit<
+          SyncOperation,
+          | 'id'
+          | 'timestamp'
+          | 'retryCount'
+          | 'status'
+          | 'lastAttempt'
+          | 'nextRetryAt'
+        >
       >,
     ) => {
       const operation: SyncOperation = {
@@ -26,6 +35,7 @@ const syncSlice = createSlice({
         id: `sync_${makeRandomId(8)}`,
         timestamp: Date.now(),
         retryCount: 0,
+        status: 'pending',
       };
 
       console.log(
@@ -80,13 +90,47 @@ const syncSlice = createSlice({
       state.lastSyncTimestamp = action.payload;
     },
 
-    incrementRetryCount: (state, action: PayloadAction<string>) => {
+    incrementRetryCount: (
+      state,
+      action: PayloadAction<{operationId: string; maxRetries?: number}>,
+    ) => {
       const operation = state.pendingOperations.find(
-        op => op.id === action.payload,
+        op => op.id === action.payload.operationId,
       );
-      if (operation) {
-        operation.retryCount += 1;
+      if (!operation) return;
+      operation.retryCount += 1;
+      operation.lastAttempt = Date.now();
+
+      const maxRetries = action.payload.maxRetries || SYNC_CONFIG.MAX_RETRIES;
+
+      if (operation.retryCount >= maxRetries) {
+        operation.status = 'failed';
+        operation.nextRetryAt = undefined;
+      } else {
+        operation.status = 'retrying';
+        // Fixed 3-minute delay for all retries
+        const delay = SYNC_CONFIG.RETRY_DELAY;
+
+        operation.nextRetryAt = Date.now() + delay;
+        // reload it to trigger useEffect that will do the check
+        state.shouldReload = !state.shouldReload;
       }
+    },
+
+    setOperationStatus: (
+      state,
+      action: PayloadAction<{
+        operationId: string;
+        status: SyncOperation['status'];
+      }>,
+    ) => {
+      const operation = state.pendingOperations.find(
+        op => op.id === action.payload.operationId,
+      );
+      if (!operation) return;
+      operation.status = action.payload.status;
+      if (action.payload.status === 'processing')
+        operation.lastAttempt = Date.now();
     },
 
     setSyncError: (
@@ -126,6 +170,7 @@ export const {
   incrementRetryCount,
   removeFromQueue,
   setLastSyncTimestamp,
+  setOperationStatus,
   setShouldReload,
   setSyncError,
   setSyncingStatus,

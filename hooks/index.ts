@@ -11,7 +11,7 @@ import {
   selectShouldReload,
   clearShouldReload,
 } from '@/redux/sync/syncSlice';
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import * as mainThunks from '@/redux/main/thunks';
 import {useNetInfo} from '@react-native-community/netinfo';
 
@@ -35,8 +35,11 @@ const useSync = () => {
   const dispatch = useAppDispatch();
   const con = useNetInfo();
 
+  const [reload, setReload] = useState(0);
+
   useEffect(() => {
     if (!con.isConnected) return;
+    let timerId: ReturnType<typeof setTimeout> | undefined;
 
     if (operations.length === 0 && shouldReload) {
       dispatch(mainThunks.fetchIni()).then(() => {
@@ -47,6 +50,29 @@ const useSync = () => {
 
     if (operations.length === 0) return;
 
+    let nextOperation;
+
+    let next;
+    if ((next = operations.find(o => o.status === 'pending')))
+      nextOperation = next;
+    else if (
+      (next = operations
+        .filter(o => o.status === 'retrying' && o.nextRetryAt !== undefined)
+        .sort((a, b) => a.nextRetryAt! - b.nextRetryAt!)[0])
+    ) {
+      const canRun = Date.now() - next.nextRetryAt!;
+      if (canRun > 0) {
+        if (timerId) clearTimeout(timerId);
+        nextOperation = next;
+      } else {
+        timerId = setTimeout(() => {
+          setReload(x => x + 1);
+        }, Math.abs(canRun));
+      }
+    }
+
+    if (!nextOperation) return;
+
     const {
       handler: handlerKey,
       path,
@@ -55,7 +81,7 @@ const useSync = () => {
       id,
       cb,
       frontendId,
-    } = operations[0];
+    } = nextOperation;
 
     if (handlerKey === 'genericSync') {
       const handlerThunks = handler[path[0] as keyof typeof handler];
@@ -77,7 +103,11 @@ const useSync = () => {
         }
       }
     }
-  }, [operations.length, con.isConnected, dispatch, shouldReload]);
+
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, [operations.length, con.isConnected, dispatch, shouldReload, reload]);
 };
 
 const useDev = () => {

@@ -15,7 +15,15 @@ import {
   replaceIncome as replaceIncomeAction,
   deleteBudget as deleteBudgetAction,
 } from './mainSlice';
-import {addToQueue, removeFromQueue, setSyncError} from '../sync/syncSlice';
+import {
+  addToQueue,
+  removeFromQueue,
+  setSyncError,
+  incrementRetryCount,
+  setSyncingStatus,
+  setOperationStatus,
+} from '../sync/syncSlice';
+import {SYNC_CONFIG} from '@/constants/theme';
 import _, {omit} from 'lodash';
 
 const DIFFERED = 0;
@@ -500,7 +508,7 @@ export const genericSync = createAsyncThunk<
   any,
   {
     path: string[];
-    method: 'POST' | 'PUT' | 'DELETE';
+    method: 'POST' | 'PUT' | 'DELETE' | 'PATCH';
     data?: any;
     cb?: string;
     operationId: string;
@@ -514,6 +522,7 @@ export const genericSync = createAsyncThunk<
     const {dispatch} = thunkAPI;
 
     try {
+      dispatch(setOperationStatus({operationId, status: 'processing'}));
       const endpoint = path.join('/');
 
       const response = await fetch(getURL(endpoint), {
@@ -546,9 +555,10 @@ export const genericSync = createAsyncThunk<
 
       return result.d;
     } catch (error) {
-      console.log('generit error', error);
+      dispatch(incrementRetryCount({operationId, maxRetries: SYNC_CONFIG.MAX_RETRIES}));
       dispatch(setSyncError({operationId, error: String(error)}));
-      throw error;
+
+      return {error: true, message: String(error)};
     }
   },
 );

@@ -85,6 +85,9 @@ export interface SyncOperation {
   retryCount: number;
   handler: string;
   frontendId?: string;
+  status: 'pending' | 'processing' | 'retrying' | 'failed';
+  lastAttempt?: number;
+  nextRetryAt?: number;
 }
 
 export interface SyncSlice {
