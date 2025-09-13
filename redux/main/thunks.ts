@@ -531,24 +531,28 @@ export const deleteExpense = createAsyncThunk<
 
 export const deleteIncome = createAsyncThunk<
   any,
-  {id?: string},
+  string,
   {state: RootState}
 >('income/delete', async (id, thunkAPI) => {
-  const token = thunkAPI.getState().auth.token;
+  const {dispatch} = thunkAPI;
 
-  let data;
-  const path = 'income' + (id ? `/${id}` : '');
-  let resp = await fetch(getURL(path), {
-    method: 'DELETE',
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  data = await resp.json();
-  if (data.err) throw data.err;
+  // Always remove from local state first
+  dispatch(removeIncomeAction(id));
 
-  // differed fetch
-  setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
+  // Check if it's a synced item (needs backend deletion)
+  const isUnsynced = typeof id === 'string' && id.startsWith('f_');
+
+  if (!isUnsynced) {
+    // Schedule backend deletion for synced items
+    dispatch(
+      addToQueue({
+        path: ['main', 'income', id],
+        method: 'DELETE',
+        handler: 'genericSync',
+        frontendId: id,
+      }),
+    );
+  }
 });
 
 export const deleteExpenseLocal = createAsyncThunk<
