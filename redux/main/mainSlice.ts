@@ -3,16 +3,6 @@ import {createSlice} from '@reduxjs/toolkit';
 import _ from 'lodash';
 import {format} from 'date-fns';
 
-import {
-  deleteExpense,
-  deleteIncome,
-  fetchIni,
-  handleCategory,
-  handleDeleteCategory,
-  handleDeleteGroupCategory,
-  handleGroupCategory,
-  uploadFile,
-} from './thunks';
 import aggregateDataByDay from '../../utils/aggregateData';
 import {MainSlice, Income, Expense} from '@/types';
 import {printJsonIndent} from '@/common';
@@ -202,7 +192,7 @@ const mainSlice = createSlice({
   },
   extraReducers: builder => {
     builder
-      .addCase(fetchIni.fulfilled, (state, action) => {
+      .addCase('ini/fetchIni/fulfilled', (state, action) => {
         let {expenses, income, categories} = action.payload;
         expenses = expenses.map((ex: Expense) => ({
           ...ex,
@@ -226,52 +216,7 @@ const mainSlice = createSlice({
         //
         state._aggregated = aggregateDataByDay(expenses, categories);
       })
-      .addCase(fetchIni.rejected, (state, action) => {
-        state.snackbar.open = true;
-        state.snackbar.type = 'error';
-        state.snackbar.msg = action.error.message ?? 'Coś poszło nie tak';
-      })
-      .addCase(handleCategory.rejected, (state, action) => {
-        state.snackbar.open = true;
-        state.snackbar.type = 'error';
-        state.snackbar.msg = action.error.message ?? 'Coś poszło nie tak';
-      })
-      .addCase(uploadFile.rejected, (state, action) => {
-        state.snackbar.open = true;
-        state.snackbar.type = 'error';
-        state.snackbar.msg = action.error.message ?? 'Coś poszło nie tak';
-      })
-      .addCase(deleteExpense.fulfilled, (state, action) => {
-        state.snackbar.open = true;
-        state.snackbar.type = 'info';
-        state.snackbar.msg = 'Usunięto wydatek';
-      })
-      .addCase(deleteExpense.rejected, (state, action) => {
-        state.snackbar.open = true;
-        state.snackbar.type = 'info';
-        state.snackbar.msg = action.error.message ?? 'Coś poszło nie tak';
-      })
-      .addCase(deleteIncome.fulfilled, (state, action) => {
-        state.snackbar.open = true;
-        state.snackbar.type = 'info';
-        state.snackbar.msg = 'Usunięto wpływ';
-      })
-      .addCase(deleteIncome.rejected, (state, action) => {
-        state.snackbar.open = true;
-        state.snackbar.type = 'info';
-        state.snackbar.msg = action.error.message ?? 'Coś poszło nie tak';
-      })
-      .addCase(handleGroupCategory.rejected, (state, action) => {
-        state.snackbar.open = true;
-        state.snackbar.type = 'error';
-        state.snackbar.msg = action.error.message ?? 'Coś poszło nie tak';
-      })
-      .addCase(handleDeleteCategory.rejected, (state, action) => {
-        state.snackbar.open = true;
-        state.snackbar.type = 'error';
-        state.snackbar.msg = action.error.message ?? 'Coś poszło nie tak';
-      })
-      .addCase(handleDeleteGroupCategory.rejected, (state, action) => {
+      .addCase('ini/fetchIni/rejected', (state, action) => {
         state.snackbar.open = true;
         state.snackbar.type = 'error';
         state.snackbar.msg = action.error.message ?? 'Coś poszło nie tak';
