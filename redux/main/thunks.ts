@@ -209,7 +209,42 @@ export const updateBudgetItem = createAsyncThunk<
 export const fetchIni = createAsyncThunk<any, void, {state: RootState}>(
   'ini/fetchIni',
   async (_, thunkAPI) => {
-    const token = thunkAPI.getState().auth.token;
+    const {dispatch, getState} = thunkAPI;
+    const state = getState();
+    const pendingOps = state.sync.pendingOperations || [];
+
+    // If there are pending operations, process them first
+    if (pendingOps.length > 0) {
+      // Process all pending operations sequentially
+      for (const operation of pendingOps) {
+        try {
+          await dispatch(
+            genericSync({
+              path: operation.path.slice(1), // Remove 'main' prefix
+              method: operation.method,
+              data: operation.data,
+              cb: operation.cb,
+              operationId: operation.id,
+              frontendId: operation.frontendId,
+            }),
+          ).unwrap();
+        } catch (error) {
+          // If any operation fails, stop processing and don't fetch ini
+          throw error;
+        }
+      }
+
+      // After processing operations, check if queue is empty
+      const updatedState = getState();
+      const remainingOps = updatedState.sync.pendingOperations || [];
+
+      // Only proceed if queue is now empty
+      if (remainingOps.length > 0) {
+        return null;
+      }
+    }
+
+    const token = getState().auth.token;
     let data;
     let resp = await fetch(getURL('ini'), {
       headers: {

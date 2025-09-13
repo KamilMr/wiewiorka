@@ -9,7 +9,6 @@ const emptyState = (): SyncSlice => ({
   isSyncing: false,
   lastSyncTimestamp: null,
   syncErrors: {},
-  shouldReload: false,
 });
 
 const syncSlice = createSlice({
@@ -112,8 +111,6 @@ const syncSlice = createSlice({
         const delay = SYNC_CONFIG.RETRY_DELAY;
 
         operation.nextRetryAt = Date.now() + delay;
-        // reload it to trigger useEffect that will do the check
-        state.shouldReload = !state.shouldReload;
       }
     },
 
@@ -144,14 +141,6 @@ const syncSlice = createSlice({
       delete state.syncErrors[action.payload];
     },
 
-    setShouldReload: state => {
-      state.shouldReload = true;
-    },
-
-    clearShouldReload: state => {
-      state.shouldReload = false;
-    },
-
     dropSync: () => emptyState(),
   },
 });
@@ -159,19 +148,15 @@ const syncSlice = createSlice({
 export const selectOperations = (state: RootState) =>
   state.sync.pendingOperations;
 
-export const selectShouldReload = (state: RootState) => state.sync.shouldReload;
-
 export const {
   addToQueue,
   clearQueue,
-  clearShouldReload,
   clearSyncError,
   dropSync,
   incrementRetryCount,
   removeFromQueue,
   setLastSyncTimestamp,
   setOperationStatus,
-  setShouldReload,
   setSyncError,
   setSyncingStatus,
 } = syncSlice.actions;

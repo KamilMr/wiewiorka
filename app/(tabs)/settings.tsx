@@ -7,11 +7,12 @@ import {clearDevMode} from '@/redux/main/mainSlice';
 import {logout} from '@/redux/auth/thunks';
 import {router} from 'expo-router';
 import {selectStatus} from '@/redux/main/selectors';
-import {setShouldReload, selectOperations} from '@/redux/sync/syncSlice';
+import {selectOperations} from '@/redux/sync/syncSlice';
 import {useAppDispatch, useAppSelector} from '@/hooks';
 import {useAppTheme} from '@/constants/theme';
 import {useDev} from '@/hooks';
 import {useNetInfo} from '@react-native-community/netinfo';
+import {fetchIni} from '@/redux/main/thunks';
 
 const Settings = () => {
   const dispatch = useAppDispatch();
@@ -27,7 +28,7 @@ const Settings = () => {
 
   const handleFetch = async () => {
     if (fetching === 'fetching') return;
-    dispatch(setShouldReload());
+    dispatch(fetchIni());
   };
 
   const getReloadIconColor = () => {
