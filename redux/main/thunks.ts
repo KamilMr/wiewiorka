@@ -3,11 +3,35 @@ import {RootState} from '../store';
 
 import {getURL, makeNewIdArr, printJsonIndent} from '@/common';
 import {Expense, Income} from '@/types';
-import * as mainSliceReducers from './mainSlice';
+import {
+  addBudgets as addBudgetsAction,
+  updateBudget as updateBudgetAction,
+  addExpense as addExpenseAction,
+  updateExpense as updateExpenseAction,
+  addIncome as addIncomeAction,
+  updateIncome as updateIncomeAction,
+  replaceBudget as replaceBudgetAction,
+  replaceExpense as replaceExpenseAction,
+  replaceIncome as replaceIncomeAction,
+  deleteBudget as deleteBudgetAction,
+} from './mainSlice';
 import {addToQueue, removeFromQueue, setSyncError} from '../sync/syncSlice';
 import _, {omit} from 'lodash';
 
 const DIFFERED = 0;
+
+const mainSliceReducers = {
+  deleteBudget: deleteBudgetAction,
+  addBudgets: addBudgetsAction,
+  updateBudget: updateBudgetAction,
+  addExpense: addExpenseAction,
+  updateExpense: updateExpenseAction,
+  addIncome: addIncomeAction,
+  updateIncome: updateIncomeAction,
+  replaceBudget: replaceBudgetAction,
+  replaceExpense: replaceExpenseAction,
+  replaceIncome: replaceIncomeAction,
+};
 
 export interface Budget {
   id?: string;
@@ -39,7 +63,7 @@ export const deleteBudget = createAsyncThunk<
   });
 
   // Update local state immediately
-  dispatch(mainSliceReducers.deleteBudget({id}));
+  dispatch(deleteBudgetAction({id}));
 
   // Queue for sync - DELETE request
   dispatch(
@@ -104,7 +128,7 @@ export const createUpdateBudget = createAsyncThunk<
 
     if (newBudgets.length > 0) {
       dispatch(
-        mainSliceReducers.addBudgets(
+        addBudgetsAction(
           newBudgets.map(budget =>
             _.pick(budget, ['amount', 'categoryId', 'date', 'id']),
           ),
@@ -114,7 +138,7 @@ export const createUpdateBudget = createAsyncThunk<
 
     existingBudgets.forEach(budget => {
       dispatch(
-        mainSliceReducers.updateBudget({
+        updateBudgetAction({
           id: budget.id,
           ..._.pick(budget, ['amount', 'categoryId', 'date']),
         }),
@@ -158,7 +182,7 @@ export const updateBudgetItem = createAsyncThunk<
   const {dispatch} = thunkAPI;
 
   // Update local state immediately
-  dispatch(mainSliceReducers.updateBudget({id, ...changes}));
+  dispatch(updateBudgetAction({id, ...changes}));
 
   // Queue for sync
   dispatch(
@@ -198,7 +222,7 @@ export const addNewExpense = createAsyncThunk<
 
   // Editing existing expense
   const frontendId = `f_${makeNewIdArr(1)[0]}`;
-  dispatch(mainSliceReducers.addExpense([{...expense, id: frontendId}]));
+  dispatch(addExpenseAction([{...expense, id: frontendId}]));
 
   dispatch(
     addToQueue({
@@ -218,7 +242,7 @@ export const updateExpense = createAsyncThunk<any, Expense, {state: RootState}>(
     const {dispatch} = thunkAPI;
 
     // Editing existing expense
-    dispatch(mainSliceReducers.updateExpense(expense));
+    dispatch(updateExpenseAction(expense));
 
     dispatch(
       addToQueue({
@@ -248,7 +272,7 @@ export const addNewIncome = createAsyncThunk<
   };
 
   const frontendId = `f_${makeNewIdArr(1)[0]}`;
-  dispatch(mainSliceReducers.addIncome([{...incomeWithAuth, id: frontendId}]));
+  dispatch(addIncomeAction([{...incomeWithAuth, id: frontendId}]));
 
   dispatch(
     addToQueue({
@@ -268,7 +292,7 @@ export const updateIncome = createAsyncThunk<any, Income, {state: RootState}>(
     const {dispatch} = thunkAPI;
 
     dispatch(
-      mainSliceReducers.updateIncome({
+      updateIncomeAction({
         ...income,
         ownerId: '',
         houseId: '',

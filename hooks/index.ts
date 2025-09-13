@@ -84,4 +84,11 @@ const useDev = () => {
   return useAppSelector(state => state.main.devMode);
 };
 
-export {useSync, useIsLoading, useAppSelector, useAppDispatch, useAppStore, useDev};
+export {
+  useSync,
+  useIsLoading,
+  useAppSelector,
+  useAppDispatch,
+  useAppStore,
+  useDev,
+};
