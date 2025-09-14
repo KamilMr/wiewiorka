@@ -3,7 +3,7 @@ import {useState} from 'react';
 
 import {useAppTheme} from '@/constants/theme';
 import {Select} from '@/components';
-import ElementDropdown from '@/components/ElementDropdown';
+import ElementDropdown from '@/components/Dropdown';
 
 const DropdownPage = () => {
   const t = useAppTheme();

@@ -20,7 +20,7 @@ export default function DevLayout() {
   }
 
   return (
-    <KeyboardView>
+    <KeyboardView offset={0}>
       <Stack
         screenOptions={{
           headerRightContainerStyle: {paddingRight: sizes.xxl},

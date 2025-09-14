@@ -36,7 +36,7 @@ import {
   selectSources,
 } from '@/redux/main/selectors';
 import {Expense} from '@/types';
-import ElementDropdown from '@/components/ElementDropdown';
+import ElementDropdown from '@/components/Dropdown';
 import KeyboardView from '@/components/KeyboardView';
 import SafeScrollContainer from '@/components/SafeScrollContainer';
 
