@@ -320,7 +320,7 @@ export default function AddNew() {
 
   return (
     <KeyboardView>
-      <SafeScrollContainer>
+      <SafeScrollContainer style={{backgroundColor: 'white', padding: 10}}>
         <View style={{flex: 1}}>
           {!isSplit && (
             <TextInput
