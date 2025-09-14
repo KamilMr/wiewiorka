@@ -35,20 +35,20 @@ const SafeScrollContainer = ({children, style, fullHeight = true}) => {
 
 const styles = StyleSheet.create({
   stackContainerRoot: ({safeInsets, headerHeight, fullHeight}) => ({
-    flex: 1,
-    minWidth: '100%',
+    // flex: 1,
+    // minWidth: '100%',
     // not minHeight: '100%' to keep 100% height on iPhone also when keyboard is opened
-    minHeight: fullHeight
-      ? Dimensions.get('window').height - headerHeight
-      : null,
-    paddingTop: safeInsets.top + sizes.lg,
-    paddingBottom: safeInsets.bottom + sizes.lg,
+    // minHeight: fullHeight
+    //   ? Dimensions.get('window').height - headerHeight
+    //   : null,
+    // paddingTop: safeInsets.top + sizes.lg,
+    // paddingBottom: safeInsets.bottom + sizes.lg,
   }),
   tabContainerRoot: ({safeInsets, fullHeight}) => ({
-    flex: 1,
-    width: '100%',
-    minHeight: fullHeight ? '100%' : null,
-    paddingTop: safeInsets.top + sizes.sm,
+    // flex: 1,
+    // width: '100%',
+    // minHeight: fullHeight ? '100%' : null,
+    // paddingTop: safeInsets.top + sizes.sm,
   }),
 });
 

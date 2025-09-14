@@ -2,8 +2,7 @@ import {useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {IconButton} from 'react-native-paper';
 
-import Select from './CustomSelect';
-import Text from './CustomText';
+import DropdownComponent from './Dropdown';
 import TextInput from './CustomTextInput';
 import {sizes, useAppTheme} from '@/constants/theme';
 
@@ -77,7 +76,7 @@ const PriceAndCategory = ({
       </View>
 
       <View style={{flexDirection: 'row', marginVertical: sizes.md}}>
-        <View style={{flex: 1}}>
+        <View style={{flex: 1, marginBottom: sizes.xl}}>
           {showDescriptionInput && (
             <TextInput
               dense
@@ -95,18 +94,24 @@ const PriceAndCategory = ({
         </View>
       </View>
 
-      <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 8,
+          height: 55,
+        }}
+      >
         <TextInput
           style={{flex: 1, marginVertical: 0}}
-          dense
+          // dense
           label="Cena"
           keyboardType="numeric"
           onChangeText={text => onUpdateItem(index, 'price', text)}
           value={item.price}
         />
         <View style={{flex: 2}}>
-          <Select
-            style={{root: {marginTop: sizes.md}}}
+          <DropdownComponent
             items={itemsToSelect}
             onChange={category =>
               onUpdateItem(index, 'category', category.value)
