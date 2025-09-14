@@ -31,7 +31,7 @@ const DevPage = () => {
           style={styles.cardItem}
           onPress={() => router.navigate('/dev/keyboard-avoid')}
         >
-          <TabBarIcon name="keyboard" color={t.colors.primary} />
+          <TabBarIcon name="eye" color={t.colors.primary} />
           <Text style={[styles.cardText, {color: t.colors.primary}]}>
             Keyboard Avoid
           </Text>

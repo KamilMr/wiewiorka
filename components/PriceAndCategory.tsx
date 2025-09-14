@@ -2,7 +2,9 @@ import {useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {IconButton} from 'react-native-paper';
 
-import {Select, Text, TextInput} from '@/components';
+import Select from './CustomSelect';
+import Text from './CustomText';
+import TextInput from './CustomTextInput';
 import {sizes, useAppTheme} from '@/constants/theme';
 
 interface PriceAndCategoryProps {

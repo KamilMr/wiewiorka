@@ -3,7 +3,8 @@ import {StyleSheet, View, ScrollView} from 'react-native';
 import {useState} from 'react';
 import {router} from 'expo-router';
 
-import {Text, Menu} from '..';
+import Text from '../CustomText';
+import Menu from '../Menu';
 import {sizes, useAppTheme} from '@/constants/theme';
 import {formatPrice} from '@/common';
 import {BudgetCardProps} from '@/utils/types';

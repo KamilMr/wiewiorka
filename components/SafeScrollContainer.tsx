@@ -1,4 +1,3 @@
-import React from 'react';
 import {Dimensions, ScrollView, StyleSheet, View} from 'react-native';
 
 import {useHeaderHeight} from '@react-navigation/elements';
