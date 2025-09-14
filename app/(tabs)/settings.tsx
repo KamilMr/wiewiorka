@@ -98,7 +98,7 @@ const Settings = () => {
           onPress={handleDevModeToggle}
           style={styles.devButton}
         >
-          Wyłącz tryb programisty
+          Wyłącz tryb Dev
         </Button>
       )}
       <Button icon="logout" mode="contained" onPress={handleLogout}>

@@ -1,4 +1,5 @@
 import React, {useState, useRef} from 'react';
+import {usePathname} from 'expo-router';
 import {
   View,
   TouchableOpacity,
@@ -7,7 +8,7 @@ import {
   Modal,
   Dimensions,
 } from 'react-native';
-import {usePathname} from 'expo-router';
+
 import {useAppDispatch} from '@/hooks';
 import {toggleDevMode, setSnackbar, clearDevMode} from '@/redux/main/mainSlice';
 import {useDev} from '@/hooks';
@@ -47,9 +48,7 @@ const DevModeToggle: React.FC<DevModeToggleProps> = ({children}) => {
           dispatch(toggleDevMode());
           dispatch(
             setSnackbar({
-              msg: devMode
-                ? 'Tryb programisty wyłączony'
-                : 'Tryb programisty włączony',
+              msg: devMode ? 'Tryb dev wyłączony' : 'Tryb dev włączony',
               type: 'success',
             }),
           );
@@ -83,7 +82,7 @@ const DevModeToggle: React.FC<DevModeToggleProps> = ({children}) => {
     dispatch(clearDevMode());
     dispatch(
       setSnackbar({
-        msg: 'Tryb programisty wyłączony',
+        msg: 'Tryb dev wyłączony',
         type: 'success',
       }),
     );
