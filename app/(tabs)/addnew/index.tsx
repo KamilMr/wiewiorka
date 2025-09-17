@@ -17,6 +17,7 @@ import {
   PriceAndCategory,
   TextInput,
 } from '@/components';
+import {EnhancedPriceInput} from '@/components/EnhancedPriceInput';
 import {SelectRadioButtons} from '@/components/addnew/SelectRadioButtons';
 import {RemainingAmountDisplay} from '@/components/addnew/RemainingAmountDisplay';
 import {sizes} from '@/constants/theme';
@@ -66,6 +67,7 @@ export default function AddNew() {
   const [splitItems, setSplitItems] = useState<
     Array<{price: string; category: string; description: string}>
   >([initSplitItem(), initSplitItem()]);
+  const [exchangeRate, setExchangeRate] = useState<number>(4.3);
 
   const focusRef = useRef<any>(null);
   const dirty = useRef({});
@@ -382,17 +384,24 @@ export default function AddNew() {
             <View
               style={{
                 flexDirection: 'row',
-                alignItems: 'center',
+                alignItems: 'flex-start',
               }}
             >
-              <TextInput
-                ref={focusRef}
-                label="Cena"
-                style={{flex: 2}}
-                keyboardType="numeric"
-                disabled={isSplit}
-                onChangeText={text => setForm({...form, price: text})}
+              <EnhancedPriceInput
                 value={form.price}
+                onValueChange={value =>
+                  setForm({
+                    ...form,
+                    price: Array.isArray(value) ? value[0] : value,
+                  })
+                }
+                defaultCurrency="PLN"
+                availableCurrencies={['EUR']}
+                exchangeRate={exchangeRate}
+                onExchangeRateChange={setExchangeRate}
+                label="Cena"
+                style={{width: '90%'}}
+                disabled={isSplit}
               />
               {type === 'expense' && (
                 <IconButton
@@ -400,7 +409,7 @@ export default function AddNew() {
                   onPress={handleSplitToggle}
                   disabled={!form.price && !isSplit}
                   size={20}
-                  style={{margin: 0, padding: 0, width: 60}}
+                  style={{margin: 0, padding: 2, width: 50}}
                 />
               )}
             </View>
