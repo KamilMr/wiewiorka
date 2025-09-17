@@ -14,6 +14,7 @@ import {SelectRadioButtons} from '@/components/addnew/SelectRadioButtons';
 import {Text} from '@/components';
 import {printJsonIndent} from '@/common';
 import {sizes, useAppTheme} from '@/constants/theme';
+import {setSnackbar} from '@/redux/main/mainSlice';
 
 interface RenderExchangeRateProps {
   editingRate: boolean;
@@ -118,6 +119,10 @@ export const EnhancedPriceInput: React.FC<EnhancedPriceInputProps> = ({
   const [rateValue, setRateValue] = useState(exchangeRate.toString());
   const [swap, setSwap] = useState(false);
 
+  // Calculator mode
+  const [isCalculatorMode, setIsCalculatorMode] = useState(false);
+  const [calculatorExpression, setCalculatorExpression] = useState('');
+
   const isEnhancedMode = targetCurrency !== null;
   const allCurrencies = [defaultCurrency, ...availableCurrencies];
   const currentSymbol = currencySymbols[baseCurrency[1]] || baseCurrency;
@@ -152,11 +157,35 @@ export const EnhancedPriceInput: React.FC<EnhancedPriceInputProps> = ({
 
   const handleRateBlur = () => handleRateSubmit();
 
+  const safeCalculate = (expression: string): number | null => {
+    try {
+      // Remove the = sign and clean the expression
+      const cleanExpression = expression.replace('=', '').trim();
+
+      // Only allow numbers, +, -, *, /, (, ), and spaces
+      if (!/^[0-9+\-*/().\s]+$/.test(cleanExpression))
+        throw 'Niedozwolone znaki';
+
+      // Simple evaluation using Function constructor (safer than eval)
+      const result = Function(`"use strict"; return (${cleanExpression})`)();
+
+      // Check if result is a valid number
+      if (typeof result !== 'number' || isNaN(result) || !isFinite(result))
+        throw 'Niepoprawny wynik';
+
+      return result;
+    } catch (err) {
+      // TODO: add snackbar
+      return null;
+    }
+  };
+
   const handleCurrencySelect = (currency: string) => {
     if (currency === baseCurrency[1]) {
       setTargetCurrency(null);
       setSwap(false);
-    } else
+    } // TODO: fix typescript errors
+    else
       // Selected different currency - go to enhanced mode
       setTargetCurrency([
         (baseCurrency[0] / exchangeRate).toFixed(2),
@@ -177,6 +206,23 @@ export const EnhancedPriceInput: React.FC<EnhancedPriceInputProps> = ({
   }));
 
   const handleBasePriceChange = (value: string) => {
+    // Check if calculator mode should be activated/deactivated
+    if (value.startsWith('=') && !isEnhancedMode) {
+      setIsCalculatorMode(true);
+      setCalculatorExpression(value);
+      return;
+    } else if (isCalculatorMode && !value.startsWith('=')) {
+      setIsCalculatorMode(false);
+      setCalculatorExpression('');
+    }
+
+    // Update calculator expression if in calculator mode
+    if (isCalculatorMode) {
+      setCalculatorExpression(value);
+      return;
+    }
+
+    // Normal mode behavior
     onValueChange?.([value, value * rateValue]);
     setBaseCurrency([value, baseCurrency[1]]);
     if (targetCurrency) {
@@ -192,6 +238,17 @@ export const EnhancedPriceInput: React.FC<EnhancedPriceInputProps> = ({
     setTargetCurrency([price, targetCurrency![1]]);
   };
 
+  const handleCalculationConfirm = () => {
+    const result = safeCalculate(calculatorExpression);
+    if (result !== null) {
+      const resultString = result.toString();
+      setBaseCurrency([resultString, baseCurrency[1]]);
+      onValueChange?.([resultString, resultString * rateValue]);
+    }
+    setIsCalculatorMode(false);
+    setCalculatorExpression('');
+  };
+
   return (
     <View style={[styles.container, style]}>
       {!isEnhancedMode ? (
@@ -205,7 +262,9 @@ export const EnhancedPriceInput: React.FC<EnhancedPriceInputProps> = ({
           <View style={styles.normalInput}>
             <View style={styles.inputSection}>
               <CustomTextInput
-                value={baseCurrency[0]}
+                value={
+                  isCalculatorMode ? calculatorExpression : baseCurrency[0]
+                }
                 onChangeText={handleBasePriceChange}
                 keyboardType="numeric"
                 disabled={disabled}
@@ -218,16 +277,27 @@ export const EnhancedPriceInput: React.FC<EnhancedPriceInputProps> = ({
               />
             </View>
 
-            <View style={styles.currencySection}>
-              <Button
-                mode="text"
-                onPress={showModal}
-                style={styles.currencyButton}
-                labelStyle={styles.currencyButtonText}
-              >
-                {currentSymbol}
-              </Button>
-            </View>
+            {isCalculatorMode ? (
+              <View style={styles.calculatorSection}>
+                <IconButton
+                  icon="check"
+                  size={24}
+                  onPress={handleCalculationConfirm}
+                  style={styles.okButton}
+                />
+              </View>
+            ) : (
+              <View style={styles.currencySection}>
+                <Button
+                  mode="text"
+                  onPress={showModal}
+                  style={styles.currencyButton}
+                  labelStyle={styles.currencyButtonText}
+                >
+                  {currentSymbol}
+                </Button>
+              </View>
+            )}
           </View>
         </View>
       ) : (
@@ -455,5 +525,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#666',
+  },
+  calculatorSection: {
+    marginLeft: sizes.sm,
+  },
+  okButton: {
+    margin: 0,
+    backgroundColor: '#4CAF50',
   },
 });
