@@ -23,6 +23,7 @@ import NoData from './NoData';
 import PieChartBar from './PieChartBar';
 import PriceAndCategory from './PriceAndCategory';
 import SummaryCard from './SummaryCard';
+import {EnhancedPriceInput} from './EnhancedPriceInput';
 
 export {
   BudgetCard,
@@ -41,6 +42,7 @@ export {
   CustomTextInput as TextInput,
   CustomDatePicker as DatePicker,
   DropdownComponent as Select,
+  EnhancedPriceInput,
   FullWidthImage,
   Glow,
   IconButtonWithStatus,
