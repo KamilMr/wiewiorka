@@ -37,6 +37,8 @@ const CurrencyPriceInput: React.FC<CurrencyPriceInputProps> = ({
   const [showCurrencyMenu, setShowCurrencyMenu] = useState(false);
   const [currencyPressed, setCurrencyPressed] = useState(false);
   const [conversionPressed, setConversionPressed] = useState(false);
+  const [isCalculatorMode, setIsCalculatorMode] = useState(false);
+  const [calculatorExpression, setCalculatorExpression] = useState('');
 
   const currentAmount = value ?? amount;
 
@@ -68,8 +70,41 @@ const CurrencyPriceInput: React.FC<CurrencyPriceInputProps> = ({
     return `1 ${selectedCurrency.code} = ${rate.toFixed(4)} ${targetCurrency.code}`;
   }, [selectedCurrency, targetCurrency, exchangeRates]);
 
+  const safeCalculate = (expression: string): number | null => {
+    try {
+      const cleanExpression = expression.replace('#', '').trim();
+      if (!/^[0-9+\-*/.() ]+$/.test(cleanExpression))
+        throw 'Invalid characters';
+      const result = Function(`"use strict"; return (${cleanExpression})`)();
+      if (typeof result !== 'number' || isNaN(result) || !isFinite(result))
+        throw 'Invalid result';
+      return result;
+    } catch {
+      return null;
+    }
+  };
+
   // Handlers
   const handleAmountChange = (newValue: string) => {
+    if (disabled) return;
+
+    // Check if calculator mode should be activated/deactivated
+    if (newValue.startsWith('#')) {
+      setIsCalculatorMode(true);
+      setCalculatorExpression(newValue);
+      return;
+    } else if (isCalculatorMode && !newValue.startsWith('#')) {
+      setIsCalculatorMode(false);
+      setCalculatorExpression('');
+    }
+
+    // Update calculator expression if in calculator mode
+    if (isCalculatorMode) {
+      setCalculatorExpression(newValue);
+      return;
+    }
+
+    // Normal mode behavior
     const cleanValue = newValue.replace(/[^0-9.,]/g, '').replace(',', '.');
     const dotCount = (cleanValue.match(/\./g) || []).length;
     if (dotCount <= 1) {
@@ -103,17 +138,29 @@ const CurrencyPriceInput: React.FC<CurrencyPriceInputProps> = ({
   const handleConversionPressIn = () => setConversionPressed(true);
   const handleConversionPressOut = () => setConversionPressed(false);
 
+  const handleCalculationConfirm = () => {
+    const result = safeCalculate(calculatorExpression);
+    if (result !== null) {
+      const resultString = result.toString();
+      if (!value) setAmount(resultString);
+      onAmountChange?.(resultString);
+    }
+    setIsCalculatorMode(false);
+    setCalculatorExpression('');
+  };
+
   return (
     <Surface style={styles.container} elevation={1}>
       <View style={styles.mainSection}>
         {/* Pole kwoty i selektor waluty */}
         <View style={styles.inputRow}>
           <TextInput
-            value={currentAmount}
+            value={isCalculatorMode ? calculatorExpression : currentAmount}
             onChangeText={handleAmountChange}
+            onSubmitEditing={handleCalculationConfirm}
             disabled={disabled}
             placeholder="0"
-            keyboardType="numeric"
+            keyboardType="phone-pad"
             style={styles.amountInput}
             contentStyle={styles.amountInputContent}
             underlineStyle={{height: 0}}

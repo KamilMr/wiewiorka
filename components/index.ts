@@ -24,11 +24,13 @@ import PieChartBar from './PieChartBar';
 import PriceAndCategory from './PriceAndCategory';
 import SummaryCard from './SummaryCard';
 import {EnhancedPriceInput} from './EnhancedPriceInput';
+import CurrencyPriceInput from './CurrencyPriceInput';
 
 export {
   BudgetCard,
   ButtonWithStatus,
   ColorPicker,
+  CurrencyPriceInput,
   CustomBar as BarChart,
   CustomButton as Button,
   CustomChip as Chip,
