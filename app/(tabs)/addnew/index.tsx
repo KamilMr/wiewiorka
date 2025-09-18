@@ -17,7 +17,7 @@ import {
   PriceAndCategory,
   TextInput,
 } from '@/components';
-import {EnhancedPriceInput} from '@/components/EnhancedPriceInput';
+import {CurrencyPriceInput} from '@/components';
 import {SelectRadioButtons} from '@/components/addnew/SelectRadioButtons';
 import {RemainingAmountDisplay} from '@/components/addnew/RemainingAmountDisplay';
 import {sizes} from '@/constants/theme';
@@ -44,7 +44,7 @@ import SafeScrollContainer from '@/components/SafeScrollContainer';
 const initState = (date = new Date(), categories: any[] = []) => ({
   description: '',
   date,
-  price: '300',
+  price: '',
   category: categories[0]?.name,
 });
 
@@ -68,6 +68,17 @@ export default function AddNew() {
     Array<{price: string; category: string; description: string}>
   >([initSplitItem(), initSplitItem()]);
   const [exchangeRate, setExchangeRate] = useState<number>(4.3);
+
+  // Currency data for CurrencyPriceInput
+  const currencies = [
+    {code: 'PLN', symbol: 'zł', name: 'Polski Złoty'},
+    {code: 'EUR', symbol: '€', name: 'Euro'},
+  ];
+
+  const exchangeRates = {
+    PLN_EUR: 0.23,
+    EUR_PLN: 4.35,
+  };
 
   const focusRef = useRef<any>(null);
   const dirty = useRef({});
@@ -387,22 +398,17 @@ export default function AddNew() {
                 alignItems: 'flex-start',
               }}
             >
-              <EnhancedPriceInput
-                value={form.price}
-                onValueChange={value =>
-                  setForm({
-                    ...form,
-                    price: Array.isArray(value) ? value[0] : value,
-                  })
-                }
-                defaultCurrency="PLN"
-                availableCurrencies={['EUR']}
-                exchangeRate={exchangeRate}
-                onExchangeRateChange={setExchangeRate}
-                label="Cena"
-                style={{width: '90%'}}
-                disabled={isSplit}
-              />
+              <View style={{width: '90%'}}>
+                <CurrencyPriceInput
+                  value={form.price}
+                  currencies={currencies}
+                  disabled={isSplit}
+                  exchangeRates={exchangeRates}
+                  initialAmount={form.price}
+                  initialCurrency={currencies[0]}
+                  onAmountChange={value => setForm({...form, price: value})}
+                />
+              </View>
               {type === 'expense' && (
                 <IconButton
                   icon={isSplit ? 'call-merge' : 'call-split'}
@@ -423,8 +429,9 @@ export default function AddNew() {
                   <ElementDropdown
                     items={itemsToSelect}
                     showDivider={type === 'expense'}
+                    keyboardShouldPersistTaps="handled"
+                    dropdownPosition="top"
                     onChange={handleSelectCategory}
-                    style={{root: {marginTop: 4}}}
                     value={
                       type === 'income'
                         ? form.category
