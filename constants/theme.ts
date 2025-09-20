@@ -6,6 +6,76 @@ export const colorNames = {
   white: '#FFFFFF',
 };
 
+export const unifiedColors = {
+  // Primary palette - Navy blue
+  primary: '#003366', // Main brand color inspiring trust
+  primaryLight: '#004080', // Lighter navy variant
+  primaryDark: '#002244', // Darker variant for hover/active states
+
+  // Accent colors - Amber
+  accent: '#FFBF00', // Accent color symbolizing wealth
+  accentLight: '#FFD633', // Lighter amber
+  accentDark: '#E6AC00', // Darker amber
+
+  // Background colors - Beige system
+  background: '#F5F5DC', // Main beige background
+  surface: '#FFFFFF', // White surfaces
+  surfaceVariant: '#F8F9FA', // Light gray for sections
+  warmBeige: '#FAF8F5', // Warm beige for highlights
+
+  // Semantic colors
+  success: '#28A745', // Confirmed transactions and positive balances
+  successLight: '#D4EDDA', // Light background for success
+  warning: '#FFC107', // Budget limit alerts
+  warningLight: '#FFF3CD', // Light background for warnings
+  error: '#DC3545', // Error messages and negative balances
+  errorLight: '#F8D7DA', // Light background for errors
+  info: '#17A2B8', // Financial advice and tips
+  infoLight: '#D1ECF1', // Light background for info
+
+  // Neutral palette
+  textPrimary: '#212529', // Primary text
+  textSecondary: '#6C757D', // Helper text and labels
+  textTertiary: '#ADB5BD', // Separators and inactive elements
+  outline: '#E9ECEF', // Borders and divider lines
+  outlineVariant: '#DEE2E6', // Subtle borders
+
+  // Additional accent colors
+  gold: '#FFD700', // Luxury accent for premium features
+  warmOrange: '#FFA726', // Warm accent for notifications
+
+  // Text colors on surfaces
+  onSurface: '#212529',
+  onSurfaceVariant: '#6C757D',
+  onPrimary: '#FFFFFF',
+  onAccent: '#003366',
+};
+
+export const typography = {
+  // Display text
+  displayLarge: {fontSize: 32, fontWeight: '400' as const, lineHeight: 40},
+  displayMedium: {fontSize: 28, fontWeight: '400' as const, lineHeight: 36},
+
+  // Headlines
+  headlineLarge: {fontSize: 24, fontWeight: '400' as const, lineHeight: 32},
+  headlineMedium: {fontSize: 20, fontWeight: '400' as const, lineHeight: 28},
+
+  // Titles
+  titleLarge: {fontSize: 18, fontWeight: '500' as const, lineHeight: 24},
+  titleMedium: {fontSize: 16, fontWeight: '500' as const, lineHeight: 22},
+  titleSmall: {fontSize: 14, fontWeight: '500' as const, lineHeight: 20},
+
+  // Body text
+  bodyLarge: {fontSize: 16, fontWeight: '400' as const, lineHeight: 24},
+  bodyMedium: {fontSize: 14, fontWeight: '400' as const, lineHeight: 20},
+  bodySmall: {fontSize: 12, fontWeight: '400' as const, lineHeight: 16},
+
+  // Labels
+  labelLarge: {fontSize: 14, fontWeight: '500' as const, lineHeight: 20},
+  labelMedium: {fontSize: 12, fontWeight: '500' as const, lineHeight: 16},
+  labelSmall: {fontSize: 10, fontWeight: '500' as const, lineHeight: 14},
+};
+
 /**
  * Base size multiplier
  * @constant {number}
@@ -15,6 +85,7 @@ export const SM: number = 2;
 /**
  * Object containing size options with different scaling factors.
  * Each key represents a size (sm, md, lg, xl, xxl, xxxl) with values based on powers of SM.
+ * - `xs`: 1
  * - `sm`: 2
  * - `md`: 4
  * - `lg`: 8
@@ -22,42 +93,58 @@ export const SM: number = 2;
  * - `xxl`: 32
  * - `xxxl`: 64
  *
- * @type {{ sm: 2, md: 4, lg: 8, xl: 16, xxl: 32, xxxl: 64 }}
+ * @type {{ xs: 1, sm: 2, md: 4, lg: 8, xl: 16, xxl: 32, xxxl: 64 }}
  */
-export const sizes: Record<'sm' | 'md' | 'lg' | 'xl' | 'xxl' | 'xxxl', number> =
-  {
-    sm: SM, // 2
-    md: SM ** 2, // 4
-    lg: SM ** 3, // 8
-    xl: SM ** 4, // 16
-    xxl: SM ** 5, // 32
-    xxxl: SM ** 6, // 64
-  };
+export const sizes: Record<
+  'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl' | 'xxxl',
+  number
+> = {
+  xs: 1, // New: For fine adjustments
+  sm: SM, // 2
+  md: SM ** 2, // 4
+  lg: SM ** 3, // 8
+  xl: SM ** 4, // 16
+  xxl: SM ** 5, // 32
+  xxxl: SM ** 6, // 64
+};
 
-export const paperTheme = {
+export const spacing = {
+  ...sizes,
+  // Semantic spacing
+  cardPadding: 16,
+  sectionGap: 24,
+  componentGap: 12,
+  buttonPadding: 12,
+};
+
+export const borderRadius = {
+  sm: 4,
+  md: 8,
+  lg: 12,
+  xl: 16,
+};
+
+export const shadows = {
+  sm: {elevation: 2, shadowRadius: 4},
+  md: {elevation: 4, shadowRadius: 8},
+  lg: {elevation: 8, shadowRadius: 16},
+};
+
+export const unifiedTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
     ...colorNames,
-    // primary: '#5C4033', // A deep brown resembling the tree bark
-    // onPrimary: '#FFFFFF', // White for contrast
-    // secondaryContainer: '#A67B5B', // Light brown for subtle highlights
-    // onSecondaryContainer: '#FFFFFF', // White for readability
-    background: '#FFFFFF', // Dark brown almost black for background depth
-    // onBackground: '#FFFFFF', // White to pop against dark backgrounds
-    // surface: '#8D6E63', // Muted earth tone for surfaces
-    // surfaceVariant: '#5C4033', // Dark brown to complement primary
-    // onSurface: '#8D6E63', // White for clarity on darker surfaces
-    // elevation: {
-    //   level1: '#5C4033', // Dark brown to keep consistency with shadows
-    //   level2: '#A67B5B', // Light brown for elevated elements
-    //   level3: '#5C4033', // Dark brown for deeper elevation
-    //   level4: '#3E2C1F', // Deeper shade for the utmost elevation
-    //   level5: '#3E2C1F', // Same as level 4 for consistency
-    // },
-    error: '#D32F2F', // Standard error color for clear visibility
+    ...unifiedColors,
   },
+  spacing,
+  typography,
+  borderRadius,
+  shadows,
 };
+
+// Keep paperTheme for backward compatibility
+export const paperTheme = unifiedTheme;
 
 export type AppTheme = typeof paperTheme;
 
