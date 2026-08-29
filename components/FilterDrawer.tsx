@@ -1,7 +1,8 @@
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {Pressable, StyleSheet, Switch, View} from 'react-native';
-import BottomSheet, {
+import {
   BottomSheetBackdrop,
+  BottomSheetModal,
   BottomSheetScrollView,
   BottomSheetTextInput,
 } from '@gorhom/bottom-sheet';
@@ -39,7 +40,7 @@ const FilterDrawer = ({
   onClose,
   categoryItems,
 }: FilterDrawerProps) => {
-  const bottomSheetRef = useRef<BottomSheet>(null);
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
   const insets = useSafeAreaInsets();
   const [categoriesExpanded, setCategoriesExpanded] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -51,9 +52,9 @@ const FilterDrawer = ({
   }, []);
 
   useEffect(() => {
-    if (visible) bottomSheetRef.current?.snapToIndex(0);
+    if (visible) bottomSheetRef.current?.present();
     else {
-      bottomSheetRef.current?.close();
+      bottomSheetRef.current?.dismiss();
       closeCategoryList();
     }
   }, [visible, closeCategoryList]);
@@ -79,21 +80,19 @@ const FilterDrawer = ({
     });
   };
 
-  const handleSheetChange = (index: number) => {
-    if (index === -1) {
-      closeCategoryList();
-      if (visible) onClose();
-    }
+  const handleDismiss = () => {
+    closeCategoryList();
+    if (visible) onClose();
   };
 
   return (
-    <BottomSheet
+    <BottomSheetModal
       ref={bottomSheetRef}
-      index={-1}
+      index={0}
       snapPoints={snapPoints}
       enableDynamicSizing={false}
       enablePanDownToClose
-      onChange={handleSheetChange}
+      onDismiss={handleDismiss}
       backgroundStyle={styles.sheetBackground}
       handleIndicatorStyle={styles.handleIndicator}
       backdropComponent={props => (
@@ -319,13 +318,13 @@ const FilterDrawer = ({
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Zamknij filtry"
-          onPress={onClose}
+          onPress={() => bottomSheetRef.current?.dismiss()}
           style={({pressed}) => [styles.closeButton, pressed && styles.pressed]}
         >
           <Text style={styles.closeButtonText}>Zamknij</Text>
         </Pressable>
       </View>
-    </BottomSheet>
+    </BottomSheetModal>
   );
 };
 

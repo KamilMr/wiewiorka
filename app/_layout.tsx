@@ -5,6 +5,7 @@ import {StatusBar} from 'expo-status-bar';
 import {Provider} from 'react-redux';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {KeyboardProvider} from 'react-native-keyboard-controller';
+import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 
 import 'react-native-reanimated';
 import {useFonts} from 'expo-font';
@@ -112,40 +113,42 @@ const RootLayout = () => {
           <SocketConnector />
           <PaperProvider theme={paperTheme}>
             <KeyboardProvider>
-              <Stack
-                initialRouteName="(tabs)"
-                screenOptions={{
-                  contentStyle: {backgroundColor: warmColors.background},
-                  headerStyle: {backgroundColor: warmColors.card},
-                  headerTintColor: warmColors.foreground,
-                  headerTitleStyle: {color: warmColors.foreground},
-                }}
-              >
-                <Stack.Screen name="sign-in" options={{headerShown: false}} />
-                <Stack.Screen name="sign-up" options={{headerShown: false}} />
-                <Stack.Screen
-                  name="forgot-password"
-                  options={{headerShown: false}}
-                />
-                <Stack.Screen name="(tabs)" options={{headerShown: false}} />
-                <Stack.Screen
-                  name="categories"
-                  options={{headerShown: false}}
-                />
-                <Stack.Screen name="budget" options={{headerShown: false}} />
-                <Stack.Screen name="debt" options={{headerShown: false}} />
-                <Stack.Screen
-                  name="income-summary"
-                  options={{headerShown: false}}
-                />
-                <Stack.Screen name="storage" options={{headerShown: false}} />
-                <Stack.Screen name="dev" options={{headerShown: false}} />
-                <Stack.Screen
-                  name="changelog"
-                  options={{...appHeaderOptions, title: 'Historia Zmian'}}
-                />
-                <Stack.Screen name="+not-found" />
-              </Stack>
+              <BottomSheetModalProvider>
+                <Stack
+                  initialRouteName="(tabs)"
+                  screenOptions={{
+                    contentStyle: {backgroundColor: warmColors.background},
+                    headerStyle: {backgroundColor: warmColors.card},
+                    headerTintColor: warmColors.foreground,
+                    headerTitleStyle: {color: warmColors.foreground},
+                  }}
+                >
+                  <Stack.Screen name="sign-in" options={{headerShown: false}} />
+                  <Stack.Screen name="sign-up" options={{headerShown: false}} />
+                  <Stack.Screen
+                    name="forgot-password"
+                    options={{headerShown: false}}
+                  />
+                  <Stack.Screen name="(tabs)" options={{headerShown: false}} />
+                  <Stack.Screen
+                    name="categories"
+                    options={{headerShown: false}}
+                  />
+                  <Stack.Screen name="budget" options={{headerShown: false}} />
+                  <Stack.Screen name="debt" options={{headerShown: false}} />
+                  <Stack.Screen
+                    name="income-summary"
+                    options={{headerShown: false}}
+                  />
+                  <Stack.Screen name="storage" options={{headerShown: false}} />
+                  <Stack.Screen name="dev" options={{headerShown: false}} />
+                  <Stack.Screen
+                    name="changelog"
+                    options={{...appHeaderOptions, title: 'Historia Zmian'}}
+                  />
+                  <Stack.Screen name="+not-found" />
+                </Stack>
+              </BottomSheetModalProvider>
             </KeyboardProvider>
             <SnackBar />
           </PaperProvider>
