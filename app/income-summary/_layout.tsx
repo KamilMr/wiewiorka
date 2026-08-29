@@ -1,10 +1,14 @@
 import {Stack} from 'expo-router';
-import {appHeaderStatusOptions} from '@/components/navigation/AppHeaderTitle';
+import {
+  appHeaderOptions,
+  appHeaderStatusOptions,
+} from '@/components/navigation/AppHeaderTitle';
 
 export default function IncomeSummaryLayout() {
   return (
     <Stack
       screenOptions={{
+        ...appHeaderOptions,
         ...appHeaderStatusOptions,
         title: 'Wpływy',
       }}
