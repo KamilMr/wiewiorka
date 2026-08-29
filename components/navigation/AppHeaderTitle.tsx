@@ -1,5 +1,7 @@
 import {StyleSheet, Text, View} from 'react-native';
 
+import DevModeToggle from '@/components/DevModeToggle';
+import StatusIndicator from '@/components/StatusIndicator';
 import {warmColors} from '@/constants/warmTheme';
 
 type AppHeaderTitleProps = {
@@ -16,6 +18,15 @@ export function AppHeaderTitle({title}: AppHeaderTitleProps) {
     </View>
   );
 }
+
+export const appHeaderStatusOptions = {
+  headerRightContainerStyle: {paddingRight: 20},
+  headerRight: () => (
+    <DevModeToggle>
+      <StatusIndicator />
+    </DevModeToggle>
+  ),
+};
 
 export const appHeaderOptions = {
   headerTitle: ({children}: {children: string}) => (

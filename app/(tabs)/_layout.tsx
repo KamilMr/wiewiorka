@@ -2,10 +2,11 @@ import React, {useEffect} from 'react';
 import {Redirect, Tabs} from 'expo-router';
 
 import {BottomTabBar} from '@/components/navigation/BottomTabBar';
-import {appHeaderOptions} from '@/components/navigation/AppHeaderTitle';
+import {
+  appHeaderOptions,
+  appHeaderStatusOptions,
+} from '@/components/navigation/AppHeaderTitle';
 import {sizes} from '@/constants/theme';
-import DevModeToggle from '@/components/DevModeToggle';
-import StatusIndicator from '@/components/StatusIndicator';
 import {useAppDispatch, useAppSelector} from '@/hooks';
 import {selectToken} from '@/redux/auth/authSlice';
 import {fetchIni} from '@/redux/main/thunks';
@@ -27,13 +28,8 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: true,
         ...appHeaderOptions,
+        ...appHeaderStatusOptions,
         headerTitleContainerStyle: {paddingLeft: sizes.md},
-        headerRightContainerStyle: {paddingRight: 20},
-        headerRight: () => (
-          <DevModeToggle>
-            <StatusIndicator />
-          </DevModeToggle>
-        ),
       }}
     >
       <Tabs.Screen name="index" options={{title: 'Strona główna'}} />
