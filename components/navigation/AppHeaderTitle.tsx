@@ -1,3 +1,5 @@
+import type {BottomTabNavigationOptions} from '@react-navigation/bottom-tabs';
+import type {NativeStackNavigationOptions} from '@react-navigation/native-stack';
 import {StyleSheet, Text, View} from 'react-native';
 
 import DevModeToggle from '@/components/DevModeToggle';
@@ -19,14 +21,40 @@ export function AppHeaderTitle({title}: AppHeaderTitleProps) {
   );
 }
 
+type SharedHeaderOptionKey =
+  | 'headerTitle'
+  | 'headerTitleAlign'
+  | 'headerStyle'
+  | 'headerShadowVisible'
+  | 'headerTintColor';
+
+type SharedHeaderOptions = Pick<
+  NativeStackNavigationOptions,
+  SharedHeaderOptionKey
+> &
+  Pick<BottomTabNavigationOptions, SharedHeaderOptionKey>;
+
+type SharedHeaderStatusOptions = Pick<
+  NativeStackNavigationOptions,
+  'headerRight'
+> &
+  Pick<BottomTabNavigationOptions, 'headerRight'>;
+
 export const appHeaderStatusOptions = {
-  headerRightContainerStyle: {paddingRight: 20},
   headerRight: () => (
     <DevModeToggle>
       <StatusIndicator />
     </DevModeToggle>
   ),
-};
+} satisfies SharedHeaderStatusOptions;
+
+export const appTabHeaderStatusOptions = {
+  ...appHeaderStatusOptions,
+  headerRightContainerStyle: {paddingRight: 20},
+} satisfies Pick<
+  BottomTabNavigationOptions,
+  'headerRight' | 'headerRightContainerStyle'
+>;
 
 export const appHeaderOptions = {
   headerTitle: ({children}: {children: string}) => (
@@ -36,7 +64,7 @@ export const appHeaderOptions = {
   headerStyle: {backgroundColor: warmColors.background},
   headerShadowVisible: false,
   headerTintColor: warmColors.foreground,
-};
+} satisfies SharedHeaderOptions;
 
 const styles = StyleSheet.create({
   container: {

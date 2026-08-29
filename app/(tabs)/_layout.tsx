@@ -4,7 +4,7 @@ import {Redirect, Tabs} from 'expo-router';
 import {BottomTabBar} from '@/components/navigation/BottomTabBar';
 import {
   appHeaderOptions,
-  appHeaderStatusOptions,
+  appTabHeaderStatusOptions,
 } from '@/components/navigation/AppHeaderTitle';
 import {sizes} from '@/constants/theme';
 import {useAppDispatch, useAppSelector} from '@/hooks';
@@ -28,7 +28,7 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: true,
         ...appHeaderOptions,
-        ...appHeaderStatusOptions,
+        ...appTabHeaderStatusOptions,
         headerTitleContainerStyle: {paddingLeft: sizes.md},
       }}
     >
