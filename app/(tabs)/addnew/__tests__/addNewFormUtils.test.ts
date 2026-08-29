@@ -6,7 +6,7 @@ import {
   initSplitItem,
   initializeSplitItems,
   validateAddNewForm,
-} from '../addNewFormUtils';
+} from '@/utils/addNewFormUtils';
 
 const categories = [
   {id: 4, name: 'Food'},
