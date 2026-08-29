@@ -36,7 +36,6 @@ const Records = () => {
 
   const [number, setNumber] = useState(30);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchVisible, setSearchVisible] = useState(false);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [typeFilter, setTypeFilter] = useState<RecordType>('all');
   const [filters, setFilters] = useState<FilterState>({
@@ -202,84 +201,95 @@ const Records = () => {
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <View style={styles.header}>
         <Text style={styles.title}>Zapisy</Text>
-        <Pressable
-          onPress={() => setSearchVisible(v => !v)}
-          style={({pressed}) => [styles.iconBtn, pressed && styles.pressed]}
-        >
-          <FontAwesome6
-            name={searchVisible ? 'xmark' : 'magnifying-glass'}
-            size={15}
-            color={warmColors.foreground}
-            iconStyle="solid"
-          />
-        </Pressable>
       </View>
 
-      {searchVisible && (
-        <View style={styles.searchRow}>
-          <FontAwesome6
-            name="magnifying-glass"
-            size={14}
-            color={warmColors.mutedForeground}
-            iconStyle="solid"
-            style={styles.searchIcon}
-          />
-          <TextInput
-            autoFocus
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            placeholder="Szukaj"
-            placeholderTextColor={warmColors.mutedForeground}
-            style={styles.searchInput}
-          />
-          {searchQuery.length > 0 && (
-            <Pressable
-              onPress={() => setSearchQuery('')}
-              hitSlop={8}
-              style={styles.searchClear}
-            >
-              <FontAwesome6
-                name="xmark"
-                size={14}
-                color={warmColors.mutedForeground}
-                iconStyle="solid"
-              />
-            </Pressable>
-          )}
-        </View>
-      )}
-
       <View style={styles.stickyFilters}>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Filtruj zapisy według daty i kategorii"
-          accessibilityState={{expanded: drawerVisible}}
-          onPress={() => setDrawerVisible(true)}
-          style={({pressed}) => [styles.dateBtn, pressed && styles.pressed]}
-        >
-          <View style={styles.dateBtnLeft}>
+        <View style={styles.filterRow}>
+          <View style={styles.searchRow}>
             <FontAwesome6
-              name="calendar"
-              size={15}
+              name="magnifying-glass"
+              size={14}
               color={warmColors.mutedForeground}
-              iconStyle="regular"
+              iconStyle="solid"
+              style={styles.searchIcon}
             />
-            <Text style={styles.dateBtnText}>{dateLabel}</Text>
+            <TextInput
+              accessibilityLabel="Szukaj zapisów"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              placeholder="Szukaj"
+              placeholderTextColor={warmColors.mutedForeground}
+              style={styles.searchInput}
+            />
+            {searchQuery.length > 0 && (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Wyczyść wyszukiwanie"
+                onPress={() => setSearchQuery('')}
+                hitSlop={8}
+                style={styles.searchClear}
+              >
+                <FontAwesome6
+                  name="xmark"
+                  size={14}
+                  color={warmColors.mutedForeground}
+                  iconStyle="solid"
+                />
+              </Pressable>
+            )}
           </View>
-          <View style={styles.dateBtnRight}>
+
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Filtruj zapisy według daty i kategorii"
+            accessibilityState={{expanded: drawerVisible}}
+            onPress={() => setDrawerVisible(true)}
+            style={({pressed}) => [
+              styles.filterButton,
+              pressed && styles.pressed,
+            ]}
+          >
+            <FontAwesome6
+              name="sliders"
+              size={16}
+              color={warmColors.foreground}
+              iconStyle="solid"
+            />
             {activeFilterCount > 0 && (
               <View style={styles.badge}>
                 <Text style={styles.badgeText}>{activeFilterCount}</Text>
               </View>
             )}
+          </Pressable>
+        </View>
+
+        {(filters.dateFrom || filters.dateTo) && (
+          <View style={styles.dateChip}>
             <FontAwesome6
-              name="sliders"
-              size={12}
-              color={warmColors.mutedForeground}
-              iconStyle="solid"
+              name="calendar"
+              size={14}
+              color={warmColors.accentForeground}
+              iconStyle="regular"
             />
+            <Text style={styles.dateChipText}>{dateLabel}</Text>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Wyczyść zakres dat"
+              onPress={() =>
+                setFilters(prev => ({...prev, dateFrom: null, dateTo: null}))
+              }
+              hitSlop={8}
+              style={styles.dateClear}
+            >
+              <FontAwesome6
+                name="xmark"
+                size={12}
+                color={warmColors.accentForeground}
+                iconStyle="solid"
+              />
+            </Pressable>
           </View>
-        </Pressable>
+        )}
 
         <ScrollView
           horizontal
@@ -386,9 +396,6 @@ const styles = StyleSheet.create({
     backgroundColor: warmColors.background,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
     paddingHorizontal: 24,
     paddingTop: 16,
     paddingBottom: 12,
@@ -399,31 +406,26 @@ const styles = StyleSheet.create({
     color: warmColors.foreground,
     letterSpacing: -0.3,
   },
-  iconBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: warmColors.cardSolid,
-    borderWidth: 1,
-    borderColor: warmColors.cardBorder,
-    ...warmShadow.sm,
-  },
   pressed: {
     opacity: 0.85,
   },
-  searchRow: {
+  filterRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 8,
     marginHorizontal: 24,
-    marginBottom: 8,
+    marginBottom: 10,
+  },
+  searchRow: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 46,
+    paddingHorizontal: 14,
     backgroundColor: warmColors.cardSolid,
     borderWidth: 1,
     borderColor: warmColors.cardBorder,
     borderRadius: warmRadius.lg,
-    paddingHorizontal: 14,
-    height: 44,
     ...warmShadow.sm,
   },
   searchIcon: {
@@ -443,36 +445,21 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: warmColors.cardBorder,
   },
-  dateBtn: {
-    flexDirection: 'row',
+  filterButton: {
+    width: 46,
+    height: 46,
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginHorizontal: 24,
-    marginBottom: 10,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    justifyContent: 'center',
     backgroundColor: warmColors.cardSolid,
     borderWidth: 1,
     borderColor: warmColors.cardBorder,
     borderRadius: warmRadius.lg,
     ...warmShadow.sm,
   },
-  dateBtnLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  dateBtnRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  dateBtnText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: warmColors.foreground,
-  },
   badge: {
+    position: 'absolute',
+    top: -7,
+    right: -7,
     minWidth: 20,
     height: 20,
     borderRadius: 10,
@@ -485,6 +472,30 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '700',
     color: warmColors.primaryForeground,
+  },
+  dateChip: {
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginHorizontal: 24,
+    marginBottom: 10,
+    paddingVertical: 8,
+    paddingLeft: 12,
+    paddingRight: 8,
+    backgroundColor: warmColors.accent,
+    borderWidth: 1,
+    borderColor: warmColors.accent,
+    borderRadius: warmRadius.md,
+  },
+  dateChipText: {
+    flexShrink: 1,
+    fontSize: 13,
+    fontWeight: '500',
+    color: warmColors.accentForeground,
+  },
+  dateClear: {
+    padding: 4,
   },
   pillsRow: {
     flexDirection: 'row',
