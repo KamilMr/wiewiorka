@@ -14,7 +14,10 @@ const Home = () => {
   const {refreshing, onRefresh} = usePullToRefresh();
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView
+      style={styles.safeArea}
+      edges={['right', 'bottom', 'left']}
+    >
       <View style={styles.container}>
         <ScrollView
           style={styles.scrollView}

@@ -198,7 +198,7 @@ const Records = () => {
   })();
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <SafeAreaView style={styles.safeArea} edges={[]}>
       <View style={styles.header}>
         <Text style={styles.title}>Zapisy</Text>
       </View>
