@@ -1,5 +1,5 @@
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {Pressable, StyleSheet, Switch, View} from 'react-native';
+import {Pressable, ScrollView, StyleSheet, Switch, View} from 'react-native';
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
@@ -123,7 +123,7 @@ const FilterDrawer = ({
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.section}>
+        <View>
           <Text style={styles.sectionTitle}>Zakres dat</Text>
           <View style={styles.dateRow}>
             <View style={styles.dateControl}>
@@ -145,7 +145,7 @@ const FilterDrawer = ({
           </View>
         </View>
 
-        <View style={styles.section}>
+        <View>
           <Text style={styles.sectionTitle}>Kategorie</Text>
           <Pressable
             accessibilityRole="button"
@@ -158,19 +158,11 @@ const FilterDrawer = ({
               pressed && styles.pressed,
             ]}
           >
-            <View style={styles.categoryTriggerLeft}>
-              <FontAwesome6
-                name="list-check"
-                size={16}
-                color={warmColors.primary}
-                iconStyle="solid"
-              />
-              <Text style={styles.categoryTriggerText}>
-                {filters.categories.length
-                  ? `Wybrano ${filters.categories.length}`
-                  : 'Wybierz kategorie'}
-              </Text>
-            </View>
+            <Text style={styles.categoryTriggerText}>
+              {filters.categories.length
+                ? `Wybrano ${filters.categories.length}`
+                : 'Wybierz kategorie'}
+            </Text>
             <FontAwesome6
               name={categoriesExpanded ? 'chevron-up' : 'chevron-down'}
               size={13}
@@ -211,76 +203,77 @@ const FilterDrawer = ({
           {categoriesExpanded && (
             <View style={styles.categoryList}>
               <View style={styles.searchRow}>
-                <FontAwesome6
-                  name="magnifying-glass"
-                  size={14}
-                  color={warmColors.mutedForeground}
-                  iconStyle="solid"
-                />
-                <BottomSheetTextInput
-                  accessibilityLabel="Szukaj kategorii"
-                  value={searchQuery}
-                  onChangeText={setSearchQuery}
-                  placeholder="Szukaj kategorii"
-                  placeholderTextColor={warmColors.mutedForeground}
-                  style={styles.searchInput}
-                />
+                <View style={styles.searchInputContainer}>
+                  <FontAwesome6
+                    name="magnifying-glass"
+                    size={13}
+                    color={warmColors.mutedForeground}
+                    iconStyle="solid"
+                  />
+                  <BottomSheetTextInput
+                    accessibilityLabel="Szukaj kategorii"
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                    placeholder="Szukaj kategorii"
+                    placeholderTextColor={warmColors.mutedForeground}
+                    style={styles.searchInput}
+                  />
+                </View>
               </View>
-              {filteredCategories.length ? (
-                filteredCategories.map(item => {
-                  const selected = filters.categories.includes(item.value);
-                  return (
-                    <Pressable
-                      key={item.value}
-                      accessibilityRole="checkbox"
-                      accessibilityLabel={item.label}
-                      accessibilityState={{checked: selected}}
-                      onPress={() => toggleCategory(item.value)}
-                      style={({pressed}) => [
-                        styles.categoryRow,
-                        pressed && styles.pressed,
-                      ]}
-                    >
-                      <View style={styles.categoryName}>
-                        <View
-                          style={[
-                            styles.colorDot,
-                            {
-                              backgroundColor:
-                                item.color || warmColors.secondary,
-                            },
-                          ]}
-                        />
-                        <Text style={styles.categoryNameText}>
-                          {item.label}
-                        </Text>
-                      </View>
-                      <View
-                        style={[
-                          styles.checkbox,
-                          selected && styles.checkboxSelected,
+              <ScrollView
+                nestedScrollEnabled
+                keyboardShouldPersistTaps="handled"
+                style={styles.categoryOptions}
+              >
+                {filteredCategories.length ? (
+                  filteredCategories.map(item => {
+                    const selected = filters.categories.includes(item.value);
+                    return (
+                      <Pressable
+                        key={item.value}
+                        accessibilityRole="checkbox"
+                        accessibilityLabel={item.label}
+                        accessibilityState={{checked: selected}}
+                        onPress={() => toggleCategory(item.value)}
+                        style={({pressed}) => [
+                          styles.categoryRow,
+                          pressed && styles.pressed,
                         ]}
                       >
+                        <View style={styles.categoryName}>
+                          <View
+                            style={[
+                              styles.colorDot,
+                              {
+                                backgroundColor:
+                                  item.color || warmColors.secondary,
+                              },
+                            ]}
+                          />
+                          <Text style={styles.categoryNameText}>
+                            {item.label}
+                          </Text>
+                        </View>
                         {selected && (
                           <FontAwesome6
                             name="check"
-                            size={11}
-                            color={warmColors.primaryForeground}
+                            size={14}
+                            color={warmColors.primary}
                             iconStyle="solid"
                           />
                         )}
-                      </View>
-                    </Pressable>
-                  );
-                })
-              ) : (
-                <Text style={styles.noResults}>Brak wyników</Text>
-              )}
+                      </Pressable>
+                    );
+                  })
+                ) : (
+                  <Text style={styles.noResults}>Brak wyników</Text>
+                )}
+              </ScrollView>
             </View>
           )}
         </View>
 
-        <View style={styles.section}>
+        <View>
           <Pressable
             accessibilityRole="switch"
             accessibilityLabel="Urlop"
@@ -346,42 +339,33 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 24,
     paddingBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: warmColors.cardBorder,
   },
   title: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
     color: warmColors.foreground,
   },
   clearButton: {paddingVertical: 8, minHeight: 40, justifyContent: 'center'},
   clearButtonText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
-    color: warmColors.destructive,
+    color: warmColors.primary,
   },
   body: {flex: 1},
-  scrollContent: {paddingHorizontal: 24, paddingVertical: 20},
-  section: {
-    paddingBottom: 20,
-    marginBottom: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: warmColors.cardBorder,
-  },
+  scrollContent: {paddingHorizontal: 24, paddingVertical: 20, gap: 24},
   sectionTitle: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '700',
-    color: warmColors.mutedForeground,
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
+    color: warmColors.foreground,
     marginBottom: 12,
   },
   dateRow: {flexDirection: 'row', gap: 12},
   dateControl: {flex: 1},
   datePicker: {backgroundColor: 'transparent', width: '100%'},
   categoryTrigger: {
-    minHeight: 52,
-    paddingHorizontal: 14,
+    minHeight: 42,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -391,28 +375,27 @@ const styles = StyleSheet.create({
     backgroundColor: warmColors.cardSolid,
   },
   categoryTriggerActive: {borderColor: warmColors.ring},
-  categoryTriggerLeft: {flexDirection: 'row', alignItems: 'center', gap: 10},
-  categoryTriggerText: {fontSize: 15, color: warmColors.foreground},
-  chips: {flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12},
+  categoryTriggerText: {fontSize: 13, color: warmColors.foreground},
+  chips: {flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 10},
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
-    minHeight: 32,
-    paddingLeft: 10,
-    paddingRight: 6,
+    minHeight: 28,
+    paddingLeft: 8,
+    paddingRight: 4,
     borderRadius: warmRadius.pill,
     backgroundColor: warmColors.accent,
   },
-  chipText: {fontSize: 13, color: warmColors.accentForeground},
-  removeChip: {padding: 6, marginLeft: 2},
+  chipText: {fontSize: 12, color: warmColors.accentForeground},
+  removeChip: {padding: 5, marginLeft: 1},
   colorDot: {
-    width: 9,
-    height: 9,
+    width: 8,
+    height: 8,
     borderRadius: warmRadius.pill,
-    marginRight: 8,
+    marginRight: 6,
   },
   categoryList: {
-    marginTop: 10,
+    marginTop: 12,
     borderWidth: 1,
     borderColor: warmColors.cardBorder,
     borderRadius: warmRadius.lg,
@@ -420,59 +403,47 @@ const styles = StyleSheet.create({
     backgroundColor: warmColors.cardSolid,
   },
   searchRow: {
-    height: 46,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 14,
+    padding: 8,
     borderBottomWidth: 1,
     borderBottomColor: warmColors.cardBorder,
+  },
+  searchInputContainer: {
+    height: 36,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: warmColors.input,
+    borderRadius: warmRadius.md,
+    backgroundColor: warmColors.inputBackground,
   },
   searchInput: {
     flex: 1,
-    marginLeft: 10,
-    fontSize: 15,
+    marginLeft: 8,
+    fontSize: 13,
     color: warmColors.foreground,
   },
+  categoryOptions: {maxHeight: 240},
   categoryRow: {
-    minHeight: 48,
-    paddingHorizontal: 14,
+    minHeight: 40,
+    paddingHorizontal: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    borderBottomWidth: 1,
-    borderBottomColor: warmColors.cardBorder,
   },
   categoryName: {flexDirection: 'row', alignItems: 'center', flex: 1},
-  categoryNameText: {fontSize: 15, color: warmColors.foreground},
-  checkbox: {
-    width: 22,
-    height: 22,
-    borderRadius: warmRadius.sm,
-    borderWidth: 1,
-    borderColor: warmColors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  checkboxSelected: {
-    backgroundColor: warmColors.primary,
-    borderColor: warmColors.primary,
-  },
+  categoryNameText: {fontSize: 13, color: warmColors.foreground},
   noResults: {
     padding: 16,
     textAlign: 'center',
     color: warmColors.mutedForeground,
-    fontSize: 14,
+    fontSize: 13,
   },
   holidayRow: {
-    minHeight: 52,
-    paddingHorizontal: 14,
+    minHeight: 40,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    borderRadius: warmRadius.lg,
-    backgroundColor: warmColors.cardSolid,
-    borderWidth: 1,
-    borderColor: warmColors.cardBorder,
   },
   holidayLabel: {flexDirection: 'row', alignItems: 'center', gap: 10},
   holidayIcon: {
