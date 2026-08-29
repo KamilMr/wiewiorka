@@ -199,10 +199,6 @@ const Records = () => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={[]}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Zapisy</Text>
-      </View>
-
       <View style={styles.stickyFilters}>
         <View style={styles.filterRow}>
           <View style={styles.searchRow}>
@@ -394,17 +390,6 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: warmColors.background,
-  },
-  header: {
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 12,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: warmColors.foreground,
-    letterSpacing: -0.3,
   },
   pressed: {
     opacity: 0.85,
