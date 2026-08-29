@@ -2,11 +2,11 @@ import {StyleSheet, Text, View} from 'react-native';
 
 import {warmColors} from '@/constants/warmTheme';
 
-type TabHeaderTitleProps = {
+type AppHeaderTitleProps = {
   title: string;
 };
 
-export function TabHeaderTitle({title}: TabHeaderTitleProps) {
+export function AppHeaderTitle({title}: AppHeaderTitleProps) {
   return (
     <View style={styles.container}>
       <Text style={styles.eyebrow}>WIEWIORKA</Text>
@@ -16,6 +16,16 @@ export function TabHeaderTitle({title}: TabHeaderTitleProps) {
     </View>
   );
 }
+
+export const appHeaderOptions = {
+  headerTitle: ({children}: {children: string}) => (
+    <AppHeaderTitle title={children} />
+  ),
+  headerTitleAlign: 'left' as const,
+  headerStyle: {backgroundColor: warmColors.background},
+  headerShadowVisible: false,
+  headerTintColor: warmColors.foreground,
+};
 
 const styles = StyleSheet.create({
   container: {

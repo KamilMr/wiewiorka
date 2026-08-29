@@ -16,6 +16,7 @@ import {store, persistor} from '@/redux/store';
 import {paperTheme} from '@/constants/theme';
 import {warmColors} from '@/constants/warmTheme';
 import {SnackBar, Text, Button} from '@/components';
+import {appHeaderOptions} from '@/components/navigation/AppHeaderTitle';
 import {useSync, useAppSelector, useAppDispatch} from '@/hooks';
 import {logError, log, setAttribute} from '@/utils/crashlytics';
 import {selectToken} from '@/redux/auth/authSlice';
@@ -141,7 +142,7 @@ const RootLayout = () => {
                 <Stack.Screen name="dev" options={{headerShown: false}} />
                 <Stack.Screen
                   name="changelog"
-                  options={{title: 'Historia Zmian'}}
+                  options={{...appHeaderOptions, title: 'Historia Zmian'}}
                 />
                 <Stack.Screen name="+not-found" />
               </Stack>

@@ -4,7 +4,7 @@ import {useDev} from '@/hooks';
 import KeyboardView from '@/components/KeyboardView';
 import DevModeToggle from '@/components/DevModeToggle';
 import StatusIndicator from '@/components/StatusIndicator';
-import {sizes} from '@/constants/theme';
+import {appHeaderOptions} from '@/components/navigation/AppHeaderTitle';
 
 export default function DevLayout() {
   const devMode = useDev();
@@ -23,7 +23,8 @@ export default function DevLayout() {
     <KeyboardView offset={0}>
       <Stack
         screenOptions={{
-          headerRightContainerStyle: {paddingRight: sizes.xxl},
+          ...appHeaderOptions,
+          headerRightContainerStyle: {paddingRight: 20},
           headerRight: () => (
             <DevModeToggle>
               <StatusIndicator />
