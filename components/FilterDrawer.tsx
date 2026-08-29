@@ -1,5 +1,6 @@
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {Pressable, ScrollView, StyleSheet, Switch, View} from 'react-native';
+import {Pressable, StyleSheet, Switch, View} from 'react-native';
+import {ScrollView} from 'react-native-gesture-handler';
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
@@ -71,6 +72,9 @@ const FilterDrawer = ({
         value,
       },
   );
+  const categoryOptionsHeight = filteredCategories.length
+    ? Math.min(filteredCategories.length * 40, 240)
+    : 48;
 
   const toggleCategory = (value: string) => {
     onFiltersChange({
@@ -122,6 +126,7 @@ const FilterDrawer = ({
         style={styles.body}
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
+        nestedScrollEnabled
       >
         <View>
           <Text style={styles.sectionTitle}>Zakres dat</Text>
@@ -221,9 +226,13 @@ const FilterDrawer = ({
                 </View>
               </View>
               <ScrollView
+                disallowInterruption
                 nestedScrollEnabled
                 keyboardShouldPersistTaps="handled"
-                style={styles.categoryOptions}
+                style={[
+                  styles.categoryOptions,
+                  {height: categoryOptionsHeight},
+                ]}
               >
                 {filteredCategories.length ? (
                   filteredCategories.map(item => {
@@ -250,7 +259,10 @@ const FilterDrawer = ({
                               },
                             ]}
                           />
-                          <Text style={styles.categoryNameText}>
+                          <Text
+                            style={styles.categoryNameText}
+                            numberOfLines={1}
+                          >
                             {item.label}
                           </Text>
                         </View>
@@ -425,7 +437,7 @@ const styles = StyleSheet.create({
   },
   categoryOptions: {maxHeight: 240},
   categoryRow: {
-    minHeight: 40,
+    height: 40,
     paddingHorizontal: 12,
     flexDirection: 'row',
     alignItems: 'center',
