@@ -48,10 +48,20 @@ const Records = () => {
   const {refreshing, onRefresh} = usePullToRefresh();
 
   const categoriesByUsage = useAppSelector(selectCategoriesByUsage);
-  const categoryItems = categoriesByUsage.map(cat => ({
-    label: cat.name,
-    value: cat.name,
-  }));
+  const categoryItems = useMemo(
+    () =>
+      [
+        ...categoriesByUsage.slice(0, 3),
+        ...categoriesByUsage
+          .slice(3)
+          .sort((a, b) => a.name.localeCompare(b.name, 'pl')),
+      ].map(cat => ({
+        label: cat.name,
+        value: cat.name,
+        color: cat.color || undefined,
+      })),
+    [categoriesByUsage],
+  );
 
   useEffect(() => {
     if (params.category)
@@ -241,6 +251,9 @@ const Records = () => {
 
       <View style={styles.stickyFilters}>
         <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Filtruj zapisy według daty i kategorii"
+          accessibilityState={{expanded: drawerVisible}}
           onPress={() => setDrawerVisible(true)}
           style={({pressed}) => [styles.dateBtn, pressed && styles.pressed]}
         >
@@ -260,7 +273,7 @@ const Records = () => {
               </View>
             )}
             <FontAwesome6
-              name="chevron-down"
+              name="sliders"
               size={12}
               color={warmColors.mutedForeground}
               iconStyle="solid"
@@ -299,15 +312,6 @@ const Records = () => {
           ))}
         </ScrollView>
       </View>
-
-      <FilterDrawer
-        visible={drawerVisible}
-        filters={filters}
-        onFiltersChange={handleFiltersChange}
-        onClearAll={handleClearAll}
-        onClose={() => setDrawerVisible(false)}
-        categoryItems={categoryItems}
-      />
 
       <ScrollView
         onScroll={handleScroll}
@@ -363,6 +367,15 @@ const Records = () => {
           />
         )}
       </ScrollView>
+
+      <FilterDrawer
+        visible={drawerVisible}
+        filters={filters}
+        onFiltersChange={handleFiltersChange}
+        onClearAll={handleClearAll}
+        onClose={() => setDrawerVisible(false)}
+        categoryItems={categoryItems}
+      />
     </SafeAreaView>
   );
 };
