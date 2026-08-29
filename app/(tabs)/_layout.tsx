@@ -2,6 +2,7 @@ import React, {useEffect} from 'react';
 import {Redirect, Tabs} from 'expo-router';
 
 import {BottomTabBar} from '@/components/navigation/BottomTabBar';
+import {TabHeaderTitle} from '@/components/navigation/TabHeaderTitle';
 import {sizes} from '@/constants/theme';
 import {warmColors} from '@/constants/warmTheme';
 import DevModeToggle from '@/components/DevModeToggle';
@@ -26,11 +27,13 @@ export default function TabLayout() {
       tabBar={props => <BottomTabBar {...props} />}
       screenOptions={{
         headerShown: true,
-        headerTitle: '',
-        headerStyle: {backgroundColor: warmColors.sidebar},
-        headerTintColor: warmColors.sidebarForeground,
-        headerTitleStyle: {color: warmColors.sidebarForeground},
-        headerRightContainerStyle: {paddingRight: sizes.xxl},
+        headerTitle: ({children}) => <TabHeaderTitle title={children} />,
+        headerTitleAlign: 'left',
+        headerTitleContainerStyle: {paddingLeft: sizes.md},
+        headerStyle: {backgroundColor: warmColors.background},
+        headerShadowVisible: false,
+        headerTintColor: warmColors.foreground,
+        headerRightContainerStyle: {paddingRight: 20},
         headerRight: () => (
           <DevModeToggle>
             <StatusIndicator />
