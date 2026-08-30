@@ -1,5 +1,5 @@
 import {useEffect} from 'react';
-import {View} from 'react-native';
+import {Image, View} from 'react-native';
 import {Stack, type ErrorBoundaryProps} from 'expo-router';
 import {StatusBar} from 'expo-status-bar';
 import {Provider} from 'react-redux';
@@ -26,6 +26,23 @@ import {setStorageItems, setShopList} from '@/redux/storage/storageSlice';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
+
+const LoadingScreen = () => (
+  <View
+    style={{
+      flex: 1,
+      backgroundColor: warmColors.background,
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}
+  >
+    <Image
+      source={require('../assets/images/splash.png')}
+      resizeMode="contain"
+      style={{width: '100%', height: '100%'}}
+    />
+  </View>
+);
 
 const Sync = () => {
   useSync();
@@ -108,7 +125,7 @@ const RootLayout = () => {
     >
       <StatusBar style="dark" backgroundColor={warmColors.background} />
       <Provider store={store}>
-        <PersistGate persistor={persistor}>
+        <PersistGate loading={<LoadingScreen />} persistor={persistor}>
           <Sync />
           <SocketConnector />
           <PaperProvider theme={paperTheme}>
