@@ -70,6 +70,7 @@ export interface Expense {
   image: string;
   houseId: string;
   owner: string;
+  ownerId?: number | string;
   tags?: string[];
 }
 

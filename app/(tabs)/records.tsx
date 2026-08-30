@@ -22,6 +22,7 @@ import WarmPill from '@/components/warm/WarmPill';
 import WarmCard from '@/components/warm/WarmCard';
 import {formatPrice, isCloseToBottom} from '@/common';
 import {selectRecords, selectCategoriesByUsage} from '@/redux/main/selectors';
+import {selectMe} from '@/redux/auth/authSlice';
 import {useAppSelector, usePullToRefresh} from '@/hooks';
 import {warmColors, warmRadius, warmShadow} from '@/constants/warmTheme';
 
@@ -47,6 +48,7 @@ const Records = () => {
   const {refreshing, onRefresh} = usePullToRefresh();
 
   const categoriesByUsage = useAppSelector(selectCategoriesByUsage);
+  const currentUser = useAppSelector(selectMe);
   const categoryItems = useMemo(
     () =>
       [
@@ -370,6 +372,7 @@ const Records = () => {
             handleNavigate={handleNavigate}
             handleScroll={handleScroll}
             scrollEnabled={false}
+            ownerAvatar={currentUser}
           />
         )}
       </ScrollView>
