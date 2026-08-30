@@ -213,7 +213,7 @@ export default function DynamicRecordList({
                     <Text style={styles.rowSubtitle} numberOfLines={1}>
                       {`${exp.category || exp.source || 'Nieznana'}${
                         hasHoliday(exp.tags) ? ' 🏖️' : ''
-                      }${exp.owner ? ` • ${exp.owner}` : ''}`}
+                      }${!ownerAvatar && exp.owner ? ` • ${exp.owner}` : ''}`}
                     </Text>
                   </View>
                   <View style={styles.rowRight}>
