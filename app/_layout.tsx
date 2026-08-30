@@ -1,4 +1,4 @@
-import {useEffect} from 'react';
+import {useCallback, useEffect} from 'react';
 import {Image, View} from 'react-native';
 import {Stack, type ErrorBoundaryProps} from 'expo-router';
 import {StatusBar} from 'expo-status-bar';
@@ -111,9 +111,9 @@ const RootLayout = () => {
     setAttribute('environment', __DEV__ ? 'development' : 'production');
   }, []);
 
-  useEffect(() => {
-    if (loaded) SplashScreen.hideAsync();
-  }, [loaded]);
+  const handleRootLayout = useCallback(() => {
+    SplashScreen.hideAsync();
+  }, []);
 
   if (!loaded) {
     return null;
@@ -121,6 +121,7 @@ const RootLayout = () => {
 
   return (
     <GestureHandlerRootView
+      onLayout={handleRootLayout}
       style={{flex: 1, backgroundColor: warmColors.background}}
     >
       <StatusBar style="dark" backgroundColor={warmColors.background} />
