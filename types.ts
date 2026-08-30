@@ -1,6 +1,18 @@
 import {AggregatedData, BudgetMainSlice as MonthlyBudget} from '@/utils/types';
 
-export interface AuthSlice {
+export interface ProfilePhotoUrls {
+  avatarUrl: string | null;
+  mediumUrl: string | null;
+  originalUrl: string | null;
+}
+
+export interface ProfilePhotoUploadFile {
+  uri: string;
+  name: string;
+  type: 'image/jpeg' | 'image/png' | 'image/webp';
+}
+
+export interface AuthSlice extends ProfilePhotoUrls {
   name: string;
   email: string;
   token: string;

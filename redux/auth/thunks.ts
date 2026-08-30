@@ -1,12 +1,14 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 
 import {getURL} from '@/common';
+import {ProfilePhotoUploadFile, ProfilePhotoUrls} from '@/types';
 import {dropMain, setSnackbar} from '../main/mainSlice';
+import {RootState} from '../store';
 import {logError, log, setUserId, setAttribute} from '@/utils/crashlytics';
 
-interface DataResponse {
+interface DataResponse<T = any> {
   err?: string;
-  d: any;
+  d: T;
 }
 
 interface SignInCredentials {
@@ -79,6 +81,44 @@ export const signup = createAsyncThunk(
     }
   },
 );
+
+export const uploadProfilePhoto = createAsyncThunk<
+  ProfilePhotoUrls,
+  ProfilePhotoUploadFile,
+  {state: RootState}
+>('/user/uploadProfilePhoto', async (file, {getState}) => {
+  const data = new FormData();
+  data.append('photo', file as unknown as Blob);
+
+  const resp = await fetch(getURL('users/profile-photo'), {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${getState().auth.token}`,
+    },
+    body: data,
+  });
+  const response: DataResponse<ProfilePhotoUrls> = await resp.json();
+  if (response.err) throw new Error(response.err);
+
+  return response.d;
+});
+
+export const deleteProfilePhoto = createAsyncThunk<
+  ProfilePhotoUrls,
+  void,
+  {state: RootState}
+>('/user/deleteProfilePhoto', async (_, {getState}) => {
+  const resp = await fetch(getURL('users/profile-photo'), {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${getState().auth.token}`,
+    },
+  });
+  const response: DataResponse<ProfilePhotoUrls> = await resp.json();
+  if (response.err) throw new Error(response.err);
+
+  return response.d;
+});
 
 export const logout = createAsyncThunk('/user/logout', async (_, thunkAPI) => {
   let data: DataResponse;
