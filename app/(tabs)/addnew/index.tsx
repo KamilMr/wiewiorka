@@ -51,7 +51,7 @@ import {
   initSplitItem,
   initializeSplitItems,
   validateAddNewForm,
-} from './addNewFormUtils';
+} from '@/utils/addNewFormUtils';
 
 export default function AddNew() {
   const expenseCategories = useAppSelector(selectCategoriesByUsage);

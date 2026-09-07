@@ -1,6 +1,6 @@
 import React from 'react';
 import {Pressable, StyleSheet, View} from 'react-native';
-import {Text} from '@/components';
+import Text from '@/components/CustomText';
 import {warmColors, warmRadius} from '@/constants/warmTheme';
 
 type Variant = 'primary' | 'secondary' | 'ghost';

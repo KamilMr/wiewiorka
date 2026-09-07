@@ -1,19 +1,16 @@
 import {Stack} from 'expo-router';
-import DevModeToggle from '@/components/DevModeToggle';
-import StatusIndicator from '@/components/StatusIndicator';
-import {sizes} from '@/constants/theme';
+import {
+  appHeaderOptions,
+  appHeaderStatusOptions,
+} from '@/components/navigation/AppHeaderTitle';
 
 export default function Layout() {
   return (
     <Stack
       screenOptions={{
+        ...appHeaderOptions,
+        ...appHeaderStatusOptions,
         title: 'Budzet',
-        headerRightContainerStyle: {paddingRight: sizes.xxl},
-        headerRight: () => (
-          <DevModeToggle>
-            <StatusIndicator />
-          </DevModeToggle>
-        ),
       }}
     />
   );

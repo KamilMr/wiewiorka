@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   GestureResponderEvent,
+  Image,
   NativeScrollEvent,
   NativeSyntheticEvent,
   Pressable,
@@ -15,7 +16,7 @@ import {IconButton, Text} from '@/components';
 import WarmCard from '@/components/warm/WarmCard';
 import WarmIconChip from '@/components/warm/WarmIconChip';
 import WarmSectionHeader from '@/components/warm/WarmSectionHeader';
-import {warmColors} from '@/constants/warmTheme';
+import {warmColors, warmShadow} from '@/constants/warmTheme';
 import {formatPrice} from '@/common';
 
 interface SelExpense {
@@ -26,6 +27,7 @@ interface SelExpense {
   category: string;
   price: string | number;
   owner: string;
+  ownerId?: number | string;
   source?: string;
   date: string;
   image?: string;
@@ -46,6 +48,11 @@ interface Props {
     [key: string]: SelExpense[];
   };
   scrollEnabled?: boolean;
+  ownerAvatar?: {
+    id?: number | string;
+    name?: string;
+    avatarUrl?: string | null;
+  };
 }
 
 const isUnsynced = (id: number | string): boolean => {
@@ -69,6 +76,60 @@ const hexWithAlpha = (hex: string, alpha: number) => {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
+const getOwnerInitials = (owner?: string) => {
+  const names = owner?.trim().split(/\s+/).filter(Boolean) ?? [];
+  if (!names.length) return '?';
+  return `${names[0][0]}${
+    names.length > 1 ? names[names.length - 1][0] : ''
+  }`.toUpperCase();
+};
+
+const isCurrentOwner = (
+  record: SelExpense,
+  ownerAvatar: Props['ownerAvatar'],
+) => {
+  if (!ownerAvatar) return false;
+  if (record.ownerId !== undefined && record.ownerId !== null) {
+    return String(record.ownerId) === String(ownerAvatar.id);
+  }
+
+  const recordOwner = record.owner?.trim().replace(/\s+/g, ' ');
+  const currentOwner = ownerAvatar.name?.trim().replace(/\s+/g, ' ');
+  return Boolean(recordOwner && currentOwner && recordOwner === currentOwner);
+};
+
+const OwnerAvatar = ({
+  owner,
+  imageUrl,
+}: {
+  owner?: string;
+  imageUrl?: string | null;
+}) => {
+  const [imageError, setImageError] = React.useState(false);
+  const showImage = Boolean(imageUrl) && !imageError;
+
+  React.useEffect(() => setImageError(false), [imageUrl]);
+
+  return (
+    <View style={styles.ownerAvatarPosition}>
+      <View style={styles.ownerAvatar}>
+        {showImage ? (
+          <Image
+            source={{uri: imageUrl!}}
+            resizeMode="cover"
+            style={styles.ownerAvatarImage}
+            onError={() => setImageError(true)}
+          />
+        ) : (
+          <Text style={styles.ownerAvatarInitials}>
+            {getOwnerInitials(owner)}
+          </Text>
+        )}
+      </View>
+    </View>
+  );
+};
+
 const formatGroupLabel = (dateKey: string) => {
   const d = parse(dateKey, 'dd/MM/yyyy', new Date());
   if (isToday(d)) return `Dziś, ${formatDate(d, 'dd MMM', {locale: pl})}`;
@@ -82,6 +143,7 @@ export default function DynamicRecordList({
   handleScroll = () => {},
   handleNavigate = () => () => {},
   scrollEnabled = true,
+  ownerAvatar,
 }: Props) {
   return (
     <ScrollView onScroll={handleScroll} scrollEnabled={scrollEnabled}>
@@ -127,11 +189,23 @@ export default function DynamicRecordList({
                     pressed && styles.rowPressed,
                   ]}
                 >
-                  <WarmIconChip
-                    icon={exp.exp ? 'tag' : 'arrow-down'}
-                    background={chipBg}
-                    color={chipIconColor}
-                  />
+                  <View style={styles.categoryIcon}>
+                    <WarmIconChip
+                      icon={exp.exp ? 'tag' : 'arrow-down'}
+                      background={chipBg}
+                      color={chipIconColor}
+                    />
+                    {ownerAvatar && (
+                      <OwnerAvatar
+                        owner={exp.owner}
+                        imageUrl={
+                          isCurrentOwner(exp, ownerAvatar)
+                            ? ownerAvatar.avatarUrl
+                            : null
+                        }
+                      />
+                    )}
+                  </View>
                   <View style={styles.rowMain}>
                     <Text style={styles.rowTitle} numberOfLines={1}>
                       {exp.description || exp.category || 'Brak opisu'}
@@ -139,7 +213,7 @@ export default function DynamicRecordList({
                     <Text style={styles.rowSubtitle} numberOfLines={1}>
                       {`${exp.category || exp.source || 'Nieznana'}${
                         hasHoliday(exp.tags) ? ' 🏖️' : ''
-                      }${exp.owner ? ` • ${exp.owner}` : ''}`}
+                      }${!ownerAvatar && exp.owner ? ` • ${exp.owner}` : ''}`}
                     </Text>
                   </View>
                   <View style={styles.rowRight}>
@@ -182,6 +256,38 @@ const styles = StyleSheet.create({
   },
   rowPressed: {
     backgroundColor: warmColors.muted,
+  },
+  categoryIcon: {
+    position: 'relative',
+  },
+  ownerAvatarPosition: {
+    position: 'absolute',
+    right: -4,
+    bottom: -4,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    elevation: 2,
+    ...warmShadow.sm,
+  },
+  ownerAvatar: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+    borderWidth: 2,
+    borderColor: warmColors.background,
+    borderRadius: 9,
+    backgroundColor: warmColors.cardSolid,
+  },
+  ownerAvatarImage: {
+    width: '100%',
+    height: '100%',
+  },
+  ownerAvatarInitials: {
+    fontSize: 8,
+    fontWeight: '700',
+    color: warmColors.foreground,
   },
   rowMain: {
     flex: 1,

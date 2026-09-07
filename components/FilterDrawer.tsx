@@ -1,14 +1,18 @@
-import {useEffect, useRef} from 'react';
-import {View, StyleSheet, Animated} from 'react-native';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {Pressable, StyleSheet, Switch, View} from 'react-native';
+import {ScrollView} from 'react-native-gesture-handler';
 import {
-  Surface,
-  Divider,
-  Chip,
-  Button as PaperButton,
-} from 'react-native-paper';
-import {sizes} from '@/constants/theme';
-import {warmColors} from '@/constants/warmTheme';
-import MultiSelectCategories, {Items} from './MultiSelectCategories';
+  BottomSheetBackdrop,
+  BottomSheetModal,
+  BottomSheetScrollView,
+  BottomSheetTextInput,
+} from '@gorhom/bottom-sheet';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+
+import {Text} from '@/components';
+import {normalize} from '@/common';
+import {warmColors, warmRadius, warmShadow} from '@/constants/warmTheme';
 import CustomDatePicker from './DatePicker';
 
 export interface FilterState {
@@ -18,13 +22,15 @@ export interface FilterState {
   holidayTag: boolean;
 }
 
+type CategoryItem = {label: string; value: string; color?: string};
+
 interface FilterDrawerProps {
   visible: boolean;
   filters: FilterState;
   onFiltersChange: (filters: Partial<FilterState>) => void;
   onClearAll: () => void;
   onClose: () => void;
-  categoryItems: Items;
+  categoryItems: CategoryItem[];
 }
 
 const FilterDrawer = ({
@@ -35,143 +41,450 @@ const FilterDrawer = ({
   onClose,
   categoryItems,
 }: FilterDrawerProps) => {
-  const animatedHeight = useRef(new Animated.Value(0)).current;
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
+  const insets = useSafeAreaInsets();
+  const [categoriesExpanded, setCategoriesExpanded] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const snapPoints = useMemo(() => ['88%'], []);
+
+  const closeCategoryList = useCallback(() => {
+    setCategoriesExpanded(false);
+    setSearchQuery('');
+  }, []);
 
   useEffect(() => {
-    Animated.timing(animatedHeight, {
-      toValue: visible ? 1 : 0,
-      duration: 300,
-      useNativeDriver: false,
-    }).start();
-  }, [visible]);
+    if (visible) bottomSheetRef.current?.present();
+    else {
+      bottomSheetRef.current?.dismiss();
+      closeCategoryList();
+    }
+  }, [visible, closeCategoryList]);
 
-  const height = animatedHeight.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 600], // Increased for better spacing
-  });
+  const filteredCategories = categoryItems.filter(item =>
+    normalize(item.label.toLowerCase()).includes(
+      normalize(searchQuery.toLowerCase()),
+    ),
+  );
+  const selectedCategories = filters.categories.map(
+    value =>
+      categoryItems.find(item => item.value === value) || {
+        label: value,
+        value,
+      },
+  );
+  const categoryOptionsHeight = filteredCategories.length
+    ? Math.min(filteredCategories.length * 40, 240)
+    : 48;
 
-  const opacity = animatedHeight.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 1],
-  });
+  const toggleCategory = (value: string) => {
+    onFiltersChange({
+      categories: filters.categories.includes(value)
+        ? filters.categories.filter(category => category !== value)
+        : [...filters.categories, value],
+    });
+  };
 
-  if (!visible) return null;
+  const handleDismiss = () => {
+    closeCategoryList();
+    if (visible) onClose();
+  };
 
   return (
-    <Animated.View style={[styles.container, {maxHeight: height, opacity}]}>
-      <Surface elevation={1} style={styles.surface}>
-        {/* Date Range Section */}
-        <View style={[styles.section, {flexDirection: 'row'}]}>
-          <View style={{width: '50%', height: 80}}>
-            <CustomDatePicker
-              label="Od"
-              value={filters.dateFrom}
-              onChange={date => onFiltersChange({dateFrom: date || null})}
-              style={styles.datePicker}
-            />
-          </View>
-          <View style={styles.dateSpacing} />
-          <View style={{width: '50%', height: 80}}>
-            <CustomDatePicker
-              label="Do"
-              value={filters.dateTo}
-              onChange={date => onFiltersChange({dateTo: date || null})}
-              style={styles.datePicker}
-            />
+    <BottomSheetModal
+      ref={bottomSheetRef}
+      index={0}
+      snapPoints={snapPoints}
+      enableDynamicSizing={false}
+      enablePanDownToClose
+      onDismiss={handleDismiss}
+      backgroundStyle={styles.sheetBackground}
+      handleIndicatorStyle={styles.handleIndicator}
+      backdropComponent={props => (
+        <BottomSheetBackdrop
+          {...props}
+          appearsOnIndex={0}
+          disappearsOnIndex={-1}
+          pressBehavior="close"
+          opacity={0.45}
+        />
+      )}
+    >
+      <View style={styles.header}>
+        <Text style={styles.title}>Filtry</Text>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Wyczyść filtry"
+          onPress={onClearAll}
+          hitSlop={8}
+          style={({pressed}) => [styles.clearButton, pressed && styles.pressed]}
+        >
+          <Text style={styles.clearButtonText}>Wyczyść filtry</Text>
+        </Pressable>
+      </View>
+
+      <BottomSheetScrollView
+        style={styles.body}
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+        nestedScrollEnabled
+      >
+        <View>
+          <Text style={styles.sectionTitle}>Zakres dat</Text>
+          <View style={styles.dateRow}>
+            <View style={styles.dateControl}>
+              <CustomDatePicker
+                label="Od"
+                value={filters.dateFrom}
+                onChange={date => onFiltersChange({dateFrom: date || null})}
+                style={styles.datePicker}
+              />
+            </View>
+            <View style={styles.dateControl}>
+              <CustomDatePicker
+                label="Do"
+                value={filters.dateTo}
+                onChange={date => onFiltersChange({dateTo: date || null})}
+                style={styles.datePicker}
+              />
+            </View>
           </View>
         </View>
 
-        <Divider style={styles.divider} />
+        <View>
+          <Text style={styles.sectionTitle}>Kategorie</Text>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Wybierz kategorie"
+            accessibilityState={{expanded: categoriesExpanded}}
+            onPress={() => setCategoriesExpanded(expanded => !expanded)}
+            style={({pressed}) => [
+              styles.categoryTrigger,
+              categoriesExpanded && styles.categoryTriggerActive,
+              pressed && styles.pressed,
+            ]}
+          >
+            <Text style={styles.categoryTriggerText}>
+              {filters.categories.length
+                ? `Wybrano ${filters.categories.length}`
+                : 'Wybierz kategorie'}
+            </Text>
+            <FontAwesome6
+              name={categoriesExpanded ? 'chevron-up' : 'chevron-down'}
+              size={13}
+              color={warmColors.mutedForeground}
+              iconStyle="solid"
+            />
+          </Pressable>
 
-        {/* Categories Multi-Select Section */}
-        <View style={styles.section}>
-          <MultiSelectCategories
-            items={categoryItems}
-            value={filters.categories}
-            onChange={categories => onFiltersChange({categories})}
-            placeholder="Wybierz kategorie"
-            showDivider
-          />
+          {selectedCategories.length > 0 && (
+            <View style={styles.chips}>
+              {selectedCategories.map(item => (
+                <View key={item.value} style={styles.chip}>
+                  {!!item.color && (
+                    <View
+                      style={[styles.colorDot, {backgroundColor: item.color}]}
+                    />
+                  )}
+                  <Text style={styles.chipText}>{item.label}</Text>
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={`Usuń kategorię ${item.label}`}
+                    onPress={() => toggleCategory(item.value)}
+                    hitSlop={8}
+                    style={styles.removeChip}
+                  >
+                    <FontAwesome6
+                      name="xmark"
+                      size={11}
+                      color={warmColors.mutedForeground}
+                      iconStyle="solid"
+                    />
+                  </Pressable>
+                </View>
+              ))}
+            </View>
+          )}
+
+          {categoriesExpanded && (
+            <View style={styles.categoryList}>
+              <View style={styles.searchRow}>
+                <View style={styles.searchInputContainer}>
+                  <FontAwesome6
+                    name="magnifying-glass"
+                    size={13}
+                    color={warmColors.mutedForeground}
+                    iconStyle="solid"
+                  />
+                  <BottomSheetTextInput
+                    accessibilityLabel="Szukaj kategorii"
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                    placeholder="Szukaj kategorii"
+                    placeholderTextColor={warmColors.mutedForeground}
+                    style={styles.searchInput}
+                  />
+                </View>
+              </View>
+              <ScrollView
+                disallowInterruption
+                nestedScrollEnabled
+                keyboardShouldPersistTaps="handled"
+                style={[
+                  styles.categoryOptions,
+                  {height: categoryOptionsHeight},
+                ]}
+              >
+                {filteredCategories.length ? (
+                  filteredCategories.map(item => {
+                    const selected = filters.categories.includes(item.value);
+                    return (
+                      <Pressable
+                        key={item.value}
+                        accessibilityRole="checkbox"
+                        accessibilityLabel={item.label}
+                        accessibilityState={{checked: selected}}
+                        onPress={() => toggleCategory(item.value)}
+                        style={({pressed}) => [
+                          styles.categoryRow,
+                          pressed && styles.pressed,
+                        ]}
+                      >
+                        <View style={styles.categoryName}>
+                          <View
+                            style={[
+                              styles.colorDot,
+                              {
+                                backgroundColor:
+                                  item.color || warmColors.secondary,
+                              },
+                            ]}
+                          />
+                          <Text
+                            style={styles.categoryNameText}
+                            numberOfLines={1}
+                          >
+                            {item.label}
+                          </Text>
+                        </View>
+                        {selected && (
+                          <FontAwesome6
+                            name="check"
+                            size={14}
+                            color={warmColors.primary}
+                            iconStyle="solid"
+                          />
+                        )}
+                      </Pressable>
+                    );
+                  })
+                ) : (
+                  <Text style={styles.noResults}>Brak wyników</Text>
+                )}
+              </ScrollView>
+            </View>
+          )}
         </View>
 
-        <Divider style={styles.divider} />
-
-        {/* Holiday Tag Section */}
-        <View style={styles.section}>
-          <Chip
-            icon={filters.holidayTag ? 'calendar-check' : 'calendar'}
-            selected={filters.holidayTag}
+        <View>
+          <Pressable
+            accessibilityRole="switch"
+            accessibilityLabel="Urlop"
+            accessibilityState={{checked: filters.holidayTag}}
             onPress={() => onFiltersChange({holidayTag: !filters.holidayTag})}
-            mode={filters.holidayTag ? 'flat' : 'outlined'}
-            style={styles.holidayChip}
+            style={({pressed}) => [
+              styles.holidayRow,
+              pressed && styles.pressed,
+            ]}
           >
-            Urlop
-          </Chip>
+            <View style={styles.holidayLabel}>
+              <View style={styles.holidayIcon}>
+                <FontAwesome6
+                  name="umbrella-beach"
+                  size={16}
+                  color={warmColors.primary}
+                  iconStyle="solid"
+                />
+              </View>
+              <Text style={styles.categoryNameText}>Urlop</Text>
+            </View>
+            <Switch
+              value={filters.holidayTag}
+              onValueChange={holidayTag => onFiltersChange({holidayTag})}
+              trackColor={{false: warmColors.border, true: warmColors.primary}}
+              thumbColor={warmColors.primaryForeground}
+              accessibilityLabel="Urlop"
+              pointerEvents="none"
+            />
+          </Pressable>
         </View>
+      </BottomSheetScrollView>
 
-        <Divider style={styles.divider} />
-
-        {/* Action Buttons */}
-        <View style={styles.buttonRow}>
-          <PaperButton
-            mode="outlined"
-            onPress={onClose}
-            icon="close"
-            style={styles.closeButton}
-          >
-            Zamknij
-          </PaperButton>
-          <PaperButton
-            mode="outlined"
-            onPress={onClearAll}
-            icon="filter-remove"
-            style={styles.clearButton}
-          >
-            Wyczyść filtry
-          </PaperButton>
-        </View>
-      </Surface>
-    </Animated.View>
+      <View style={[styles.footer, {paddingBottom: insets.bottom + 12}]}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Zamknij filtry"
+          onPress={() => bottomSheetRef.current?.dismiss()}
+          style={({pressed}) => [styles.closeButton, pressed && styles.pressed]}
+        >
+          <Text style={styles.closeButtonText}>Zamknij</Text>
+        </Pressable>
+      </View>
+    </BottomSheetModal>
   );
 };
 
 export default FilterDrawer;
 
 const styles = StyleSheet.create({
-  container: {
-    overflow: 'hidden',
-    marginBottom: sizes.md,
+  sheetBackground: {
+    backgroundColor: warmColors.background,
+    borderRadius: warmRadius.xxl,
+    ...warmShadow.md,
   },
-  surface: {
-    padding: sizes.lg,
-    borderRadius: sizes.sm,
+  handleIndicator: {
+    backgroundColor: warmColors.border,
+    width: 42,
   },
-  section: {
-    marginVertical: sizes.md,
-  },
-  datePicker: {
-    backgroundColor: 'transparent',
-    width: '100%',
-  },
-  dateSpacing: {
-    height: sizes.md,
-  },
-  divider: {
-    marginVertical: sizes.md,
-  },
-  holidayChip: {
-    alignSelf: 'flex-start',
-  },
-  buttonRow: {
+  header: {
     flexDirection: 'row',
-    gap: sizes.sm,
-    marginTop: sizes.sm,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 24,
+    paddingBottom: 16,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: warmColors.foreground,
+  },
+  clearButton: {paddingVertical: 8, minHeight: 40, justifyContent: 'center'},
+  clearButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: warmColors.primary,
+  },
+  body: {flex: 1},
+  scrollContent: {paddingHorizontal: 24, paddingVertical: 20, gap: 24},
+  sectionTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: warmColors.foreground,
+    marginBottom: 12,
+  },
+  dateRow: {flexDirection: 'row', gap: 12},
+  dateControl: {flex: 1},
+  datePicker: {backgroundColor: 'transparent', width: '100%'},
+  categoryTrigger: {
+    minHeight: 42,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: warmColors.cardBorder,
+    borderRadius: warmRadius.lg,
+    backgroundColor: warmColors.cardSolid,
+  },
+  categoryTriggerActive: {borderColor: warmColors.ring},
+  categoryTriggerText: {fontSize: 13, color: warmColors.foreground},
+  chips: {flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 10},
+  chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    minHeight: 28,
+    paddingLeft: 8,
+    paddingRight: 4,
+    borderRadius: warmRadius.pill,
+    backgroundColor: warmColors.accent,
+  },
+  chipText: {fontSize: 12, color: warmColors.accentForeground},
+  removeChip: {padding: 5, marginLeft: 1},
+  colorDot: {
+    width: 8,
+    height: 8,
+    borderRadius: warmRadius.pill,
+    marginRight: 6,
+  },
+  categoryList: {
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: warmColors.cardBorder,
+    borderRadius: warmRadius.lg,
+    overflow: 'hidden',
+    backgroundColor: warmColors.cardSolid,
+  },
+  searchRow: {
+    padding: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: warmColors.cardBorder,
+  },
+  searchInputContainer: {
+    height: 36,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: warmColors.input,
+    borderRadius: warmRadius.md,
+    backgroundColor: warmColors.inputBackground,
+  },
+  searchInput: {
+    flex: 1,
+    marginLeft: 8,
+    fontSize: 13,
+    color: warmColors.foreground,
+  },
+  categoryOptions: {maxHeight: 240},
+  categoryRow: {
+    height: 40,
+    paddingHorizontal: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  categoryName: {flexDirection: 'row', alignItems: 'center', flex: 1},
+  categoryNameText: {fontSize: 13, color: warmColors.foreground},
+  noResults: {
+    padding: 16,
+    textAlign: 'center',
+    color: warmColors.mutedForeground,
+    fontSize: 13,
+  },
+  holidayRow: {
+    minHeight: 40,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  holidayLabel: {flexDirection: 'row', alignItems: 'center', gap: 10},
+  holidayIcon: {
+    width: 30,
+    height: 30,
+    borderRadius: warmRadius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: warmColors.accent,
+  },
+  footer: {
+    paddingHorizontal: 24,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: warmColors.cardBorder,
+    backgroundColor: warmColors.background,
   },
   closeButton: {
-    flex: 1,
+    minHeight: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: warmRadius.lg,
+    backgroundColor: warmColors.primary,
+    ...warmShadow.sm,
   },
-  clearButton: {
-    flex: 1,
-    borderColor: warmColors.destructive,
+  closeButtonText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: warmColors.primaryForeground,
   },
+  pressed: {opacity: 0.82},
 });

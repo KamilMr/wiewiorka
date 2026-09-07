@@ -1,10 +1,11 @@
-import {useEffect} from 'react';
-import {View} from 'react-native';
+import {useCallback, useEffect} from 'react';
+import {Image, View} from 'react-native';
 import {Stack, type ErrorBoundaryProps} from 'expo-router';
 import {StatusBar} from 'expo-status-bar';
 import {Provider} from 'react-redux';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {KeyboardProvider} from 'react-native-keyboard-controller';
+import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 
 import 'react-native-reanimated';
 import {useFonts} from 'expo-font';
@@ -16,6 +17,7 @@ import {store, persistor} from '@/redux/store';
 import {paperTheme} from '@/constants/theme';
 import {warmColors} from '@/constants/warmTheme';
 import {SnackBar, Text, Button} from '@/components';
+import {appHeaderOptions} from '@/components/navigation/AppHeaderTitle';
 import {useSync, useAppSelector, useAppDispatch} from '@/hooks';
 import {logError, log, setAttribute} from '@/utils/crashlytics';
 import {selectToken} from '@/redux/auth/authSlice';
@@ -24,6 +26,23 @@ import {setStorageItems, setShopList} from '@/redux/storage/storageSlice';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
+
+const LoadingScreen = () => (
+  <View
+    style={{
+      flex: 1,
+      backgroundColor: warmColors.background,
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}
+  >
+    <Image
+      source={require('../assets/images/splash.png')}
+      resizeMode="contain"
+      style={{width: '100%', height: '100%'}}
+    />
+  </View>
+);
 
 const Sync = () => {
   useSync();
@@ -92,9 +111,9 @@ const RootLayout = () => {
     setAttribute('environment', __DEV__ ? 'development' : 'production');
   }, []);
 
-  useEffect(() => {
-    if (loaded) SplashScreen.hideAsync();
-  }, [loaded]);
+  const handleRootLayout = useCallback(() => {
+    SplashScreen.hideAsync();
+  }, []);
 
   if (!loaded) {
     return null;
@@ -102,49 +121,52 @@ const RootLayout = () => {
 
   return (
     <GestureHandlerRootView
+      onLayout={handleRootLayout}
       style={{flex: 1, backgroundColor: warmColors.background}}
     >
       <StatusBar style="dark" backgroundColor={warmColors.background} />
       <Provider store={store}>
-        <PersistGate persistor={persistor}>
+        <PersistGate loading={<LoadingScreen />} persistor={persistor}>
           <Sync />
           <SocketConnector />
           <PaperProvider theme={paperTheme}>
             <KeyboardProvider>
-              <Stack
-                initialRouteName="(tabs)"
-                screenOptions={{
-                  contentStyle: {backgroundColor: warmColors.background},
-                  headerStyle: {backgroundColor: warmColors.card},
-                  headerTintColor: warmColors.foreground,
-                  headerTitleStyle: {color: warmColors.foreground},
-                }}
-              >
-                <Stack.Screen name="sign-in" options={{headerShown: false}} />
-                <Stack.Screen name="sign-up" options={{headerShown: false}} />
-                <Stack.Screen
-                  name="forgot-password"
-                  options={{headerShown: false}}
-                />
-                <Stack.Screen name="(tabs)" options={{headerShown: false}} />
-                <Stack.Screen
-                  name="categories"
-                  options={{headerShown: false}}
-                />
-                <Stack.Screen name="budget" options={{headerShown: false}} />
-                <Stack.Screen name="debt" options={{headerShown: false}} />
-                <Stack.Screen
-                  name="income-summary"
-                  options={{headerShown: false}}
-                />
-                <Stack.Screen name="storage" options={{headerShown: false}} />
-                <Stack.Screen name="dev" options={{headerShown: false}} />
-                <Stack.Screen
-                  name="changelog"
-                  options={{title: 'Historia Zmian'}}
-                />
-                <Stack.Screen name="+not-found" />
-              </Stack>
+              <BottomSheetModalProvider>
+                <Stack
+                  initialRouteName="(tabs)"
+                  screenOptions={{
+                    contentStyle: {backgroundColor: warmColors.background},
+                    headerStyle: {backgroundColor: warmColors.card},
+                    headerTintColor: warmColors.foreground,
+                    headerTitleStyle: {color: warmColors.foreground},
+                  }}
+                >
+                  <Stack.Screen name="sign-in" options={{headerShown: false}} />
+                  <Stack.Screen name="sign-up" options={{headerShown: false}} />
+                  <Stack.Screen
+                    name="forgot-password"
+                    options={{headerShown: false}}
+                  />
+                  <Stack.Screen name="(tabs)" options={{headerShown: false}} />
+                  <Stack.Screen
+                    name="categories"
+                    options={{headerShown: false}}
+                  />
+                  <Stack.Screen name="budget" options={{headerShown: false}} />
+                  <Stack.Screen name="debt" options={{headerShown: false}} />
+                  <Stack.Screen
+                    name="income-summary"
+                    options={{headerShown: false}}
+                  />
+                  <Stack.Screen name="storage" options={{headerShown: false}} />
+                  <Stack.Screen name="dev" options={{headerShown: false}} />
+                  <Stack.Screen
+                    name="changelog"
+                    options={{...appHeaderOptions, title: 'Historia Zmian'}}
+                  />
+                  <Stack.Screen name="+not-found" />
+                </Stack>
+              </BottomSheetModalProvider>
             </KeyboardProvider>
             <SnackBar />
           </PaperProvider>

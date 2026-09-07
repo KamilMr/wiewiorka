@@ -1,5 +1,23 @@
 export const CHANGELOG = `# Historia zmian
 
+## [1.0.16] - 2026-08-29
+### Dodano
+- Odświeżanie danych przez przeciągnięcie w dół na ekranach finansowych
+- Wybór zakresu dat w podsumowaniu
+- Kartę łącznej sumy wydatków i nowy widok eksploracji podsumowania
+
+### Zmieniono
+- Przeprojektowano dolną nawigację
+- Uporządkowano filtry podsumowania i sortowanie filtrów według nazwy
+- Przeniesiono wykres udziału kategorii do nowego widoku eksploracji i usunięto zbędne wykresy trendów
+- Ujednolicono sposób formatowania kwot, także w widoku długów
+- Rozszerzono ciepłą paletę kolorów na pozostałe elementy aplikacji i wykresy
+- Usunięto cytaty finansowe z pulpitu
+
+### Naprawiono
+- Wyświetlanie cen w kartach podsumowania w jednym wierszu
+- Zaokrąglanie wyświetlanych kwot
+
 ## [1.0.15] - 2026-08-22
 ### Zmieniono
 - Wprowadzono nowy, cieplejszy wygląd ekranów logowania, rejestracji i resetowania hasła

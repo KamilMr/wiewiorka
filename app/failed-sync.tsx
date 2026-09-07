@@ -4,6 +4,7 @@ import {Icon, Text} from 'react-native-paper';
 import {Stack} from 'expo-router';
 
 import FailedSyncList from '@/components/FailedSyncList';
+import {appHeaderOptions} from '@/components/navigation/AppHeaderTitle';
 import WarmCard from '@/components/warm/WarmCard';
 import {warmColors, warmRadius} from '@/constants/warmTheme';
 import {useAppSelector} from '@/hooks';
@@ -16,6 +17,7 @@ const FailedSyncPage = () => {
     <>
       <Stack.Screen
         options={{
+          ...appHeaderOptions,
           title: 'Niezsynchronizowane',
           headerShown: true,
         }}

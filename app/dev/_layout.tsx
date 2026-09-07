@@ -2,9 +2,10 @@ import {Stack, router} from 'expo-router';
 import {useEffect} from 'react';
 import {useDev} from '@/hooks';
 import KeyboardView from '@/components/KeyboardView';
-import DevModeToggle from '@/components/DevModeToggle';
-import StatusIndicator from '@/components/StatusIndicator';
-import {sizes} from '@/constants/theme';
+import {
+  appHeaderOptions,
+  appHeaderStatusOptions,
+} from '@/components/navigation/AppHeaderTitle';
 
 export default function DevLayout() {
   const devMode = useDev();
@@ -23,12 +24,8 @@ export default function DevLayout() {
     <KeyboardView offset={0}>
       <Stack
         screenOptions={{
-          headerRightContainerStyle: {paddingRight: sizes.xxl},
-          headerRight: () => (
-            <DevModeToggle>
-              <StatusIndicator />
-            </DevModeToggle>
-          ),
+          ...appHeaderOptions,
+          ...appHeaderStatusOptions,
         }}
       >
         <Stack.Screen name="index" options={{title: 'Dev'}} />
