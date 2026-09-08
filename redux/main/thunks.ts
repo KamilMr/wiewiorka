@@ -1,25 +1,14 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
-import {RootState} from '../store';
+import type {RootState} from '../store';
 
-import {getURL, makeNewIdArr, makeRandomId} from '@/common';
-import {log, setAttribute} from '@/utils/crashlytics';
-import {Expense, Income} from '@/types';
+import {getURL, makeRandomId} from '@/common';
 import {
-  addBudgets as addBudgetsAction,
   addDebt as addDebtAction,
   addDebtPayment as addDebtPaymentAction,
   removeDebtPayment as removeDebtPaymentAction,
   updateDebtPayment as updateDebtPaymentAction,
   addExchangeRate as addExchangeRateAction,
   addBidAskExchangeRate as addBidAskExchangeRateAction,
-  updateBudget as updateBudgetAction,
-  addExpense as addExpenseAction,
-  updateExpense as updateExpenseAction,
-  addIncome as addIncomeAction,
-  updateIncome as updateIncomeAction,
-  deleteBudget as deleteBudgetAction,
-  removeExpense as removeExpenseAction,
-  removeIncome as removeIncomeAction,
   addSubcategoryAction,
   updateSubcategoryAction,
   deleteSubcategoryAction,
@@ -28,302 +17,29 @@ import {
   deleteGroupCategoryAction,
   setDebts as setDebtsAction,
 } from './mainSlice';
-import {
-  addToQueue,
-  removeFromQueue,
-} from '../sync/syncSlice';
-import _, {omit} from 'lodash';
+import {addToQueue} from '../sync/syncSlice';
 import {fetchIni} from './syncThunks';
 
 export {fetchIni, genericSync} from './syncThunks';
+export {
+  deleteBudget,
+  uploadBudget,
+  createUpdateBudget,
+  updateBudgetItem,
+} from './budgetThunks';
+export type {Budget} from './budgetThunks';
+export {
+  addNewExpense,
+  updateExpense,
+  addNewIncome,
+  updateIncome,
+  uploadFile,
+  deleteExpense,
+  deleteIncome,
+  deleteExpenseLocal,
+} from './transactionThunks';
 
 const DIFFERED = 0;
-
-export interface Budget {
-  id?: string;
-  amount: number;
-  date: string;
-  categoryId?: number;
-  groupId?: number;
-}
-
-export const deleteBudget = createAsyncThunk<
-  any,
-  {id: string},
-  {state: RootState}
->('budget/delete', async ({id}, thunkAPI) => {
-  const {dispatch, getState} = thunkAPI;
-
-  // Check if there are actions waiting in sync queue for this budget frontendId
-  const state = getState();
-  const pendingOps = state.sync.pendingOperations || [];
-
-  // Remove any pending operations for this budget (check frontendId and budget path)
-  const opsToRemove = pendingOps.filter(
-    op => op.path?.includes('budget') && op.frontendId === id,
-  );
-
-  // Remove the operations from queue
-  opsToRemove.forEach(op => {
-    dispatch(removeFromQueue(op.id));
-  });
-
-  // Update local state immediately
-  dispatch(deleteBudgetAction({id}));
-
-  // Queue for sync - DELETE request
-  dispatch(
-    addToQueue({
-      path: ['main', 'budget', id],
-      method: 'DELETE',
-      handler: 'genericSync',
-      data: {},
-      cb: 'deleteBudget',
-      frontendId: id,
-    }),
-  );
-});
-
-export const uploadBudget = createAsyncThunk<any, Budget, {state: RootState}>(
-  'budget/updateBudget',
-  async ({id, ...rest}: Budget, thunkAPI): Promise<void> => {
-    const token = thunkAPI.getState().auth.token;
-
-    let data;
-    const path = 'budget' + (id ? `/${id}` : '');
-    let resp = await fetch(getURL(path), {
-      method: id ? 'PATCH' : 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-type': 'application/json',
-      },
-      body: JSON.stringify(rest),
-    });
-    data = await resp.json();
-    if (data.err) throw data.err;
-    setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
-  },
-);
-
-export const createUpdateBudget = createAsyncThunk<
-  any,
-  Budget[],
-  {state: RootState}
->(
-  'budget/createUpdateBudget',
-  async (budgets: Budget[], thunkAPI): Promise<void> => {
-    const {dispatch} = thunkAPI;
-
-    // Create budgets with frontend IDs
-    const budgetsWithFrontendIds = budgets.map(budget => ({
-      ...budget,
-      id: budget.id ?? `f_b-${makeNewIdArr(2).join('-')}`,
-      isNew: !budget.id,
-    }));
-
-    // Add to local state immediately
-    const newBudgets = budgetsWithFrontendIds.filter(budget => budget.isNew);
-    const existingBudgets = budgetsWithFrontendIds.filter(
-      budget => !budget.isNew,
-    );
-
-    if (newBudgets.length > 0) {
-      dispatch(
-        addBudgetsAction(
-          newBudgets.map(budget =>
-            _.pick(budget, ['amount', 'categoryId', 'date', 'id']),
-          ),
-        ),
-      );
-    }
-
-    existingBudgets.forEach(budget => {
-      dispatch(
-        updateBudgetAction({
-          id: budget.id,
-          ..._.pick(budget, ['amount', 'categoryId', 'date']),
-        }),
-      );
-    });
-
-    // Queue for sync
-    budgetsWithFrontendIds.forEach(budget => {
-      const tR: {
-        path: string[];
-        method: 'POST' | 'PATCH';
-        handler: string;
-        data: any;
-        cb: string;
-        frontendId: string;
-      } = {
-        path: ['main', 'budget'],
-        method: 'POST',
-        handler: 'genericSync',
-        data: _.pick(
-          budget,
-          budget.isNew ? ['amount', 'categoryId', 'date'] : ['amount'],
-        ),
-        cb: 'replaceBudget',
-        frontendId: budget.id,
-      };
-      if (!budget.isNew) {
-        tR.path.push(budget.id);
-        tR.method = 'PATCH';
-      }
-      dispatch(addToQueue(tR));
-    });
-  },
-);
-
-export const updateBudgetItem = createAsyncThunk<
-  any,
-  {id: string; changes: Partial<Budget>},
-  {state: RootState}
->('budget/update', async ({id, changes}, thunkAPI) => {
-  const {dispatch} = thunkAPI;
-
-  // Update local state immediately
-  dispatch(updateBudgetAction({id, ...changes}));
-
-  // Queue for sync
-  dispatch(
-    addToQueue({
-      path: ['main', 'budget', id],
-      method: 'PATCH',
-      handler: 'genericSync',
-      data: changes,
-      cb: 'replaceBudget',
-      frontendId: id,
-    }),
-  );
-});
-
-export const addNewExpense = createAsyncThunk<
-  any,
-  Expense & {frontendId?: string | number},
-  {state: RootState}
->('expense/save', async (expense, thunkAPI) => {
-  const {dispatch, getState} = thunkAPI;
-
-  const auth = getState().auth;
-  // Editing existing expense
-  const frontendId = `f_${makeNewIdArr(1)[0]}`;
-  dispatch(
-    addExpenseAction([
-      {
-        ...expense,
-        ownerId: auth.id || 0,
-        houseId: auth.houses?.[0] || '',
-        owner: auth.name || '',
-        id: frontendId,
-      },
-    ]),
-  );
-
-  // Log breadcrumb for sync tracking
-  log(`Expense queued for sync: ${frontendId}`);
-  setAttribute('lastExpenseCategory', expense.category || '');
-  setAttribute('lastExpenseAmount', String(expense.price || 0));
-
-  dispatch(
-    addToQueue({
-      path: ['main', 'expenses'],
-      method: 'POST',
-      handler: 'genericSync',
-      data: expense,
-      cb: 'replaceExpense',
-      frontendId: frontendId,
-    }),
-  );
-});
-
-export const updateExpense = createAsyncThunk<any, Expense, {state: RootState}>(
-  'expense/save',
-  async (expense, thunkAPI) => {
-    const {dispatch} = thunkAPI;
-
-    // Editing existing expense
-    dispatch(updateExpenseAction(expense));
-
-    // Log breadcrumb for sync tracking
-    log(`Expense update queued for sync: ${expense.id}`);
-
-    dispatch(
-      addToQueue({
-        path: ['main', 'expenses', expense.id.toString()],
-        method: 'PUT',
-        handler: 'genericSync',
-        data: expense,
-        cb: 'replaceExpense',
-        frontendId: expense.id.toString(),
-      }),
-    );
-  },
-);
-
-export const addNewIncome = createAsyncThunk<
-  any,
-  Income & {frontendId?: string | number},
-  {state: RootState}
->('income/save', async (income, thunkAPI) => {
-  const {dispatch, getState} = thunkAPI;
-
-  const auth = getState().auth;
-
-  const incomeWithAuth = {
-    ...income,
-    ownerId: auth.id || 0,
-    houseId: auth.houses?.[0] || '',
-    owner: auth.name || '',
-  };
-
-  const frontendId = `f_${makeNewIdArr(1)[0]}`;
-  dispatch(addIncomeAction([{...incomeWithAuth, id: frontendId}]));
-
-  // Log breadcrumb for sync tracking
-  log(`Income queued for sync: ${frontendId}`);
-  setAttribute('lastIncomeSource', income.source || '');
-  setAttribute('lastIncomeAmount', String(income.price || 0));
-
-  dispatch(
-    addToQueue({
-      path: ['main', 'income'],
-      method: 'POST',
-      handler: 'genericSync',
-      data: income,
-      cb: 'replaceIncome',
-      frontendId: frontendId,
-    }),
-  );
-});
-
-export const updateIncome = createAsyncThunk<any, Income, {state: RootState}>(
-  'income/update',
-  async (income, thunkAPI) => {
-    const {dispatch} = thunkAPI;
-
-    dispatch(
-      updateIncomeAction({
-        ...income,
-        ownerId: '',
-        houseId: '',
-        owner: '',
-      }),
-    );
-
-    // Log breadcrumb for sync tracking
-    log(`Income update queued for sync: ${income.id}`);
-
-    dispatch(
-      addToQueue({
-        path: ['main', 'income', income.id.toString()],
-        method: 'PATCH',
-        handler: 'genericSync',
-        data: omit(income, 'id'),
-      }),
-    );
-  },
-);
 
 export const handleCategory = createAsyncThunk<
   any,
@@ -901,99 +617,6 @@ export const handleGroupCategory = createAsyncThunk<
   // differed fetch
   setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
   return data.d;
-});
-
-export const uploadFile = createAsyncThunk<
-  any,
-  {file: any},
-  {state: RootState}
->('expense/image', async ({file}: {file: any}, thunkAPI) => {
-  const token = thunkAPI.getState().auth.token;
-  let data;
-  const path = 'expenses/image';
-  let resp = await fetch(getURL(path), {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    body: file,
-  });
-  data = await resp.json();
-
-  if (data.err) throw data;
-  // deffered fetch
-  setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
-  return data.d;
-});
-
-export const deleteExpense = createAsyncThunk<
-  any,
-  {id?: string},
-  {state: RootState}
->('expense/delete', async (id, thunkAPI) => {
-  const token = thunkAPI.getState().auth.token;
-
-  let data;
-  const path = 'expenses' + (id ? `/${id}` : '');
-  let resp = await fetch(getURL(path), {
-    method: 'DELETE',
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  data = await resp.json();
-  if (data.err) throw data.err;
-
-  // differed fetch
-  setTimeout(() => thunkAPI.dispatch(fetchIni()), DIFFERED);
-});
-
-export const deleteIncome = createAsyncThunk<any, string, {state: RootState}>(
-  'income/delete',
-  async (id, thunkAPI) => {
-    const {dispatch} = thunkAPI;
-
-    // Always remove from local state first
-    dispatch(removeIncomeAction(id));
-
-    // Log breadcrumb for sync tracking
-    log(`Income delete queued for sync: ${id}`);
-
-    // Check if it's a synced item (needs backend deletion)
-    // Schedule backend deletion for synced items
-    dispatch(
-      addToQueue({
-        path: ['main', 'income', id],
-        method: 'DELETE',
-        handler: 'genericSync',
-        frontendId: id,
-      }),
-    );
-  },
-);
-
-export const deleteExpenseLocal = createAsyncThunk<
-  any,
-  string,
-  {state: RootState}
->('expense/deleteLocal', async (id, thunkAPI) => {
-  const {dispatch} = thunkAPI;
-
-  // Always remove from local state first
-  dispatch(removeExpenseAction(id));
-
-  // Log breadcrumb for sync tracking
-  log(`Expense delete queued for sync: ${id}`);
-
-  // Schedule backend deletion for synced items
-  dispatch(
-    addToQueue({
-      path: ['main', 'expenses', id],
-      method: 'DELETE',
-      handler: 'genericSync',
-      frontendId: id,
-    }),
-  );
 });
 
 /**
