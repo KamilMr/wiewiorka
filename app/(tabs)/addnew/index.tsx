@@ -7,8 +7,8 @@ import {
   useLocalSearchParams,
   useNavigation,
 } from 'expo-router';
-import {View, StyleSheet, Alert, TouchableOpacity} from 'react-native';
-import {Button, IconButton, Switch, Text} from 'react-native-paper';
+import {View, StyleSheet, Alert} from 'react-native';
+import {Button, IconButton} from 'react-native-paper';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-controller';
 
 import {
@@ -20,6 +20,7 @@ import {
 import {CurrencyPriceInput} from '@/components';
 import {SelectRadioButtons} from '@/components/addnew/SelectRadioButtons';
 import {RemainingAmountDisplay} from '@/components/addnew/RemainingAmountDisplay';
+import {TransactionTypeControls} from '@/components/addnew/TransactionTypeControls';
 import {sizes} from '@/constants/theme';
 import {warmColors} from '@/constants/warmTheme';
 import {
@@ -458,39 +459,16 @@ export default function AddNew() {
             />
           </View>
 
-          <View style={styles.switchContainer}>
-            <Text variant="bodyLarge">Wydatek</Text>
-            <Switch
-              value={type === 'income'}
-              onValueChange={value =>
-                handleSelectType(value ? 'income' : 'expense')
-              }
-              disabled={isPasRecord}
-            />
-            <Text variant="bodyLarge">Przychód</Text>
-            <IconButton
-              icon={isSplit ? 'call-merge' : 'call-split'}
-              onPress={handleSplitToggle}
-              disabled={(!form.price[0] && !isSplit) || type !== 'expense'}
-              size={20}
-              style={styles.splitToggleButton}
-            />
-            {type === 'expense' && !isSplit && (
-              <TouchableOpacity
-                onPress={() => setHasVacationTag(!hasVacationTag)}
-                style={styles.vacationToggleButton}
-              >
-                <Text
-                  style={[
-                    styles.vacationEmoji,
-                    {opacity: hasVacationTag ? 1 : 0.3},
-                  ]}
-                >
-                  🏖️
-                </Text>
-              </TouchableOpacity>
-            )}
-          </View>
+          <TransactionTypeControls
+            type={type}
+            isPasRecord={isPasRecord}
+            isSplit={isSplit}
+            isSplitDisabled={(!form.price[0] && !isSplit) || type !== 'expense'}
+            hasVacationTag={hasVacationTag}
+            onSelectType={handleSelectType}
+            onSplitToggle={handleSplitToggle}
+            onVacationTagToggle={() => setHasVacationTag(!hasVacationTag)}
+          />
 
           {(type === 'expense' || type === 'income') && (
             <View style={styles.priceInputRow}>
@@ -643,25 +621,12 @@ const styles = StyleSheet.create({
     marginVertical: sizes.lg,
     minHeight: 80,
   },
-  switchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    gap: sizes.md,
-    marginVertical: sizes.lg,
-  },
   priceInputRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
   },
   currencyInputContainer: {
     width: '100%',
-  },
-  splitToggleButton: {
-    margin: 0,
-    marginLeft: sizes.xl,
-    padding: sizes.xs,
-    width: 50,
   },
   dropdownContainer: {
     flex: 1,
@@ -684,16 +649,5 @@ const styles = StyleSheet.create({
   splitCancelSection: {
     marginVertical: sizes.lg,
     alignItems: 'center',
-  },
-  vacationToggleButton: {
-    margin: 0,
-    marginLeft: sizes.sm,
-    padding: sizes.xs,
-    width: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  vacationEmoji: {
-    fontSize: 24,
   },
 });
