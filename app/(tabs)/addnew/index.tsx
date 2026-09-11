@@ -18,8 +18,8 @@ import {
   TextInput,
 } from '@/components';
 import {CurrencyPriceInput} from '@/components';
-import {SelectRadioButtons} from '@/components/addnew/SelectRadioButtons';
 import {RemainingAmountDisplay} from '@/components/addnew/RemainingAmountDisplay';
+import {TransactionCategoryField} from '@/components/addnew/TransactionCategoryField';
 import {TransactionTypeControls} from '@/components/addnew/TransactionTypeControls';
 import {sizes} from '@/constants/theme';
 import {warmColors} from '@/constants/warmTheme';
@@ -43,7 +43,6 @@ import {
   selectLatestBidAskExchangeRate,
 } from '@/redux/main/selectors';
 import {RateType} from '@/types/nbpTypes';
-import ElementDropdown from '@/components/Dropdown';
 import {
   createExpensePayload,
   createIncomePayload,
@@ -272,6 +271,20 @@ export default function AddNew() {
           .map((item: string) => ({label: item, value: item}))
           .sort((a, b) => a.label.localeCompare(b.label));
 
+  const dropdownValue =
+    type === 'income'
+      ? form.category
+      : expenseCategories.find(cat => cat.name === form.category)?.name;
+
+  const handleIncomeModeChange = (value: string) => {
+    if (value === 'new') {
+      setNewCustomIncome('');
+    } else {
+      setNewCustomIncome(null);
+    }
+    setForm({...form, category: ''});
+  };
+
   const handleSelectCategory = (category: {label: string; value: string}) => {
     if (category.value === 'Dodaj nową kategorię') {
     } else {
@@ -493,58 +506,17 @@ export default function AddNew() {
             </View>
           )}
 
-          {/* Add new category  selection */}
-          {type === 'income' && (
-            <SelectRadioButtons
-              items={[
-                {label: 'Dodaj nową kategorię', value: 'new'},
-                {label: 'Wybierz z listy', value: 'list'},
-              ]}
-              onSelect={value => {
-                if (value === 'new') {
-                  setNewCustomIncome('');
-                } else {
-                  setNewCustomIncome(null);
-                }
-                setForm({...form, category: ''});
-              }}
-              selected={newCustomIncome !== null ? 'new' : 'list'}
-            />
-          )}
-
-          {/* Add new category  input */}
-          {newCustomIncome !== null && (
-            <TextInput
-              style={styles.input}
-              label="Nowy rodzaj wpływu"
-              onChangeText={text => setForm({...form, category: text})}
-              value={form.category}
-            />
-          )}
-
-          {!isSplit && (
-            <View style={styles.splitIconRow}>
-              {(type === 'expense' ||
-                (type === 'income' && newCustomIncome === null)) && (
-                <View style={styles.dropdownContainer}>
-                  <ElementDropdown
-                    items={itemsToSelect}
-                    showDivider={type === 'expense'}
-                    keyboardShouldPersistTaps="handled"
-                    dropdownPosition="top"
-                    onChange={handleSelectCategory}
-                    value={
-                      type === 'income'
-                        ? form.category
-                        : expenseCategories.find(
-                            cat => cat.name === form.category,
-                          )?.name
-                    }
-                  />
-                </View>
-              )}
-            </View>
-          )}
+          <TransactionCategoryField
+            type={type}
+            isSplit={isSplit}
+            newCustomIncome={newCustomIncome}
+            categoryValue={form.category}
+            dropdownValue={dropdownValue}
+            itemsToSelect={itemsToSelect}
+            onIncomeModeChange={handleIncomeModeChange}
+            onCustomIncomeChange={text => setForm({...form, category: text})}
+            onSelectCategory={handleSelectCategory}
+          />
 
           {isSplit && type === 'expense' && (
             <View style={styles.splitContainer}>
@@ -628,9 +600,6 @@ const styles = StyleSheet.create({
   currencyInputContainer: {
     width: '100%',
   },
-  dropdownContainer: {
-    flex: 1,
-  },
   addSplitButton: {
     marginTop: sizes.sm,
   },
@@ -642,9 +611,6 @@ const styles = StyleSheet.create({
     marginVertical: sizes.lg,
     padding: sizes.md,
     borderRadius: sizes.lg,
-  },
-  splitIconRow: {
-    marginVertical: sizes.lg,
   },
   splitCancelSection: {
     marginVertical: sizes.lg,
