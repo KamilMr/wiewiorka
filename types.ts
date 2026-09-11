@@ -104,7 +104,7 @@ export interface MainSlice {
   budgets: Array<MonthlyBudget>;
   incomes: Array<Income>;
   debts: Array<Debt>;
-  categories: {[key: number]: Category};
+  categories: {[key: string]: Category};
   _aggregated: AggregatedData;
   sources: {[key: string]: string[]};
   exchangeRates: Array<import('./types/nbpTypes').StoredExchangeRate>;
