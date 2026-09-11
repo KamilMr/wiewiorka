@@ -44,6 +44,9 @@ export const TransactionTypeControls = ({
         <TouchableOpacity
           onPress={onVacationTagToggle}
           style={styles.vacationToggleButton}
+          accessibilityRole="button"
+          accessibilityLabel="Urlop"
+          accessibilityState={{selected: hasVacationTag}}
         >
           <Text
             style={[styles.vacationEmoji, {opacity: hasVacationTag ? 1 : 0.3}]}
