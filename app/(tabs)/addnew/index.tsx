@@ -8,17 +8,12 @@ import {
   useNavigation,
 } from 'expo-router';
 import {View, StyleSheet, Alert} from 'react-native';
-import {Button, IconButton} from 'react-native-paper';
+import {IconButton} from 'react-native-paper';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-controller';
 
-import {
-  ButtonWithStatus,
-  DatePicker,
-  PriceAndCategory,
-  TextInput,
-} from '@/components';
+import {ButtonWithStatus, DatePicker, TextInput} from '@/components';
 import {CurrencyPriceInput} from '@/components';
-import {RemainingAmountDisplay} from '@/components/addnew/RemainingAmountDisplay';
+import {SplitExpenseEditor} from '@/components/addnew/SplitExpenseEditor';
 import {TransactionCategoryField} from '@/components/addnew/TransactionCategoryField';
 import {TransactionTypeControls} from '@/components/addnew/TransactionTypeControls';
 import {sizes} from '@/constants/theme';
@@ -519,31 +514,14 @@ export default function AddNew() {
           />
 
           {isSplit && type === 'expense' && (
-            <View style={styles.splitContainer}>
-              <RemainingAmountDisplay
-                totalPrice={form.price}
-                splitItems={splitItems}
-              />
-              {splitItems.map((item, index) => (
-                <PriceAndCategory
-                  key={index}
-                  item={item}
-                  index={index}
-                  expenseCategories={expenseCategories}
-                  onUpdateItem={updateSplitItem}
-                  onRemoveItem={removeSplitItem}
-                  canRemove={splitItems.length > 2}
-                />
-              ))}
-              <Button
-                mode="text"
-                onPress={addSplitItem}
-                style={styles.addSplitButton}
-                icon="plus"
-              >
-                Dodaj pozycję
-              </Button>
-            </View>
+            <SplitExpenseEditor
+              totalPrice={form.price}
+              splitItems={splitItems}
+              expenseCategories={expenseCategories}
+              onUpdateItem={updateSplitItem}
+              onAddItem={addSplitItem}
+              onRemoveItem={removeSplitItem}
+            />
           )}
         </View>
         <View style={styles.actionControls}>
@@ -600,20 +578,8 @@ const styles = StyleSheet.create({
   currencyInputContainer: {
     width: '100%',
   },
-  addSplitButton: {
-    marginTop: sizes.sm,
-  },
   input: {
     marginVertical: sizes.xxxl,
     padding: sizes.lg,
-  },
-  splitContainer: {
-    marginVertical: sizes.lg,
-    padding: sizes.md,
-    borderRadius: sizes.lg,
-  },
-  splitCancelSection: {
-    marginVertical: sizes.lg,
-    alignItems: 'center',
   },
 });
